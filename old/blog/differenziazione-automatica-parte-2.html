@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>La magia della differenziazione automatica - Parte 2 | Italian Association for Machine Learning</title>
+    <meta content="GravCMS"  />
+<meta content="The Italian Association for Machine Learning (IAML) is a not-for-profit organization with the purpose of promoting knowledge of machine learning in all aspects of the Italian public life, from universities to enterprises and IT professionals."  />
+<meta property="og:title" content="La magia della differenziazione automatica - Parte 2 | IAML.it"  />
+<meta property="og:image" content="https://iaml.it/blog/differenziazione-automatica-parte-2/computational_graph.png"  />
+<meta property="og:url" content="https://iaml.it/blog/differenziazione-automatica-parte-2/"  />
+<meta property="og:description" content="Nella prima puntata di questa serie abbiamo visto come funziona la differenziazione nei software di deep learning, e le differenze tra differenziazione simbolica, numerica, ed automatica. In questa seconda parte, passiamo ad una implementazione didattica in puro Python di un meccanismo di reverse-mode autodiff simile a quello reso celebre da PyTorch."  />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="icon" type="image/png" href="../user/themes/deliver/images/favicon.png" />
+
+	<!-- Global site tag (gtag.js) - Google Ads: 774709547 --> <script async src="https://www.googletagmanager.com/gtag/js?id=AW-774709547"></script> <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'AW-774709547'); </script> 
+	
+		
+                            		                                                <link href="../user/themes/deliver/css-compiled/nucleus.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css-compiled/template.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css/custom.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css/toc.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css/font-awesome.min.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/facebook/css/facebook.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/facebook/assets/unitegallery/css/unite-gallery.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/facebook/assets/unitegallery/themes/default/ug-theme-default.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/markdown-notices/assets/notices.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/breadcrumbs/css/breadcrumbs.css" type="text/css" rel="stylesheet" />
+<link href="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/events/assets/events.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/form/assets/form-styles.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/mathjax/assets/css/mathjax.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/simplesearch/css/simplesearch.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/highlight/css/zenburn.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/login/css/login.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css/slidebars.min.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css/slideme.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/socialbuttons/vendor/rrssb/css/rrssb.css" type="text/css" rel="stylesheet" />
+
+
+                                                            <script src="../system/assets/jquery/jquery-2.x.min.js" type="text/javascript" ></script>
+<script src="../user/themes/deliver/js/modernizr.custom.71422.js" type="text/javascript" ></script>
+<script src="../user/plugins/facebook/assets/unitegallery/js/unitegallery.min.js" type="text/javascript" ></script>
+<script src="../user/plugins/facebook/assets/unitegallery/themes/default/ug-theme-default.js" type="text/javascript" ></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.js" type="text/javascript" ></script>
+<script src="../user/plugins/events/assets/events.js" type="text/javascript" ></script>
+<script src="../user/plugins/mathjax/assets/js/mathjax.js" type="text/javascript" ></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript" ></script>
+<script src="../user/plugins/highlight/js/highlight.pack.js" type="text/javascript" ></script>
+<script src="../user/themes/deliver/js/deliver.js" type="text/javascript" ></script>
+<script src="../user/themes/deliver/js/slidebars.min.js" type="text/javascript" ></script>
+<script src="../user/themes/deliver/js/jquery.slideme2.js" type="text/javascript" ></script>
+<script src="../user/plugins/socialbuttons/vendor/rrssb/js/rrssb.min.js" type="text/javascript" ></script>
+
+<script>
+window.addEventListener("load", function(){
+window.cookieconsent.initialise({
+"palette": {
+    "popup": {
+        "background": "#4d4d4d",
+        "text": "#fff"
+    },
+    "button": {
+        "background": "#f1d600",
+        "text": "#000",
+        "border": "#f1d600"
+    }
+},
+"position": "bottom",
+"theme": "block",
+"content": {
+    "message": "This website uses cookies to ensure you get the best experience on our website.",
+    "dismiss": "Got it!",
+    "link": "Learn more",
+    "href": "https://cookiesandyou.com"
+}
+})});
+hljs.initHighlightingOnLoad();
+
+</script>
+
+
+</head>
+<body id="top" class="header-lite fullwidth blogstyling">
+    <div id="sb-site">
+                <header id="header">
+                <div class="logo">
+                    <h3><a href="../index.html"><img src="../user/pages/images/IAML_logo_viola.png" /></a></h3>
+                                            <ul class="social-icons">
+            <li>
+            <a href="https://twitter.com/iaml_it">
+                <i class="fa fa-twitter"></i>            </a>
+        </li>
+            <li>
+            <a href="https://www.linkedin.com/company/iaml/">
+                <i class="fa fa-linkedin"></i>            </a>
+        </li>
+            <li>
+            <a href="https://www.facebook.com/machinelearningitalia/">
+                <i class="fa fa-facebook"></i>            </a>
+        </li>
+            <li>
+            <a href="blog.rss">
+                <i class="fa fa-rss"></i>            </a>
+        </li>
+    </ul>  
+                                    </div>
+                <div id="navbar">
+                                                            
+<ul class="navigation">
+                                                        <li class="">
+                    <a href="../index.html">
+                                                Home
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../activities">
+                                                Activities
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../supporters.html">
+                                                Supporters
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../member.html">
+                                                Become a member
+                    </a>
+                </li>
+                                                                <li class="active">
+                    <a href="../blog">
+                                                Blog
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../governance.html">
+                                                Governance
+                    </a>
+                </li>
+                                                                                                                                </ul>                                                   <form class="search-box">
+    <input type="search" placeholder="Search..." value="" data-search-input="/search/query" />
+    <script>
+    jQuery(document).ready(function($){
+        var input = $('[data-search-input]');
+
+        input.on('keypress', function(event) {
+            if (event.which == 13 && input.val().length > 3) {
+                event.preventDefault();
+                window.location.href = input.data('search-input') + ':' + input.val();
+            }
+        });
+    });
+    </script>
+    <i class="fa fa-search"></i>
+</form>                    <span class="panel-activation sb-toggle-left navbar-left menu-btn fa fa-bars"></span>
+                </div>
+        </header>
+        
+        
+                <section id="body" class="">
+                            
+				<div class="flush-top blog-header blog-header-image" style="background: #B4B093 url(/user/pages/05.blog/blue_header.jpg) no-repeat right;">
+            <h1>La magia della differenziazione automatica - Parte 2</h1>
+        </div>
+            
+        
+<div id="breadcrumbs" itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
+                                            <a href="../index.html" itemprop="url"><span itemprop="title">Home</span></a>
+                        <i class="fa fa-angle-right"></i>
+                                                <a href="../blog" itemprop="url"><span itemprop="title">Blog</span></a>
+                        <i class="fa fa-angle-right"></i>
+                                                <span itemprop="title">La magia della differenziazione automatica - Parte 2</span>
+                        </div>
+		
+		<div class="blog-content-item g-grid pure-g-r">
+			<div id="item" class="g-block pure-u-2-3">
+			    <div class="list-item">
+
+    <div class="list-blog-header">
+                    <img src="../images/a/d/e/b/3/adeb37e40df11d7a06a29c9ed2c21311791c00bf-computationalgraph.png" />
+        
+                    <h4><a href="differenziazione-automatica-parte-2.html">La magia della differenziazione automatica - Parte 2</a></h4>
+        
+        <span class="list-blog-date">
+            <i class="fa fa-calendar"></i>
+            20, Mar
+        </span>
+                <span class="list-blog-author">
+            <i class="fa fa-user"></i>
+            Simone Scardapane
+        </span>
+                       <ul class="tags">
+            <i class="fa fa-tag"></i>
+                        <li><a href="tagdifferenziazione.html">differenziazione</a></li>
+                        <li><a href="tagdeep learning.html">deep learning</a></li>
+                        <li><a href="tagderivate.html">derivate</a></li>
+                        <li><a href="tagreverse-mode.html">reverse-mode</a></li>
+                        <li><a href="tagautomatic differentation.html">automatic differentation</a></li>
+                        <li><a href="tagautodiff.html">autodiff</a></li>
+                        <li><a href="tagpytorch.html">pytorch</a></li>
+                    </ul>
+        
+    </div>
+
+	<div>
+	<br />
+	<!-- AddToAny BEGIN -->
+<div class="a2a_kit a2a_kit_size_32 a2a_default_style">
+<a class="a2a_dd" href="https://www.addtoany.com/share"></a>
+<a class="a2a_button_facebook"></a>
+<a class="a2a_button_twitter"></a>
+<a class="a2a_button_linkedin"></a>
+<a class="a2a_button_google_plus"></a>
+<a class="a2a_button_email"></a>
+</div>
+<script async src="https://static.addtoany.com/menu/page.js"></script>
+<!-- AddToAny END -->
+</div>
+	
+    <div class="list-blog-padding">
+
+            <p><p>Nella <a href="https://iaml.it/blog/differenziazione-automatica-parte-1/">prima puntata</a> di questa serie abbiamo visto come funziona il calcolo delle derivate nei software di deep learning, e le differenze tra differenziazione simbolica, numerica, ed automatica. In questa seconda parte, passiamo ad una implementazione didattica in puro Python di un meccanismo di <em>reverse-mode autodiff</em> simile nell'interfaccia a quello reso celebre da PyTorch.</p>
+<p></p>
+<nav class="table-of-contents minitoc" role="navigation">
+                <span class="toctitle">Overview:</span>
+      
+                                              
+  <ul>
+      
+        
+        
+              <li><a href="#un-brevissimo-recap" class="toclink" title="Un brevissimo recap">Un brevissimo recap</a></li>
+      
+        
+        
+              <li><a href="#autodiff-in-pratica-operator..." class="toclink" title="Autodiff in pratica: operator overloading">Autodiff in pratica: operator overloading</a></li>
+      
+        
+        
+              <li><a href="#cosa-facciamo-in-questo-tutorial" class="toclink" title="Cosa facciamo in questo tutorial">Cosa facciamo in questo tutorial</a></li>
+      
+        
+        
+              <li><a href="#finalmente-l-implementazione" class="toclink" title="Finalmente, l'implementazione">Finalmente, l'implementazione</a></li>
+      
+        
+        
+              <li><a href="#testiamo-la-nostra..." class="toclink" title="Testiamo la nostra implementazione">Testiamo la nostra implementazione</a></li>
+      
+    
+  </ul>
+</nav>
+
+
+<div class="notices yellow">
+<p>Vi ricordiamo che questo tutorial è ispirato ad un blog post molto interessante del 2016, <a href="https://rufflewind.com/2016-12-30/reverse-mode-automatic-differentiation">Reverse-mode automatic differentiation: a tutorial</a>, di cui manteniamo il modo relativamente informale di introdurre tutti i concetti.</p>
+</div>
+<h2 id="un-brevissimo-recap" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#un-brevissimo-recap" title="Permanent link: Un brevissimo recap" data-icon="#">Un brevissimo recap</a></h2>
+<p>Qualsiasi libreria di deep learning ha la necessità di calcolare derivate parziali (gradienti) in maniera efficiente. La <strong>reverse-mode automatic differentiation</strong> (autodiff) è la tecnica più usata in pratica, e lavora salvando i risultati parziali dell'esecuzione del programma da differenziare, ed applicando in maniera furba la chain rule della derivazione "in senso inverso" rispetto all'esecuzione originale per calcolare i gradienti.</p>
+<p>Ad esempio, riprendendo l'espressione di cui avevamo già discusso nella prima parte:</p>
+<p class="mathjax mathjax--block">\[
+f(w_1, w_2) = w1 \cdot \cos \left( 3w_1 + w_2 \right) \,. \]</p>
+<p>Come primo passo, possiamo riformulare l'espressione come una serie di operazioni elementari, esattamente come sarebbero poi eseguite in un compilatore/interprete:</p>
+<p class="mathjax mathjax--block">\[
+\begin{cases}
+w_1 = & \ldots \\
+w_2 = & \ldots \\
+z_1 = & 3w_1 \\
+z_2 = & z_1 + w_2 \\
+z_3 = & \cos(z_2) \\
+z_4 = & w_1 z_3
+\end{cases}\]</p>
+<p>Per ogni variabile di input e variable intermedia <span class="mathjax mathjax--inline">$z_i$</span>, definiamo una variabile <em>duale</em>
+che ne rappresenta la derivata parziale rispetto all'uscita, ovvero proprio i termini che ci interessano per ottimizzare espressioni di questo tipo con una discesa al gradiente:</p>
+<p class="mathjax mathjax--block">\[
+ga = \frac{\partial a}{\partial z_4} \,.\]</p>
+<p>Seguendo i passi descritti <a href="https://iaml.it/blog/differenziazione-automatica-parte-1/">nella prima parte</a>, arriviamo ad un secondo insieme di istruzioni elementari che automatizzano il calcolo delle derivate:</p>
+<p class="mathjax mathjax--block">\[
+\begin{cases}
+gz_4 = & 1.0 \\
+gz_3 = & w_1 \\
+gz_2 = & -\sin(z_2) gz_3 \\
+gz_1 = & gz_2 \\
+gw_2 = & gz_2 \\
+gw_1 = & 3gz_1 + z_3gz_4
+\end{cases}\]</p>
+<p>La domanda che ci poniamo ora è: <strong>come possiamo implementare questa procedura</strong> in un qualsiasi linguaggio di programmazione?</p>
+<h2 id="autodiff-in-pratica-operator..." class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#autodiff-in-pratica-operator..." title="Permanent link: Autodiff in pratica: operator overloading" data-icon="#">Autodiff in pratica: operator overloading</a></h2>
+<p>Concentriamoci su una singola operazione del nostro programma, ad esempio <span class="mathjax mathjax--inline">$z_3 = \cos(z_2)$</span>. Nella fase di autodiff, seguiamo l'operazione in senso inverso, e questa operazione si traduce in un contributo al gradiente di <span class="mathjax mathjax--inline">$z_2$</span> dato da <span class="mathjax mathjax--inline">$-\sin(z_2) gz_3$</span>, che dipende (a) dalla derivata del coseno (<span class="mathjax mathjax--inline">$-\sin$</span>), e (b) dalla variabile duale <span class="mathjax mathjax--inline">$gz_3$</span> calcolata durante la fase di backward pass.</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/differenziazione-automatica-parte-2/images/Example1.png">
+        </figure>
+<p>Le stesse considerazioni valgono per le altre operazioni. Ad esempio, l'assegnazione <span class="mathjax mathjax--inline">$z_2 = z_1 + w_2$</span> produce DUE contributi nella backward pass (poiché partecipano due variabili intermedie), <span class="mathjax mathjax--inline">$gz_1 = 1.0 * gz_2$</span> e <span class="mathjax mathjax--inline">$gw_2 = 1.0 * gz_2$</span>, dove nuovamente abbiamo un contributo che viene dal nodo appena creato (<span class="mathjax mathjax--inline">$gz_2$</span>), ed un contributo che deriva dalla derivata parziale della somma (in entrambi i casi, 1.0).</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/differenziazione-automatica-parte-2/images/Example2.png">
+        </figure>
+<p>Il modo più semplice di implementare questa serie di operazioni è l'<strong>operator overloading</strong>. In sostanza, all'interno del linguaggio sostituiamo ogni operazione elementare (somma, seno, ...) con un operatore esteso che durante la sua valutazione:</p>
+<ol>
+<li>Salva le variabili che hanno contribuito a quella espressione.</li>
+<li>Salva le derivate parziali da usare come pesi nella fase backward (es., <span class="mathjax mathjax--inline">$-\sin(z_2)$</span> e <span class="mathjax mathjax--inline">$1.0$</span> negli esempi di prima).</li>
+</ol>
+<p>Quando chiediamo le derivate rispetto ad un nodo, possiamo semplicemente seguire l'albero dell'espressione all'indietro, moltiplicando ogni volta per i pesi intermedi che ci siamo salvati (le frecce rosse negli schemi mostrati sopra).</p>
+<p>Questo è il metodo in cui l'autodiff è implementato in praticamente qualsiasi libreria, da TensorFlow a PyTorch, ed è quello che seguiremo in questo tutorial. </p>
+<p>Ci teniamo a sottolineare però che, nonostante la sua popolarità, questo non è l'unico modo di implementare la differenziazione automatica. Ad esempio <a href="https://github.com/google/tangent">Tangent</a>, un altro progetto Google, lavora con un processo di <strong>source code transformation</strong>, andando ad elaborare direttamente il codice sorgente scritto in NumPy. Un approccio ancora più avanzato si ritrova in <a href="https://www.tensorflow.org/swift">Swift for TensorFlow</a>, nel quale questo procedimento diventa una componente fondamentale del linguaggio. Meccanismi di <a href="https://arxiv.org/pdf/1708.06799.pdf">checkpointing</a> permettono invece di alleviare il costo in memoria di tutte le variabili intermedie, a scapito di un maggior numero di calcoli richiesti.</p>
+<p>Rimandiamo ad una <a href="https://arxiv.org/pdf/1811.05031.pdf">report</a> di C. Margossian per una panoramica più generale sull'implementazione dell'autodiff, che sicuramente subirà numerose evoluzioni con l'aumento dell'interesse sul tema.</p>
+<h2 id="cosa-facciamo-in-questo-tutorial" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#cosa-facciamo-in-questo-tutorial" title="Permanent link: Cosa facciamo in questo tutorial" data-icon="#">Cosa facciamo in questo tutorial</a></h2>
+<p>Come detto all'inizio, andremo ad implementare un meccanismo didattico di reverse-mode autodiff, usando l'operator overloading. Per rendere le cose più semplici, consideriamo le seguenti semplificazioni:</p>
+<ul>
+<li>
+<p><strong>Solo scalari</strong>: l'estensione a vettori/matrici richiede <a href="https://www.cs.toronto.edu/~rgrosse/courses/csc321_2018/slides/lec10.pdf">qualche concetto aggiuntivo</a>, e di gestire correttamente il meccanismo di broadcasting di NumPy.</p>
+</li>
+<li>
+<p><strong>Poche operazioni</strong>: seguendo l'espressione di prima, andremo ad implementare solo addizioni, moltiplicazioni, ed il coseno. L'estensione ad altri operatori è però immediata.</p>
+</li>
+<li><strong>PyTorch-based</strong>: per quanto possibile, cercheremo di mantenere la terminologia e l'interfaccia di PyTorch per dare un'idea più chiara di come quello che facciamo si ritrova poi in un software reale. </li>
+</ul>
+<p>Riguardo all'ultimo punto, se non avete mai usato PyTorch non vi preoccupate, in quanto sarà comunque tutto comprensibile anche a chi non hai mai avuto esperienza con PyTorch (ovviamente, vi invitiamo però a dare uno sguardo <a href="https://iaml.it/blog/alle-prese-con-pytorch-parte-1">ai nostri tutorial</a>).</p>
+<h2 id="finalmente-l-implementazione" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#finalmente-l-implementazione" title="Permanent link: Finalmente, l'implementazione" data-icon="#">Finalmente, l'implementazione</a></h2>
+<div class="notices blue">
+<p>Il codice è disponibile su un <a href="https://colab.research.google.com/drive/1xTT26z37fAhXQglsUxj6Dcv2tFame4uH">notebook Google Colab</a>.</p>
+</div>
+<p>Riepilogando, ogni volta che eseguiamo una operazione, il meccanismo di autodiff deve tenere traccia dell'operazione e delle derivate parziali. Per semplificarci la vita, creiamo un wrapper per ogni singola variabile intermedia nella nostra espressione:</p>
+<pre><code class="language-python"># A variable that traces its execution
+class TracedVar:
+    def __init__(self, data, requires_grad=False):
+      # Grads will only be saved for requires_grad=True
+
+      self.data = data                    # The actual value of the variable
+      self.grad_fn = None                 # The parents of the variable
+      self.grads = None                   # The computed gradient
+      self.requires_grad = requires_grad  # Whether the gradient is saved or not</code></pre>
+<p>Segue una breve spiegazione di ciascun campo.</p>
+<ol>
+<li><code>data</code> è l'effettivo valore numerico dell'espressione.</li>
+<li><code>grad_fn</code> servirà a tenere traccia simultaneamente di quali variabili hanno contribuito all'espressione, e delle derivate parziali necessarie alla fase backward (vedi sotto).</li>
+<li><code>grads</code> servirà ad accumulare i gradienti nella fase backward (le variabili <span class="mathjax mathjax--inline">$ga$</span> di prima).</li>
+<li><code>requires_grad</code> permette di salvare i gradienti solo se espressamente richiesto (tipicamente, per i parametri del nostro modello neurale).</li>
+</ol>
+<div class="notices blue">
+<p>Se avete conoscenza di PyTorch, noterete subito che <code>TracedVar</code> è un copycat del tensore di PyTorch, specializzato per gli scalari.</p>
+</div>
+<p>Aggiungiamo ora un primo operatore: il coseno.</p>
+<pre><code class="language-python">def cos(x):
+  z = TracedVar(np.cos(x.data))
+  z.grad_fn = [
+      (x, -np.sin(x.data)) # d(cos(x))/d(x) = -sin(x)
+  ]
+  return z</code></pre>
+<p>La prima riga calcola l'espressione, mentre la seconda salva i valori di cui abbiamo discusso prima: la variabile che ha generato l'espressione (x), e la derivata parziale del coseno.</p>
+<p>L'implementazione della moltiplicazione è simile.</p>
+<pre><code class="language-python">def _wrapped_mul(self, other):
+    z = TracedVar(self.data * other.data)
+    z.grad_fn = [
+        (self, other.data),  # d(ab)/d(a) = b 
+        (other, self.data)   # d(ab)/d(b) = a
+    ]
+    return z</code></pre>
+<p>L'unica differenza è che l'operazione di moltiplicazione ha due parenti (in questo caso chiamati <code>self</code> ed <code>other</code>), e per ciascuno di essi dobbiamo salvare la derivata parziale appropriata.</p>
+<p>Per comodità, sovrascriviamo l'operatore <span class="mathjax mathjax--inline">$*$</span> della nostra classe <code>TracedVar</code> con la nostra nuova operazione (questo ci permette di scrivere operazioni del tipo <code>a * b</code>):</p>
+<pre><code class="language-python">TracedVar.__mul__ = _wrapped_mul</code></pre>
+<p>L'addizione a questo punto è banale.</p>
+<pre><code class="language-python">def _wrapped_add(self, other):
+  z = TracedVar(self.data + other.data)
+  z.grad_fn = [
+      (self, 1.0),  # d(a+b)/d(a) = 1.0
+      (other, 1.0)  # d(a+b)/d(b) = 1.0
+  ]
+  return z
+TracedVar.__add__ = _wrapped_add</code></pre>
+<p>Arriviamo quindi al meccanismo di calcolo delle derivate. Copiando PyTorch, vogliamo calcolare le derivate parziali rispetto ad un oggetto <code>TracedVar</code> invocando <code>backward()</code>, ed accumulando le derivate richieste nei parametri <code>grads</code> di ciascuna variabile.</p>
+<pre><code class="language-python">def backward(self, acc=1.0):
+
+  if self.requires_grad:
+    if self.grads is None:
+      self.grads = acc
+    else:
+      self.grads += acc
+
+  # Recursively compute gradients for parents
+  if self.grad_fn is not None:
+    [parent.backward(acc * weight) for (parent, weight) in self.grad_fn]</code></pre>
+<ol>
+<li>
+<p>La variabile <code>acc</code> corrisponde al gradiente "propagato all'indietro" dall'algoritmo (le frecce rosse negli schemi di prima), e l'assegnazione 1.0 di default corrisponde alla riga <span class="mathjax mathjax--inline">$gz_4 = 1.0$</span>  (la derivata dell'uscita rispetto all'uscita stessa è 1.0).</p>
+</li>
+<li>
+<p>Se la variabile richiede di salvare il gradiente, questo viene accumulato nel parametro <code>grads</code>. Accumulare è essenziale in quanto una singola variabile potrebbe aver contribuito a più di una espressione.</p>
+</li>
+<li>Se la variabile non è un punto di partenza nel grafo (es., <span class="mathjax mathjax--inline">$w_1$</span> prima), propaghiamo il gradiente all'indietro per ogni parente, moltiplicandolo per il valore adeguato.</li>
+</ol>
+<h2 id="testiamo-la-nostra..." class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#testiamo-la-nostra..." title="Permanent link: Testiamo la nostra implementazione" data-icon="#">Testiamo la nostra implementazione</a></h2>
+<p>Definiamo l'espressione da cui siamo partiti:</p>
+<pre><code class="language-python">w1 = TracedVar(2.0, requires_grad=True)
+w2 = TracedVar(1.5, requires_grad=True)
+v = TracedVar(3.0)
+y = w1 * cos(v * w1 + w2)</code></pre>
+<p>Essendo l'esempio didattico, dobbiamo inserire nel nostro wrapper anche il valore costante 3.0 (di cui non vogliamo calcolare il gradiente), mentre in pratica questo potrebbe essere gestito con un meccanismo di casting automatico.</p>
+<p>Grazie alla magia dell'operator overloading, l'espressione di <code>y</code> è indistinguibile da quella che avremmo scritto con gli operatori classici di Python, ma adesso capiamo che "dietro le quinte" accadono numerose operazioni aggiuntive interessanti.</p>
+<p>Chiediamo il gradiente:</p>
+<pre><code class="language-python">y.backward()</code></pre>
+<p>L'operazione non ritorna nulla, ma salva il gradiente all'interno di qualsiasi variabile per cui <code>requires_grad=True</code>:</p>
+<pre><code class="language-python">w1.grads
+&gt;&gt;&gt; -5.2813645428134075</code></pre>
+<p>Possiamo valutare la correttezza dell'implementazione replicando a mano il gradiente:</p>
+<pre><code class="language-python">w1_realgrad = np.cos(7.5) - 6.0*np.sin(7.5)
+assert abs(w1.grads - w1_realgrad) &lt;= 1e-15</code></pre>
+<hr />
+<p>Se questo articolo ti è piaciuto e vuoi tenerti aggiornato sulle nostre attività, ricordati che l'<a href="../member.html">iscrizione all'Italian Association for Machine Learning</a> è gratuita! Puoi seguirci su <a href="https://www.facebook.com/machinelearningitalia/">Facebook</a>, <a href="https://www.linkedin.com/company/iaml/">LinkedIn</a>, e <a href="https://twitter.com/iaml_it">Twitter</a>.</p></p>
+            
+    
+        <p class="prev-next">
+                            <a class="button" href="reinforcement-learning-1.html"><i class="fa fa-chevron-left"></i> Previous Post</a>
+            
+                            <a class="button" href="gradient-boosting.html">Next Post <i class="fa fa-chevron-right"></i></a>
+                    </p>
+    
+    </div>
+</div>
+			</div>
+			<div id="sidebar" class="g-block size-1-3 pure-u-1-3">
+				<div class="sidebar-content">
+    <h4>Search the blog</h4>
+    <input type="text" placeholder="Search..." value="" data-searchsidebar-input="/search/query" />
+<script>
+jQuery(document).ready(function($){
+    var input = $('[data-searchsidebar-input]');
+
+    input.on('keypress', function(event) {
+        if (event.which == 13 && input.val().length > 3) {
+            event.preventDefault();
+            window.location.href = input.data('searchsidebar-input') + ':' + input.val();
+        }
+    });
+});
+</script>
+</div>
+<!--
+<div class="sidebar-content">
+	<h4>Some Text Widget</h4>
+	<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna.</p>
+</div>
+!-->
+<div class="sidebar-content">
+    <h4>Categories</h4>
+    
+
+<ul class="archives">
+        <li>
+        <a href="categoryTutorials.html">Tutorials </a> (16)
+    </li>
+        <li>
+        <a href="categoryDiscussions.html">Discussions </a> (12)
+    </li>
+        <li>
+        <a href="categoryAnnouncements.html">Announcements </a> (4)
+    </li>
+        <li>
+        <a href="categoryTutorials (English).html">Tutorials (English) </a> (4)
+    </li>
+        <li>
+        <a href="categoryArticles' summaries.html">Articles' summaries </a> (3)
+    </li>
+        <li>
+        <a href="categoryDiscussions (English).html">Discussions (English) </a> (2)
+    </li>
+        <li>
+        <a href="categoryFocus-on.html">Focus-on </a> (1)
+    </li>
+        <li>
+        <a href="categoryReviews.html">Reviews </a> (1)
+    </li>
+        <li>
+        <a href="categoryDiscussion.html">Discussion </a> (1)
+    </li>
+    </ul>
+</div>
+<div class="sidebar-content">
+    <h4>Archives</h4>
+	<ul class="archives">
+    <li>
+    	<a href="archives_monthapr_2020.html">
+        <span class="archive_date">April 2020</span>
+                <span>(1)</span>
+                </a>
+    </li>
+</ul>
+</div>
+<div class="sidebar-content">
+    <h4>Popular Tags</h4>
+    
+
+<ul class="archives">
+        <li>
+        <a href="tagdeep learning.html">deep learning </a> (11)
+    </li>
+        <li>
+        <a href="tagpytorch.html">pytorch </a> (9)
+    </li>
+        <li>
+        <a href="tagreti neurali.html">reti neurali </a> (5)
+    </li>
+        <li>
+        <a href="taggoogle.html">google </a> (4)
+    </li>
+        <li>
+        <a href="tagjit.html">jit </a> (4)
+    </li>
+        <li>
+        <a href="tagtensorflow.html">tensorflow </a> (4)
+    </li>
+        <li>
+        <a href="tagottimizzazione.html">ottimizzazione </a> (4)
+    </li>
+        <li>
+        <a href="tagrete neurale.html">rete neurale </a> (3)
+    </li>
+        <li>
+        <a href="tagtime series.html">time series </a> (3)
+    </li>
+        <li>
+        <a href="tagkeras.html">keras </a> (3)
+    </li>
+        <li>
+        <a href="tagreti convolutive.html">reti convolutive </a> (3)
+    </li>
+        <li>
+        <a href="tagpipeline.html">pipeline </a> (2)
+    </li>
+        <li>
+        <a href="tagsklearn.html">sklearn </a> (2)
+    </li>
+        <li>
+        <a href="tagautodiff.html">autodiff </a> (2)
+    </li>
+        <li>
+        <a href="tagautomatic differentation.html">automatic differentation </a> (2)
+    </li>
+        <li>
+        <a href="tagreverse-mode.html">reverse-mode </a> (2)
+    </li>
+        <li>
+        <a href="tagderivate.html">derivate </a> (2)
+    </li>
+        <li>
+        <a href="tagdifferenziazione.html">differenziazione </a> (2)
+    </li>
+        <li>
+        <a href="tagmodel selection.html">model selection </a> (2)
+    </li>
+        <li>
+        <a href="tagcross validation.html">cross validation </a> (2)
+    </li>
+        <li>
+        <a href="tagc++.html">c++ </a> (2)
+    </li>
+        <li>
+        <a href="tagnumpy.html">numpy </a> (2)
+    </li>
+        <li>
+        <a href="tagvmap.html">vmap </a> (2)
+    </li>
+        <li>
+        <a href="tagcaffe.html">caffe </a> (2)
+    </li>
+        <li>
+        <a href="tagcompiler.html">compiler </a> (2)
+    </li>
+        <li>
+        <a href="tagjax.html">jax </a> (2)
+    </li>
+        <li>
+        <a href="tagcodemotion.html">codemotion </a> (1)
+    </li>
+        <li>
+        <a href="tagbias.html">bias </a> (1)
+    </li>
+        <li>
+        <a href="tagdiscrimination.html">discrimination </a> (1)
+    </li>
+        <li>
+        <a href="tagfairness.html">fairness </a> (1)
+    </li>
+        <li>
+        <a href="tagiaml.html">iaml </a> (1)
+    </li>
+        <li>
+        <a href="tagdatabase.html">database </a> (1)
+    </li>
+        <li>
+        <a href="tagiperparametri.html">iperparametri </a> (1)
+    </li>
+        <li>
+        <a href="tagautograph.html">autograph </a> (1)
+    </li>
+        <li>
+        <a href="taghead.html">head </a> (1)
+    </li>
+        <li>
+        <a href="tagmulti-task.html">multi-task </a> (1)
+    </li>
+        <li>
+        <a href="taglearning.html">learning </a> (1)
+    </li>
+        <li>
+        <a href="tagnovità.html">novità </a> (1)
+    </li>
+        <li>
+        <a href="tagdev summit.html">dev summit </a> (1)
+    </li>
+        <li>
+        <a href="tagcustom estimator.html">custom estimator </a> (1)
+    </li>
+        <li>
+        <a href="taghyperopt.html">hyperopt </a> (1)
+    </li>
+        <li>
+        <a href="taggoodfellow.html">goodfellow </a> (1)
+    </li>
+        <li>
+        <a href="tagnlp.html">nlp </a> (1)
+    </li>
+        <li>
+        <a href="tagdati mancanti.html">dati mancanti </a> (1)
+    </li>
+        <li>
+        <a href="tagtransformer.html">transformer </a> (1)
+    </li>
+        <li>
+        <a href="tagattenzione.html">attenzione </a> (1)
+    </li>
+        <li>
+        <a href="tagrobocop.html">robocop </a> (1)
+    </li>
+        <li>
+        <a href="tagyolo.html">yolo </a> (1)
+    </li>
+        <li>
+        <a href="tagobject detection.html">object detection </a> (1)
+    </li>
+        <li>
+        <a href="tagbayes.html">bayes </a> (1)
+    </li>
+        <li>
+        <a href="tagautoencoders.html">autoencoders </a> (1)
+    </li>
+        <li>
+        <a href="tagvariational.html">variational </a> (1)
+    </li>
+        <li>
+        <a href="tageager.html">eager </a> (1)
+    </li>
+        <li>
+        <a href="tagimputazione.html">imputazione </a> (1)
+    </li>
+        <li>
+        <a href="tagCIFAR.html">CIFAR </a> (1)
+    </li>
+        <li>
+        <a href="tagword embedding.html">word embedding </a> (1)
+    </li>
+        <li>
+        <a href="tagMNIST.html">MNIST </a> (1)
+    </li>
+        <li>
+        <a href="tagimmagini.html">immagini </a> (1)
+    </li>
+        <li>
+        <a href="tagclassificazione.html">classificazione </a> (1)
+    </li>
+        <li>
+        <a href="tagkpi.html">kpi </a> (1)
+    </li>
+        <li>
+        <a href="tagreprogramming.html">reprogramming </a> (1)
+    </li>
+        <li>
+        <a href="tagadversarial.html">adversarial </a> (1)
+    </li>
+        <li>
+        <a href="tagbrowser.html">browser </a> (1)
+    </li>
+        <li>
+        <a href="tagjavascript.html">javascript </a> (1)
+    </li>
+        <li>
+        <a href="tagreti ricorsive.html">reti ricorsive </a> (1)
+    </li>
+        <li>
+        <a href="tagreti ricorrenti.html">reti ricorrenti </a> (1)
+    </li>
+        <li>
+        <a href="tagftth.html">ftth </a> (1)
+    </li>
+        <li>
+        <a href="tagadversarial example.html">adversarial example </a> (1)
+    </li>
+        <li>
+        <a href="tagmanagement.html">management </a> (1)
+    </li>
+        <li>
+        <a href="tagrobotica.html">robotica </a> (1)
+    </li>
+        <li>
+        <a href="tagocr.html">ocr </a> (1)
+    </li>
+        <li>
+        <a href="tagfocus.html">focus </a> (1)
+    </li>
+        <li>
+        <a href="tagiphone.html">iphone </a> (1)
+    </li>
+        <li>
+        <a href="tagpython.html">python </a> (1)
+    </li>
+        <li>
+        <a href="tagface id.html">face id </a> (1)
+    </li>
+        <li>
+        <a href="tagmomento.html">momento </a> (1)
+    </li>
+        <li>
+        <a href="tagadam.html">adam </a> (1)
+    </li>
+        <li>
+        <a href="tagneuroscienza.html">neuroscienza </a> (1)
+    </li>
+        <li>
+        <a href="tagonde cerebrali.html">onde cerebrali </a> (1)
+    </li>
+        <li>
+        <a href="tagtorchvision.html">torchvision </a> (1)
+    </li>
+        <li>
+        <a href="taglatin.html">latin </a> (1)
+    </li>
+        <li>
+        <a href="tagpretrained.html">pretrained </a> (1)
+    </li>
+        <li>
+        <a href="tagrete convolutiva.html">rete convolutiva </a> (1)
+    </li>
+        <li>
+        <a href="tagautograd.html">autograd </a> (1)
+    </li>
+        <li>
+        <a href="tagswish.html">swish </a> (1)
+    </li>
+        <li>
+        <a href="tagattivazione.html">attivazione </a> (1)
+    </li>
+        <li>
+        <a href="tagcheckpoint.html">checkpoint </a> (1)
+    </li>
+        <li>
+        <a href="tagtensori.html">tensori </a> (1)
+    </li>
+        <li>
+        <a href="tagvariabili.html">variabili </a> (1)
+    </li>
+        <li>
+        <a href="taglineare.html">lineare </a> (1)
+    </li>
+        <li>
+        <a href="tagregressione.html">regressione </a> (1)
+    </li>
+        <li>
+        <a href="tagconvolutional networks.html">convolutional networks </a> (1)
+    </li>
+        <li>
+        <a href="tagVatican.html">Vatican </a> (1)
+    </li>
+        <li>
+        <a href="tagproject.html">project </a> (1)
+    </li>
+        <li>
+        <a href="tagkernel.html">kernel </a> (1)
+    </li>
+        <li>
+        <a href="tagICLR.html">ICLR </a> (1)
+    </li>
+        <li>
+        <a href="tagipotesi.html">ipotesi </a> (1)
+    </li>
+        <li>
+        <a href="tagsparsità.html">sparsità </a> (1)
+    </li>
+        <li>
+        <a href="tagfunzionale.html">funzionale </a> (1)
+    </li>
+        <li>
+        <a href="tagfunctional.html">functional </a> (1)
+    </li>
+        <li>
+        <a href="tagadversarial attack.html">adversarial attack </a> (1)
+    </li>
+        <li>
+        <a href="tagkmeans.html">kmeans </a> (1)
+    </li>
+        <li>
+        <a href="taganalysis.html">analysis </a> (1)
+    </li>
+        <li>
+        <a href="tagclustering.html">clustering </a> (1)
+    </li>
+        <li>
+        <a href="tagGoogle.html">Google </a> (1)
+    </li>
+        <li>
+        <a href="tagregression.html">regression </a> (1)
+    </li>
+        <li>
+        <a href="tagJAX.html">JAX </a> (1)
+    </li>
+        <li>
+        <a href="taggaussian process.html">gaussian process </a> (1)
+    </li>
+        <li>
+        <a href="tagensemble.html">ensemble </a> (1)
+    </li>
+        <li>
+        <a href="tagboosting.html">boosting </a> (1)
+    </li>
+        <li>
+        <a href="taggradient.html">gradient </a> (1)
+    </li>
+        <li>
+        <a href="tagsemi-supervised learning.html">semi-supervised learning </a> (1)
+    </li>
+        <li>
+        <a href="tagdocument classification.html">document classification </a> (1)
+    </li>
+        <li>
+        <a href="taggraphs.html">graphs </a> (1)
+    </li>
+        <li>
+        <a href="tagvariables.html">variables </a> (1)
+    </li>
+        <li>
+        <a href="taglinear.html">linear </a> (1)
+    </li>
+        <li>
+        <a href="tagk-NN.html">k-NN </a> (1)
+    </li>
+    </ul>
+</div>
+<div class="sidebar-content syndicate">
+    <h4>Syndicate</h4>
+    <a class="button" href="../blog.atom"><i class="fa fa-rss-square"></i> Atom 1.0</a>
+    <a class="button" href="../blog.rss"><i class="fa fa-rss-square"></i> RSS</a>
+</div>
+			</div>
+		</div>
+	
+                        <div class="modular-row footer ">
+    <div class="footer-items">
+        <div class="footer-module large">
+		<h4>About</h4>
+                            <p>Italian Association for Machine Learning (C.F. 97949550582)</p>
+            			<p>Write us: info@iaml.it</p>
+        </div>
+        <div class="footer-module"><h4>Address</h4>
+            <p>
+                                    <span><strong>Operational office</strong></span>
+                                    <span>IAML c/o Pi Campus, via Indonesia 23, 00144 Rome</span>
+                                    <span><strong>Legal office</strong></span>
+                                    <span>Via Cassia 964, 00189, Rome</span>
+                            </p>
+        </div>
+        <div class="footer-module"><h4>Quick Links</h4>
+         <ul class="quickmenu">
+                            <li><i class="fa fa-chevron-right"></i><a href="../home">Home</a></li>
+                            <li><i class="fa fa-chevron-right"></i><a href="https://iaml.it/documents">Documents (Italian)</a></li>
+                    </ul>
+    </div>
+   
+</div>
+<hr>
+<div class="footer-modules">
+    <div class="footer-copyright">
+        Copyright 2018 IAML.IT. All Rights Reserved.
+    </div>
+    <div class="footer-menu">
+    <ul class="othermenu">
+           <li><a href="https://learn.getgrav.org/">Powered by Grav</a></li>
+           <li><a href="https://github.com/getgrav/grav-theme-deliver">Theme (adapted) from Deliver</a></li>
+        </ul>
+    </div>
+</div>
+</div>                    </section>
+        
+    </div>
+    <div class="sb-slidebar sb-left sb-width-thin">
+        <div id="panel">
+        
+<ul class="navigation">
+                                                        <li class="">
+                    <a href="../index.html">
+                                                Home
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../activities">
+                                                Activities
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../supporters.html">
+                                                Supporters
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../member.html">
+                                                Become a member
+                    </a>
+                </li>
+                                                                <li class="active">
+                    <a href="../blog">
+                                                Blog
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../governance.html">
+                                                Governance
+                    </a>
+                </li>
+                                                                                                                                </ul>                   </div>
+    </div>
+        <script src="../user/plugins/simplesearch/js/simplesearch.js" type="text/javascript" ></script>
+
+    <script>
+    $(function () {
+        $(document).ready(function() {
+          $.slidebars({
+            hideControlClasses: true,
+            scrollLock: true
+          });
+        });
+    });
+    </script>
+    </body>
+</html>
+
+

@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Tarallucci, Vino e Machine Learning (study groups) | Italian Association for Machine Learning</title>
+    <meta content="GravCMS"  />
+<meta content="The Italian Association for Machine Learning (IAML) is a not-for-profit organization with the purpose of promoting knowledge of machine learning in all aspects of the Italian public life, from universities to enterprises and IT professionals."  />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="icon" type="image/png" href="/user/themes/deliver/images/favicon.png" />
+
+	<!-- Global site tag (gtag.js) - Google Ads: 774709547 --> <script async src="https://www.googletagmanager.com/gtag/js?id=AW-774709547"></script> <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'AW-774709547'); </script> 
+	
+		
+                            		                                                <link href="/user/themes/deliver/css-compiled/nucleus.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css-compiled/template.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/custom.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/toc.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/font-awesome.min.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/facebook/css/facebook.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/facebook/assets/unitegallery/css/unite-gallery.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/facebook/assets/unitegallery/themes/default/ug-theme-default.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/markdown-notices/assets/notices.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/breadcrumbs/css/breadcrumbs.css" type="text/css" rel="stylesheet" />
+<link href="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/events/assets/events.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/form/assets/form-styles.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/mathjax/assets/css/mathjax.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/simplesearch/css/simplesearch.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/highlight/css/zenburn.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/login/css/login.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/slidebars.min.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/slideme.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/socialbuttons/vendor/rrssb/css/rrssb.css" type="text/css" rel="stylesheet" />
+
+
+                                                                
+    <script src="/system/assets/jquery/jquery-2.x.min.js" type="text/javascript" ></script>
+<script src="/user/themes/deliver/js/modernizr.custom.71422.js" type="text/javascript" ></script>
+<script src="/user/plugins/facebook/assets/unitegallery/js/unitegallery.min.js" type="text/javascript" ></script>
+<script src="/user/plugins/facebook/assets/unitegallery/themes/default/ug-theme-default.js" type="text/javascript" ></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.js" type="text/javascript" ></script>
+<script src="/user/plugins/events/assets/events.js" type="text/javascript" ></script>
+<script src="/user/plugins/mathjax/assets/js/mathjax.js" type="text/javascript" ></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript" ></script>
+<script src="/user/plugins/highlight/js/highlight.pack.js" type="text/javascript" ></script>
+<script src="/user/themes/deliver/js/deliver.js" type="text/javascript" ></script>
+<script src="/user/themes/deliver/js/slidebars.min.js" type="text/javascript" ></script>
+<script src="/user/themes/deliver/js/jquery.slideme2.js" type="text/javascript" ></script>
+<script src="/user/plugins/socialbuttons/vendor/rrssb/js/rrssb.min.js" type="text/javascript" ></script>
+
+<script>
+window.addEventListener("load", function(){
+window.cookieconsent.initialise({
+"palette": {
+    "popup": {
+        "background": "#4d4d4d",
+        "text": "#fff"
+    },
+    "button": {
+        "background": "#f1d600",
+        "text": "#000",
+        "border": "#f1d600"
+    }
+},
+"position": "bottom",
+"theme": "block",
+"content": {
+    "message": "This website uses cookies to ensure you get the best experience on our website.",
+    "dismiss": "Got it!",
+    "link": "Learn more",
+    "href": "https://cookiesandyou.com"
+}
+})});
+hljs.initHighlightingOnLoad();
+
+</script>
+
+
+</head>
+<body id="top" class="modular header-lite fullwidth">
+    <div id="sb-site">
+                <header id="header">
+                <div class="logo">
+                    <h3><a href="https://iaml.it"><img src="/user/pages/images/IAML_logo_viola.png" /></a></h3>
+                                            <ul class="social-icons">
+            <li>
+            <a href="https://twitter.com/iaml_it">
+                <i class="fa fa-twitter"></i>            </a>
+        </li>
+            <li>
+            <a href="https://www.linkedin.com/company/iaml/">
+                <i class="fa fa-linkedin"></i>            </a>
+        </li>
+            <li>
+            <a href="https://www.facebook.com/machinelearningitalia/">
+                <i class="fa fa-facebook"></i>            </a>
+        </li>
+            <li>
+            <a href="blog.rss">
+                <i class="fa fa-rss"></i>            </a>
+        </li>
+    </ul>  
+                                    </div>
+                <div id="navbar">
+                                                                        
+<ul class="navigation">
+                                                        <li class="">
+                    <a href="/">
+                                                Home
+                    </a>
+                </li>
+                                                                <li class="active">
+                    <a href="/activities">
+                                                Activities
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/supporters">
+                                                Supporters
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/member">
+                                                Become a member
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/blog">
+                                                Blog
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/governance">
+                                                Governance
+                    </a>
+                </li>
+                                                                                                                                </ul>                               
+                        <form class="search-box">
+    <input type="search" placeholder="Search..." value="" data-search-input="/search/query" />
+    <script>
+    jQuery(document).ready(function($){
+        var input = $('[data-search-input]');
+
+        input.on('keypress', function(event) {
+            if (event.which == 13 && input.val().length > 3) {
+                event.preventDefault();
+                window.location.href = input.data('search-input') + ':' + input.val();
+            }
+        });
+    });
+    </script>
+    <i class="fa fa-search"></i>
+</form>                    <span class="panel-activation sb-toggle-left navbar-left menu-btn fa fa-bars"></span>
+                </div>
+        </header>
+        
+        
+                <section id="body" class="">
+                        <div class="flush-top blog-header blog-header-image" style="background: #B4B093 url(/user/pages/02.activities/tvml/blue_header.jpg) no-repeat right;">
+    <h1>Tarallucci, Vino e Machine Learning (study groups)</h1>
+    </div>
+        
+            <div id="_description"></div>
+        <div class="modular-row callout">
+ <h2>Tarallucci, Vino e Machine Learning (study groups)</h2>
+<center>
+<img title="Tarallucci Vino e Machine Learning Logo" src="/images/e/7/9/8/8/e79888c78a18bfa16e2eabd74e933cbcc3408a39-logoverona.png" />
+</center>
+<div class="notices blue">
+<p><a href="http://iaml.it/activities/tvml_italian">Click here for the Italian version of this page</a></p>
+</div>
+<h2>What is a study group?</h2>
+<p>Study groups are born from the necessity felt by many people of finding a way to <strong>learn and stay updated</strong> on a rapidly evolving field such as machine learning, and also meet other people that share the same interest. </p>
+<p>The aim of is to <strong>ease the adoption of machine learning</strong> for people who already have a programming background, but are currently lacking the scientific / technical skills necessary to be proficient in it. We want to support convivial environments for sharing and learning together, in a fully 'community' spirit!</p>
+<div class="notices yellow">
+<p>BTW, if you are wondering, '<em>Tarallucci and Vino</em>' is an Italian idiomatic expression suggesting a friendly, convivial and serene environment.</p>
+</div>
+<h2>Our format</h2>
+<center><img title="Study group picture" src="/images/8/9/e/b/9/89eb980dd8f52dc6c8642012074b8f58617545a7-0d8f7272-b058-46e1-a05d-6bc1b08fc09c.jpeg" /></center>
+<p>The way we experimented up to now (in Verona and Padova) is to <strong>get together every week</strong>, generally during the late afternoon or evening, to discuss some learning material. For simplicity, we decided to use as base material a set of free online courses, and the <a href="https://colab.research.google.com">Google Colaboratory platform</a> to execute the code, so as to avoid any economic barriers, and allow people to easily catch up on lost evenings in an autonomous fashion.</p>
+<p>The study groups have been experimented in Padova and Verona, were we used the online <a href="https://www.fast.ai/">fast.ai platform</a>, which provides videos and codes, and also has a very active community and forum. The courses are updated every year to keep up with the state-of-the-art, and we have found its language to be easily accessible for our target audience.</p>
+<p>In addition, we also experimented with many variations during the events, such as:</p>
+<ul>
+<li>Free-style coding evenings.</li>
+<li>Talks with invited speakers.</li>
+<li>Sharing and presentation of projects.</li>
+<li>Hackathons.</li>
+</ul>
+<h2>Who organizes the study groups?</h2>
+<p>TVML was born in 2017 from an initiative of Cesare Montresor, a freelance developer from Verona who wanted to learn more about machine learning and find like-minded people to share his learning experience (read more about the initial months <a href="https://medium.com/@cesaremontresor/fast-ai-notebooks-google-colab-ready-44a67be5c14b">here</a>).</p>
+<p>One year later, together with Cesare we decided to make the study groups an official initiative of our association, to provide as much support as we can to help repeat this beautiful experiment in as many italian cities as possible! <strong>Every study group is independently organized by one or more local students</strong>.</p>
+<p>Below you can find all the links to get in touch with the active study groups.</p>
+<div class="notices blue">
+<center>
+<h3>Bari (TBA): <a href="https://www.facebook.com/groups/TarallucciVinoMachineLearning/">[Facebook]</a><br />
+Brescia: <a href="https://www.meetup.com/it-IT/Tarallucci-Vino-e-Machine-Learning-Brescia/">[Meetup]</a><br />
+Padova: <a href="https://www.facebook.com/groups/TarallucciVinoMachineLearning/">[Facebook]</a><br />
+Roma: <a href="https://www.facebook.com/events/437018113738422/">[Facebook]</a> - <a href="https://www.meetup.com/it-IT/Tarallucci-Vino-Machine-Learning/">[WhatsApp]</a><br />
+Verona: <a href="https://www.meetup.com/it-IT/Tarallucci-Vino-Machine-Learning/">[Meetup]</a> - <a href="https://www.facebook.com/groups/TarallucciVinoMachineLearning/">[Facebook]</a></h3>
+</center>
+</div>
+<h2>Are you interested?</h2>
+<div class="notices yellow">
+<p>If you cannot find your city in the list, don't panic! If you would like to start a similar study group, be sure to <strong>get in touch with us</strong>, and we would be glad to share our experience, material, and provide some support to help you get started.</p>
+</div>
+<h2>Other study groups</h2>
+<p>In addition to TVML, you might be interested in the following study groups organized by the growing network supported by IAML.</p>
+<div class="notices blue">
+<center>
+<h3>Genoa: <a href="http://www.datascienceseed.com/deep-learning-group/">Study group</a> organized by the Data Science Seed Meetup of Genoa.<br />
+Torino: <a href="https://www.meetup.com/it-IT/Machine-Learning-TO/">Study group</a> organized by the Machine Learning Meetup of Turin.</h3>
+</center>
+</div>
+<p></p>
+ 
+
+</div>
+
+
+    
+                        <div class="modular-row footer ">
+    <div class="footer-items">
+        <div class="footer-module large">
+		<h4>About</h4>
+                            <p>Italian Association for Machine Learning (C.F. 97949550582)</p>
+            			<p>Write us: info@iaml.it</p>
+        </div>
+        <div class="footer-module"><h4>Address</h4>
+            <p>
+                                    <span><strong>Operational office</strong></span>
+                                    <span>IAML c/o Pi Campus, via Indonesia 23, 00144 Rome</span>
+                                    <span><strong>Legal office</strong></span>
+                                    <span>Via Cassia 964, 00189, Rome</span>
+                            </p>
+        </div>
+        <div class="footer-module"><h4>Quick Links</h4>
+         <ul class="quickmenu">
+                            <li><i class="fa fa-chevron-right"></i><a href="https://iaml.it/home">Home</a></li>
+                            <li><i class="fa fa-chevron-right"></i><a href="https://iaml.it/documents">Documents (Italian)</a></li>
+                    </ul>
+    </div>
+   
+</div>
+<hr>
+<div class="footer-modules">
+    <div class="footer-copyright">
+        Copyright 2018 IAML.IT. All Rights Reserved.
+    </div>
+    <div class="footer-menu">
+    <ul class="othermenu">
+           <li><a href="https://learn.getgrav.org/">Powered by Grav</a></li>
+           <li><a href="https://github.com/getgrav/grav-theme-deliver">Theme (adapted) from Deliver</a></li>
+        </ul>
+    </div>
+</div>
+</div>                    </section>
+        
+    </div>
+    <div class="sb-slidebar sb-left sb-width-thin">
+        <div id="panel">
+        
+<ul class="navigation">
+                                                        <li class="">
+                    <a href="/">
+                                                Home
+                    </a>
+                </li>
+                                                                <li class="active">
+                    <a href="/activities">
+                                                Activities
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/supporters">
+                                                Supporters
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/member">
+                                                Become a member
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/blog">
+                                                Blog
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/governance">
+                                                Governance
+                    </a>
+                </li>
+                                                                                                                                </ul>                   </div>
+    </div>
+            <script src="/user/plugins/simplesearch/js/simplesearch.js" type="text/javascript" ></script>
+
+    <script>
+    $(function () {
+        $(document).ready(function() {
+          $.slidebars({
+            hideControlClasses: true,
+            scrollLock: true
+          });
+        });
+    });
+    </script>
+    
+    </body>
+</html>

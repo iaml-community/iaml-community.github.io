@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Le novità dal TensorFlow Dev Summit 2019 | Italian Association for Machine Learning</title>
+    <meta content="GravCMS"  />
+<meta content="The Italian Association for Machine Learning (IAML) is a not-for-profit organization with the purpose of promoting knowledge of machine learning in all aspects of the Italian public life, from universities to enterprises and IT professionals."  />
+<meta property="og:title" content="Le novità dal TensorFlow Dev Summit 2019 | IAML.it"  />
+<meta property="og:image" content="https://iaml.it/blog/novita-tensorflow-2/0_fJ5u2WE51Oz44dr_.png"  />
+<meta property="og:url" content="https://iaml.it/blog/novita-tensorflow-2"  />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="icon" type="image/png" href="/user/themes/deliver/images/favicon.png" />
+
+	<!-- Global site tag (gtag.js) - Google Ads: 774709547 --> <script async src="https://www.googletagmanager.com/gtag/js?id=AW-774709547"></script> <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'AW-774709547'); </script> 
+	
+		
+                            		                                                <link href="/user/themes/deliver/css-compiled/nucleus.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css-compiled/template.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/custom.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/toc.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/font-awesome.min.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/facebook/css/facebook.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/facebook/assets/unitegallery/css/unite-gallery.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/facebook/assets/unitegallery/themes/default/ug-theme-default.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/markdown-notices/assets/notices.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/breadcrumbs/css/breadcrumbs.css" type="text/css" rel="stylesheet" />
+<link href="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/events/assets/events.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/form/assets/form-styles.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/mathjax/assets/css/mathjax.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/simplesearch/css/simplesearch.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/highlight/css/zenburn.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/login/css/login.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/slidebars.min.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/slideme.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/socialbuttons/vendor/rrssb/css/rrssb.css" type="text/css" rel="stylesheet" />
+
+
+                                                            <script src="/system/assets/jquery/jquery-2.x.min.js" type="text/javascript" ></script>
+<script src="/user/themes/deliver/js/modernizr.custom.71422.js" type="text/javascript" ></script>
+<script src="/user/plugins/facebook/assets/unitegallery/js/unitegallery.min.js" type="text/javascript" ></script>
+<script src="/user/plugins/facebook/assets/unitegallery/themes/default/ug-theme-default.js" type="text/javascript" ></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.js" type="text/javascript" ></script>
+<script src="/user/plugins/events/assets/events.js" type="text/javascript" ></script>
+<script src="/user/plugins/mathjax/assets/js/mathjax.js" type="text/javascript" ></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript" ></script>
+<script src="/user/plugins/highlight/js/highlight.pack.js" type="text/javascript" ></script>
+<script src="/user/themes/deliver/js/deliver.js" type="text/javascript" ></script>
+<script src="/user/themes/deliver/js/slidebars.min.js" type="text/javascript" ></script>
+<script src="/user/themes/deliver/js/jquery.slideme2.js" type="text/javascript" ></script>
+<script src="/user/plugins/socialbuttons/vendor/rrssb/js/rrssb.min.js" type="text/javascript" ></script>
+
+<script>
+window.addEventListener("load", function(){
+window.cookieconsent.initialise({
+"palette": {
+    "popup": {
+        "background": "#4d4d4d",
+        "text": "#fff"
+    },
+    "button": {
+        "background": "#f1d600",
+        "text": "#000",
+        "border": "#f1d600"
+    }
+},
+"position": "bottom",
+"theme": "block",
+"content": {
+    "message": "This website uses cookies to ensure you get the best experience on our website.",
+    "dismiss": "Got it!",
+    "link": "Learn more",
+    "href": "https://cookiesandyou.com"
+}
+})});
+hljs.initHighlightingOnLoad();
+
+</script>
+
+
+</head>
+<body id="top" class="header-lite fullwidth blogstyling">
+    <div id="sb-site">
+                <header id="header">
+                <div class="logo">
+                    <h3><a href="https://iaml.it"><img src="/user/pages/images/IAML_logo_viola.png" /></a></h3>
+                                            <ul class="social-icons">
+            <li>
+            <a href="https://twitter.com/iaml_it">
+                <i class="fa fa-twitter"></i>            </a>
+        </li>
+            <li>
+            <a href="https://www.linkedin.com/company/iaml/">
+                <i class="fa fa-linkedin"></i>            </a>
+        </li>
+            <li>
+            <a href="https://www.facebook.com/machinelearningitalia/">
+                <i class="fa fa-facebook"></i>            </a>
+        </li>
+            <li>
+            <a href="blog.rss">
+                <i class="fa fa-rss"></i>            </a>
+        </li>
+    </ul>  
+                                    </div>
+                <div id="navbar">
+                                                            
+<ul class="navigation">
+                                                        <li class="">
+                    <a href="/">
+                                                Home
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/activities">
+                                                Activities
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/supporters">
+                                                Supporters
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/member">
+                                                Become a member
+                    </a>
+                </li>
+                                                                <li class="active">
+                    <a href="/blog">
+                                                Blog
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/governance">
+                                                Governance
+                    </a>
+                </li>
+                                                                                                                                </ul>                                                   <form class="search-box">
+    <input type="search" placeholder="Search..." value="" data-search-input="/search/query" />
+    <script>
+    jQuery(document).ready(function($){
+        var input = $('[data-search-input]');
+
+        input.on('keypress', function(event) {
+            if (event.which == 13 && input.val().length > 3) {
+                event.preventDefault();
+                window.location.href = input.data('search-input') + ':' + input.val();
+            }
+        });
+    });
+    </script>
+    <i class="fa fa-search"></i>
+</form>                    <span class="panel-activation sb-toggle-left navbar-left menu-btn fa fa-bars"></span>
+                </div>
+        </header>
+        
+        
+                <section id="body" class="">
+                            
+				<div class="flush-top blog-header blog-header-image" style="background: #B4B093 url(/user/pages/05.blog/blue_header.jpg) no-repeat right;">
+            <h1>Le novità dal TensorFlow Dev Summit 2019</h1>
+        </div>
+            
+        
+<div id="breadcrumbs" itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
+                                            <a href="/" itemprop="url"><span itemprop="title">Home</span></a>
+                        <i class="fa fa-angle-right"></i>
+                                                <a href="/blog" itemprop="url"><span itemprop="title">Blog</span></a>
+                        <i class="fa fa-angle-right"></i>
+                                                <span itemprop="title">Le novità dal TensorFlow Dev Summit 2019</span>
+                        </div>
+		
+		<div class="blog-content-item g-grid pure-g-r">
+			<div id="item" class="g-block pure-u-2-3">
+			    <div class="list-item">
+
+    <div class="list-blog-header">
+                    <img src="/images/7/e/1/e/a/7e1ea5dc114bce8ed01241b2b905a16a99abf47d-0fj5u2we51oz44dr.png" />
+        
+                    <h4><a href="/blog/novita-tensorflow-2">Le novità dal TensorFlow Dev Summit 2019</a></h4>
+        
+        <span class="list-blog-date">
+            <i class="fa fa-calendar"></i>
+            08, Mar
+        </span>
+                <span class="list-blog-author">
+            <i class="fa fa-user"></i>
+            Simone Scardapane
+        </span>
+                       <ul class="tags">
+            <i class="fa fa-tag"></i>
+                        <li><a href="/blog/tag:tensorflow">tensorflow</a></li>
+                        <li><a href="/blog/tag:dev summit">dev summit</a></li>
+                        <li><a href="/blog/tag:novità">novità</a></li>
+                        <li><a href="/blog/tag:autograph">autograph</a></li>
+                        <li><a href="/blog/tag:keras">keras</a></li>
+                    </ul>
+        
+    </div>
+
+	<div>
+	<br />
+	<!-- AddToAny BEGIN -->
+<div class="a2a_kit a2a_kit_size_32 a2a_default_style">
+<a class="a2a_dd" href="https://www.addtoany.com/share"></a>
+<a class="a2a_button_facebook"></a>
+<a class="a2a_button_twitter"></a>
+<a class="a2a_button_linkedin"></a>
+<a class="a2a_button_google_plus"></a>
+<a class="a2a_button_email"></a>
+</div>
+<script async src="https://static.addtoany.com/menu/page.js"></script>
+<!-- AddToAny END -->
+</div>
+	
+    <div class="list-blog-padding">
+
+            <p><p>Si è conclusa da poco la terza edizione del <a href="https://www.tensorflow.org/dev-summit">TensorFlow Dev Summit</a>, l'evento annuale dedicato al framework di machine learning targato Google. Tra le novità principali sicuramente il rilascio di <a href="https://medium.com/tensorflow/test-drive-tensorflow-2-0-alpha-b6dd1e522b01">TensorFlow 2.0 versione alpha</a>, tool per l'aggiornamento automatico da TF 1.x a TF 2.0, oltre a tantissimi rilasci aggiuntivi nell'ecosistema. In questo articolo facciamo il punto sulle news principali e diamo un'occhiata al nuovissimo TF 2.0.</p>
+<p></p>
+<nav class="table-of-contents minitoc" role="navigation">
+                <span class="toctitle">Overview:</span>
+      
+                                              
+  <ul>
+      
+        
+        
+              <li><a href="#le-novit-principali-di-tensor..." class="toclink" title="Le novità principali di TensorFlow 2.0">Le novità principali di TensorFlow 2.0</a></li>
+      
+        
+        
+              <li><a href="#migrazione-da-tf-1-x-a-tf-2-0" class="toclink" title="Migrazione da TF 1.x a TF 2.0">Migrazione da TF 1.x a TF 2.0</a></li>
+      
+        
+        
+              <li><a href="#nuovi-rilasci-nell-ecosistema" class="toclink" title="Nuovi rilasci nell'ecosistema">Nuovi rilasci nell'ecosistema</a></li>
+      
+        
+        
+              <li><a href="#la-community-di-tensor-flow" class="toclink" title="La community di TensorFlow">La community di TensorFlow</a></li>
+      
+        
+        
+              <li><a href="#come-capirci-meglio-da-qui" class="toclink" title="Come capirci meglio da qui">Come capirci meglio da qui</a></li>
+      
+    
+  </ul>
+</nav>
+
+
+<h2 id="le-novit-principali-di-tensor..." class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#le-novit-principali-di-tensor..." title="Permanent link: Le novità principali di TensorFlow 2.0" data-icon="#">Le novità principali di TensorFlow 2.0</a></h2>
+<p>Cominciamo ovviamente da TensorFlow 2.0, che può essere già installato in alpha ed il cui rilascio ufficiale è programmato per i prossimi mesi (più sotto invece parliamo di come fare l'upgrade del proprio codice):</p>
+<ul>
+<li>Novità principale, anticipata da molto, è che la <a href="https://medium.com/tensorflow/building-an-iris-classifier-with-eager-execution-13c00a32adb0">eager execution</a> diventa la modalità di utilizzo predefinita di TF. Tutte le operazioni sono quindi eseguite dinamicamente appena definite, esattamente come già succede in NumPy:</li>
+</ul>
+<pre><code class="language-python">import tensorflow as tf
+print(tf.constant(3.0) + tf.constant(2.0))
+# Ritorna: tf.Tensor(5.0, shape=(), dtype=float32)</code></pre>
+<ul>
+<li>A seguito di questo, spariscono completamente le sessioni! Per ottimizzare blocchi di codice, è ora possibile compilarli dinamicamente con un meccanismo simile al <a href="https://iaml.it/blog/alle-prese-con-pytorch-parte-5">JIT compiler di PyTorch</a>:</li>
+</ul>
+<pre><code class="language-python">@tf.function
+def f(x):
+  return tf.reduce_sum(x)
+
+f(tf.random.uniform((3, 2))) # Crea un grafo tf.Graph la prima volta che viene eseguita!</code></pre>
+<ul>
+<li>
+<p>Un refactoring complessivo delle API a disposizione dell'utente:</p>
+<ul>
+<li>
+<p>Keras, presente in <code>tf.keras</code>, diventa il meccanismo preferito per la definizione dei modelli e si integra ora alla perfezione in TF, mentre gli Estimator rimangono opzioni "già pronte" con tantissimi parametri aggiuntivi per il training su larga scala ed il deploy. In alternativa, possiamo costruire modelli Keras ma ottimizzarli "a mano" scrivendo il proprio loop di training. Rimane infine la possibilità di definire Estimator di tipo custom (anche se passa in secondo piano rispetto a Keras), e di <a href="https://www.tensorflow.org/guide/estimators#model_to_estimator">convertire in automatico modelli Keras in oggetti di tipo Estimator</a>.</p>
+</li>
+<li>
+<p>Sparisce <code>tf.contrib</code>, le cui funzionalità vengono cancellate, spostate nel core, oppure spostate nel nuovo <a href="https://github.com/tensorflow/addons">TensorFlow addons</a> (es., l'ottimizzatore <code>LazyAdamOptimizer</code>).</p>
+</li>
+<li>Aumenta l'interoperabilità tra i componenti di TF: ad esempio possiamo usare Keras in modalità eager con il nuovo flag <code>run_eagerly</code>, o usare <code>tf.distributed</code> per parallelizzare il codice sia in Keras che con gli Estimator (es., <a href="https://www.tensorflow.org/guide/distribute_strategy">vedi esempio sulla documentazione</a>).</li>
+</ul>
+</li>
+</ul>
+<p>Quest'ultimo aspetto è particolarmente semplice: ad esempio, possiamo replicare il training in parallelo su più GPU semplicemente creando un modello ed allenandolo all'interno di uno scope predefinito, come nel codice qui sotto.</p>
+<pre><code class="language-python">with tf.distribute.MirroredStrategy().scope():
+
+  # Model definition...
+  model = tf.keras.models.Model(inputs=inputs, outputs=predictions)
+
+  # Model training...  </code></pre>
+<h2 id="migrazione-da-tf-1-x-a-tf-2-0" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#migrazione-da-tf-1-x-a-tf-2-0" title="Permanent link: Migrazione da TF 1.x a TF 2.0" data-icon="#">Migrazione da TF 1.x a TF 2.0</a></h2>
+<p>Come per qualsiasi rilascio che comporta cambiamenti così grandi, la possibilità di trasportare facilmente il proprio codice da una versione più vecchia è essenziale. Vediamo gli strumenti che abbiamo a disposizione, descritti nella <a href="https://www.tensorflow.org/alpha/guide/upgrade">compatibility guide</a>:</p>
+<ul>
+<li>Prima di tutto, il codice eliminato dalla versione 1.x (non presente in contrib) è per ora presente in via temporanea all'interno di un sotto-modulo <code>tf.compat.v1</code>. Ad esempio, volendo accedere all'<code>AdamOptimizer</code> prima disponibile in <code>tf.train</code>  (ora eliminato in favore di quello disponibile in Keras):</li>
+</ul>
+<pre><code class="language-python">from tensorflow.compat import v1
+adam = v1.train.AdamOptimizer()</code></pre>
+<ul>
+<li>
+<p>TensorFlow mette a disposizione un <a href="https://www.tensorflow.org/alpha/guide/upgrade">upgrade script</a> in grado di convertire automaticamente il codice, sostituendo in certi casi le chiamate con quelle aggiornate, oppure con la versione corrispondente nel modulo <code>tf.compat.v1</code>.</p>
+</li>
+<li>Trovate online anche una guida ufficiale su <a href="https://www.tensorflow.org/alpha/guide/effective_tf2">come scrivere codice TF 2.0</a>.</li>
+</ul>
+<h2 id="nuovi-rilasci-nell-ecosistema" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#nuovi-rilasci-nell-ecosistema" title="Permanent link: Nuovi rilasci nell'ecosistema" data-icon="#">Nuovi rilasci nell'ecosistema</a></h2>
+<p>Oltre a TensorFlow 2.0 per Python, il DevSummit è stato pieno di interessanti rilasci aggiuntivi:</p>
+<ol>
+<li>
+<p><a href="https://www.tensorflow.org/datasets">TensorFlow Datasets</a>, una collezione di dataset già pronti disponibili nel formato <code>tf.data.Dataset</code>.</p>
+</li>
+<li>
+<p>La prima versione stabile 1.0 di <a href="https://www.tensorflow.org/js/">TensorFlow.js</a> per lavorare in Javascript.</p>
+</li>
+<li>
+<p>La versione 0.2 di <a href="https://www.tensorflow.org/swift">Swift for TensorFlow</a>, che integra nativamente TF dentro il linguaggio di programmazione Swift. Ci sono numerosi aspetti interessanti di questa nuova libreria: ad esempio, la differenziazione automatica diventa <a href="https://gist.github.com/rxwei/30ba75ce092ab3b0dce4bde1fc2c9f1d">una feature di prima classe</a> del linguaggio, e possiamo richiamare in maniera trasparente qualsiasi libreria Python dal codice.</p>
+</li>
+<li>
+<p>Nuovi rilasci anche per TensorFlow Hub, la libreria di componenti già pronti ed allenati di TF. Tra le novità più interessanti, segnaliamo <a href="https://www.tensorflow.org/hub/api_docs/python/hub/KerasLayer">KerasLayer</a>, che permette di importare un oggetto da TF Hub direttamente in un modello Keras.</p>
+</li>
+<li>Alcune novità interessanti anche sulla TensorBoard, che ora supporta la possibilità di visualizzare in maniera interattiva le run relative a diversi iperparametri, come possiamo vedere nel video qui sotto.</li>
+</ol>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/xM8sO33x_OU" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<ol start="6">
+<li>Tantissimi rilasci anche per <a href="https://www.tensorflow.org/tfx">TensorFlow Extended</a>, la piattaforma di deployment end-to-end di TensorFlow.</li>
+</ol>
+<p>Ci sono tantissimi rilasci aggiuntivi che non abbiamo il modo di coprire adeguatamente in questo breve riassunto. Tra gli altri, vi segnaliamo però <a href="https://www.tensorflow.org/probability">TensorFlow probability</a> per la programmazione probabilistica, <a href="https://github.com/tensorflow/privacy">TensorFlow privacy</a> per allenare modelli con garanzie di privacy, <a href="https://www.tensorflow.org/federated/get_started">TensorFlow Federated</a>, e <a href="https://www.youtube.com/watch?v=rlpQjnUvoKw">Sonnet 2.0</a> da parte di DeepMind.</p>
+<h2 id="la-community-di-tensor-flow" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#la-community-di-tensor-flow" title="Permanent link: La community di TensorFlow" data-icon="#">La community di TensorFlow</a></h2>
+<p>Anche a livello di community sono tantissime le novità di TensorFlow, annunciate o già provate nelle settimane scorse e consolidate al Dev Summit. Tra queste, un nuovissimo <a href="https://www.tensorflow.org/">sito ufficiale</a>, una serie di <a href="https://www.tensorflow.org/community/forums">user groups</a> e <a href="https://www.tensorflow.org/community/forums">special interest groups</a>, ed infine un nuovissimo <a href="https://github.com/orgs/tensorflow/projects/4">bug tracker</a> per tenere traccia dei bug della versione 2.0.</p>
+<h2 id="come-capirci-meglio-da-qui" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#come-capirci-meglio-da-qui" title="Permanent link: Come capirci meglio da qui" data-icon="#">Come capirci meglio da qui</a></h2>
+<ul>
+<li>Prima di tutto vi consigliamo un giro sul nuovissimo sito, che ha numerosi esempi, tutorial, e notebook aggiuntivi. </li>
+<li>Sul blog di TensorFlow trovate un <a href="https://medium.com/tensorflow/recap-of-the-2019-tensorflow-dev-summit-1b5ede42da8d">recap</a> della conferenza, e tutti i video sono già <a href="https://www.tensorflow.org/dev-summit/agenda/day1">disponibili su YouTube</a>. Le varie community Google in giro per il mondo organizzano degli extended per guardare insieme il Dev Summit: noi ne abbiamo uno in programma il <a href="https://meetup.com/it-IT/Machine-Learning-Data-Science-Meetup/">19 Marzo a Roma</a> con una speaker direttamente dal Dev Summit.</li>
+</ul>
+<p>A noi piace moltissimo questa immagine, che mostra in maniera molto schematica come interagiscono molti componenti del nuovo ecosistema TensorFlow (senza considerare TF Extended):</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/novita-tensorflow-2/images/0_fJ5u2WE51Oz44dr_.png" />
+        </figure>
+<figcaption>Overview dei principali componenti di TensorFlow (<a href="https://medium.com/tensorflow/whats-coming-in-tensorflow-2-0-d3663832e9b8">fonte: Medium</a>).</figcaption>
+<p>Ovviamente, il nostro consiglio principale è quello di continuare a seguirci, perché approfondiremo a breve alcune delle nuove feature di TF 2.0! </p>
+<p>Per chiudere, non possiamo non sottolineare che la prima giornata del Dev Summit si è conclusa parlando di un progetto tutto italiano, <a href="https://iaml.it/blog/focus-on-in-codice-ratio">In Codice Ratio</a>, di cui abbiamo già visto in precedenza sul blog. Ne siamo (indirettamente) estremamente orgogliosi e vi lasciamo con il video della presentazione.</p>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/8khPUtwaVaw" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<hr />
+<p>Se questo articolo ti è piaciuto e vuoi tenerti aggiornato sulle nostre attività, ricordati che l'<a href="/member">iscrizione all'Italian Association for Machine Learning</a> è gratuita! Puoi seguirci anche su <a href="https://www.facebook.com/machinelearningitalia/">Facebook</a>, <a href="https://www.linkedin.com/company/iaml/">LinkedIn</a>, e <a href="https://twitter.com/iaml_it">Twitter</a>.</p></p>
+            
+    
+        <p class="prev-next">
+                            <a class="button" href="/blog/variational-autoencoders-1"><i class="fa fa-chevron-left"></i> Previous Post</a>
+            
+                            <a class="button" href="/blog/reinforcement-learning-1">Next Post <i class="fa fa-chevron-right"></i></a>
+                    </p>
+    
+    </div>
+</div>
+			</div>
+			<div id="sidebar" class="g-block size-1-3 pure-u-1-3">
+				<div class="sidebar-content">
+    <h4>Search the blog</h4>
+    <input type="text" placeholder="Search..." value="" data-searchsidebar-input="/search/query" />
+<script>
+jQuery(document).ready(function($){
+    var input = $('[data-searchsidebar-input]');
+
+    input.on('keypress', function(event) {
+        if (event.which == 13 && input.val().length > 3) {
+            event.preventDefault();
+            window.location.href = input.data('searchsidebar-input') + ':' + input.val();
+        }
+    });
+});
+</script>
+</div>
+<!--
+<div class="sidebar-content">
+	<h4>Some Text Widget</h4>
+	<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna.</p>
+</div>
+!-->
+<div class="sidebar-content">
+    <h4>Categories</h4>
+    
+
+<ul class="archives">
+        <li>
+        <a href="/blog/category:Tutorials">Tutorials </a> (16)
+    </li>
+        <li>
+        <a href="/blog/category:Discussions">Discussions </a> (12)
+    </li>
+        <li>
+        <a href="/blog/category:Announcements">Announcements </a> (4)
+    </li>
+        <li>
+        <a href="/blog/category:Tutorials%20%28English%29">Tutorials (English) </a> (4)
+    </li>
+        <li>
+        <a href="/blog/category:Articles%27%20summaries">Articles' summaries </a> (3)
+    </li>
+        <li>
+        <a href="/blog/category:Discussions%20%28English%29">Discussions (English) </a> (2)
+    </li>
+        <li>
+        <a href="/blog/category:Focus-on">Focus-on </a> (1)
+    </li>
+        <li>
+        <a href="/blog/category:Reviews">Reviews </a> (1)
+    </li>
+        <li>
+        <a href="/blog/category:Discussion">Discussion </a> (1)
+    </li>
+    </ul>
+</div>
+<div class="sidebar-content">
+    <h4>Archives</h4>
+	<ul class="archives">
+    <li>
+    	<a href="/blog/archives_month:apr_2020">
+        <span class="archive_date">April 2020</span>
+                <span>(1)</span>
+                </a>
+    </li>
+</ul>
+</div>
+<div class="sidebar-content">
+    <h4>Popular Tags</h4>
+    
+
+<ul class="archives">
+        <li>
+        <a href="/blog/tag:deep%20learning">deep learning </a> (11)
+    </li>
+        <li>
+        <a href="/blog/tag:pytorch">pytorch </a> (9)
+    </li>
+        <li>
+        <a href="/blog/tag:reti%20neurali">reti neurali </a> (5)
+    </li>
+        <li>
+        <a href="/blog/tag:google">google </a> (4)
+    </li>
+        <li>
+        <a href="/blog/tag:jit">jit </a> (4)
+    </li>
+        <li>
+        <a href="/blog/tag:tensorflow">tensorflow </a> (4)
+    </li>
+        <li>
+        <a href="/blog/tag:ottimizzazione">ottimizzazione </a> (4)
+    </li>
+        <li>
+        <a href="/blog/tag:rete%20neurale">rete neurale </a> (3)
+    </li>
+        <li>
+        <a href="/blog/tag:time%20series">time series </a> (3)
+    </li>
+        <li>
+        <a href="/blog/tag:keras">keras </a> (3)
+    </li>
+        <li>
+        <a href="/blog/tag:reti%20convolutive">reti convolutive </a> (3)
+    </li>
+        <li>
+        <a href="/blog/tag:pipeline">pipeline </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:sklearn">sklearn </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:autodiff">autodiff </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:automatic%20differentation">automatic differentation </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:reverse-mode">reverse-mode </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:derivate">derivate </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:differenziazione">differenziazione </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:model%20selection">model selection </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:cross%20validation">cross validation </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:c%2B%2B">c++ </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:numpy">numpy </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:vmap">vmap </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:caffe">caffe </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:compiler">compiler </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:jax">jax </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:codemotion">codemotion </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:bias">bias </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:discrimination">discrimination </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:fairness">fairness </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:iaml">iaml </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:database">database </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:iperparametri">iperparametri </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:autograph">autograph </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:head">head </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:multi-task">multi-task </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:learning">learning </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:novit%C3%A0">novità </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:dev%20summit">dev summit </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:custom%20estimator">custom estimator </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:hyperopt">hyperopt </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:goodfellow">goodfellow </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:nlp">nlp </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:dati%20mancanti">dati mancanti </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:transformer">transformer </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:attenzione">attenzione </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:robocop">robocop </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:yolo">yolo </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:object%20detection">object detection </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:bayes">bayes </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:autoencoders">autoencoders </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:variational">variational </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:eager">eager </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:imputazione">imputazione </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:CIFAR">CIFAR </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:word%20embedding">word embedding </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:MNIST">MNIST </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:immagini">immagini </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:classificazione">classificazione </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:kpi">kpi </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:reprogramming">reprogramming </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:adversarial">adversarial </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:browser">browser </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:javascript">javascript </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:reti%20ricorsive">reti ricorsive </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:reti%20ricorrenti">reti ricorrenti </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:ftth">ftth </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:adversarial%20example">adversarial example </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:management">management </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:robotica">robotica </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:ocr">ocr </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:focus">focus </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:iphone">iphone </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:python">python </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:face%20id">face id </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:momento">momento </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:adam">adam </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:neuroscienza">neuroscienza </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:onde%20cerebrali">onde cerebrali </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:torchvision">torchvision </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:latin">latin </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:pretrained">pretrained </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:rete%20convolutiva">rete convolutiva </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:autograd">autograd </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:swish">swish </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:attivazione">attivazione </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:checkpoint">checkpoint </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:tensori">tensori </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:variabili">variabili </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:lineare">lineare </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:regressione">regressione </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:convolutional%20networks">convolutional networks </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:Vatican">Vatican </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:project">project </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:kernel">kernel </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:ICLR">ICLR </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:ipotesi">ipotesi </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:sparsit%C3%A0">sparsità </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:funzionale">funzionale </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:functional">functional </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:adversarial%20attack">adversarial attack </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:kmeans">kmeans </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:analysis">analysis </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:clustering">clustering </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:Google">Google </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:regression">regression </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:JAX">JAX </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:gaussian%20process">gaussian process </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:ensemble">ensemble </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:boosting">boosting </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:gradient">gradient </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:semi-supervised%20learning">semi-supervised learning </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:document%20classification">document classification </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:graphs">graphs </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:variables">variables </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:linear">linear </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:k-NN">k-NN </a> (1)
+    </li>
+    </ul>
+</div>
+<div class="sidebar-content syndicate">
+    <h4>Syndicate</h4>
+    <a class="button" href="/blog.atom"><i class="fa fa-rss-square"></i> Atom 1.0</a>
+    <a class="button" href="/blog.rss"><i class="fa fa-rss-square"></i> RSS</a>
+</div>
+			</div>
+		</div>
+	
+                        <div class="modular-row footer ">
+    <div class="footer-items">
+        <div class="footer-module large">
+		<h4>About</h4>
+                            <p>Italian Association for Machine Learning (C.F. 97949550582)</p>
+            			<p>Write us: info@iaml.it</p>
+        </div>
+        <div class="footer-module"><h4>Address</h4>
+            <p>
+                                    <span><strong>Operational office</strong></span>
+                                    <span>IAML c/o Pi Campus, via Indonesia 23, 00144 Rome</span>
+                                    <span><strong>Legal office</strong></span>
+                                    <span>Via Cassia 964, 00189, Rome</span>
+                            </p>
+        </div>
+        <div class="footer-module"><h4>Quick Links</h4>
+         <ul class="quickmenu">
+                            <li><i class="fa fa-chevron-right"></i><a href="https://iaml.it/home">Home</a></li>
+                            <li><i class="fa fa-chevron-right"></i><a href="https://iaml.it/documents">Documents (Italian)</a></li>
+                    </ul>
+    </div>
+   
+</div>
+<hr>
+<div class="footer-modules">
+    <div class="footer-copyright">
+        Copyright 2018 IAML.IT. All Rights Reserved.
+    </div>
+    <div class="footer-menu">
+    <ul class="othermenu">
+           <li><a href="https://learn.getgrav.org/">Powered by Grav</a></li>
+           <li><a href="https://github.com/getgrav/grav-theme-deliver">Theme (adapted) from Deliver</a></li>
+        </ul>
+    </div>
+</div>
+</div>                    </section>
+        
+    </div>
+    <div class="sb-slidebar sb-left sb-width-thin">
+        <div id="panel">
+        
+<ul class="navigation">
+                                                        <li class="">
+                    <a href="/">
+                                                Home
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/activities">
+                                                Activities
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/supporters">
+                                                Supporters
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/member">
+                                                Become a member
+                    </a>
+                </li>
+                                                                <li class="active">
+                    <a href="/blog">
+                                                Blog
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/governance">
+                                                Governance
+                    </a>
+                </li>
+                                                                                                                                </ul>                   </div>
+    </div>
+        <script src="/user/plugins/simplesearch/js/simplesearch.js" type="text/javascript" ></script>
+
+    <script>
+    $(function () {
+        $(document).ready(function() {
+          $.slidebars({
+            hideControlClasses: true,
+            scrollLock: true
+          });
+        });
+    });
+    </script>
+    </body>
+</html>

@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Multi-task learning in TensorFlow con le Head API | Italian Association for Machine Learning</title>
+    <meta content="GravCMS"  />
+<meta content="The Italian Association for Machine Learning (IAML) is a not-for-profit organization with the purpose of promoting knowledge of machine learning in all aspects of the Italian public life, from universities to enterprises and IT professionals."  />
+<meta property="og:title" content="Multi-task learning in TensorFlow con le Head API"  />
+<meta property="og:image" content="https://iaml.it/blog/multitask-learning-tensorflow/images/1.jpg"  />
+<meta property="og:url" content="https://iaml.it/blog/multitask-learning-tensorflow/"  />
+<meta property="og:description" content="In questo tutorial vediamo come implementare un algoritmo di multi-task learning in TensorFlow sfruttando i custom estimators insieme alla nuovissima Head API ed ai moduli tf.data e tf.image."  />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="icon" type="image/png" href="../user/themes/deliver/images/favicon.png" />
+
+	<!-- Global site tag (gtag.js) - Google Ads: 774709547 --> <script async src="https://www.googletagmanager.com/gtag/js?id=AW-774709547"></script> <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'AW-774709547'); </script> 
+	
+		
+                            		                                                <link href="../user/themes/deliver/css-compiled/nucleus.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css-compiled/template.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css/custom.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css/toc.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css/font-awesome.min.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/facebook/css/facebook.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/facebook/assets/unitegallery/css/unite-gallery.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/facebook/assets/unitegallery/themes/default/ug-theme-default.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/markdown-notices/assets/notices.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/breadcrumbs/css/breadcrumbs.css" type="text/css" rel="stylesheet" />
+<link href="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/events/assets/events.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/form/assets/form-styles.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/mathjax/assets/css/mathjax.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/simplesearch/css/simplesearch.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/highlight/css/zenburn.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/login/css/login.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css/slidebars.min.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css/slideme.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/socialbuttons/vendor/rrssb/css/rrssb.css" type="text/css" rel="stylesheet" />
+
+
+                                                            <script src="../system/assets/jquery/jquery-2.x.min.js" type="text/javascript" ></script>
+<script src="../user/themes/deliver/js/modernizr.custom.71422.js" type="text/javascript" ></script>
+<script src="../user/plugins/facebook/assets/unitegallery/js/unitegallery.min.js" type="text/javascript" ></script>
+<script src="../user/plugins/facebook/assets/unitegallery/themes/default/ug-theme-default.js" type="text/javascript" ></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.js" type="text/javascript" ></script>
+<script src="../user/plugins/events/assets/events.js" type="text/javascript" ></script>
+<script src="../user/plugins/mathjax/assets/js/mathjax.js" type="text/javascript" ></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript" ></script>
+<script src="../user/plugins/highlight/js/highlight.pack.js" type="text/javascript" ></script>
+<script src="../user/themes/deliver/js/deliver.js" type="text/javascript" ></script>
+<script src="../user/themes/deliver/js/slidebars.min.js" type="text/javascript" ></script>
+<script src="../user/themes/deliver/js/jquery.slideme2.js" type="text/javascript" ></script>
+<script src="../user/plugins/socialbuttons/vendor/rrssb/js/rrssb.min.js" type="text/javascript" ></script>
+
+<script>
+window.addEventListener("load", function(){
+window.cookieconsent.initialise({
+"palette": {
+    "popup": {
+        "background": "#4d4d4d",
+        "text": "#fff"
+    },
+    "button": {
+        "background": "#f1d600",
+        "text": "#000",
+        "border": "#f1d600"
+    }
+},
+"position": "bottom",
+"theme": "block",
+"content": {
+    "message": "This website uses cookies to ensure you get the best experience on our website.",
+    "dismiss": "Got it!",
+    "link": "Learn more",
+    "href": "https://cookiesandyou.com"
+}
+})});
+hljs.initHighlightingOnLoad();
+
+</script>
+
+
+</head>
+<body id="top" class="header-lite fullwidth blogstyling">
+    <div id="sb-site">
+                <header id="header">
+                <div class="logo">
+                    <h3><a href="../index.html"><img src="../user/pages/images/IAML_logo_viola.png" /></a></h3>
+                                            <ul class="social-icons">
+            <li>
+            <a href="https://twitter.com/iaml_it">
+                <i class="fa fa-twitter"></i>            </a>
+        </li>
+            <li>
+            <a href="https://www.linkedin.com/company/iaml/">
+                <i class="fa fa-linkedin"></i>            </a>
+        </li>
+            <li>
+            <a href="https://www.facebook.com/machinelearningitalia/">
+                <i class="fa fa-facebook"></i>            </a>
+        </li>
+            <li>
+            <a href="blog.rss">
+                <i class="fa fa-rss"></i>            </a>
+        </li>
+    </ul>  
+                                    </div>
+                <div id="navbar">
+                                                            
+<ul class="navigation">
+                                                        <li class="">
+                    <a href="../index.html">
+                                                Home
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../activities">
+                                                Activities
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../supporters.html">
+                                                Supporters
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../member.html">
+                                                Become a member
+                    </a>
+                </li>
+                                                                <li class="active">
+                    <a href="../blog">
+                                                Blog
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../governance.html">
+                                                Governance
+                    </a>
+                </li>
+                                                                                                                                </ul>                                                   <form class="search-box">
+    <input type="search" placeholder="Search..." value="" data-search-input="/search/query" />
+    <script>
+    jQuery(document).ready(function($){
+        var input = $('[data-search-input]');
+
+        input.on('keypress', function(event) {
+            if (event.which == 13 && input.val().length > 3) {
+                event.preventDefault();
+                window.location.href = input.data('search-input') + ':' + input.val();
+            }
+        });
+    });
+    </script>
+    <i class="fa fa-search"></i>
+</form>                    <span class="panel-activation sb-toggle-left navbar-left menu-btn fa fa-bars"></span>
+                </div>
+        </header>
+        
+        
+                <section id="body" class="">
+                            
+				<div class="flush-top blog-header blog-header-image" style="background: #B4B093 url(/user/pages/05.blog/blue_header.jpg) no-repeat right;">
+            <h1>Multi-task learning in TensorFlow con le Head API</h1>
+        </div>
+            
+        
+<div id="breadcrumbs" itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
+                                            <a href="../index.html" itemprop="url"><span itemprop="title">Home</span></a>
+                        <i class="fa fa-angle-right"></i>
+                                                <a href="../blog" itemprop="url"><span itemprop="title">Blog</span></a>
+                        <i class="fa fa-angle-right"></i>
+                                                <span itemprop="title">Multi-task learning in TensorFlow con le Head API</span>
+                        </div>
+		
+		<div class="blog-content-item g-grid pure-g-r">
+			<div id="item" class="g-block pure-u-2-3">
+			    <div class="list-item">
+
+    <div class="list-blog-header">
+                    
+        
+                    <h4><a href="multitask-learning-tensorflow.html">Multi-task learning in TensorFlow con le Head API</a></h4>
+        
+        <span class="list-blog-date">
+            <i class="fa fa-calendar"></i>
+            11, Apr
+        </span>
+                <span class="list-blog-author">
+            <i class="fa fa-user"></i>
+            Simone Scardapane
+        </span>
+                       <ul class="tags">
+            <i class="fa fa-tag"></i>
+                        <li><a href="tagmulti-task.html">multi-task</a></li>
+                        <li><a href="taglearning.html">learning</a></li>
+                        <li><a href="tagtensorflow.html">tensorflow</a></li>
+                        <li><a href="taghead.html">head</a></li>
+                        <li><a href="tagcustom estimator.html">custom estimator</a></li>
+                        <li><a href="tagreti convolutive.html">reti convolutive</a></li>
+                    </ul>
+        
+    </div>
+
+	<div>
+	<br />
+	<!-- AddToAny BEGIN -->
+<div class="a2a_kit a2a_kit_size_32 a2a_default_style">
+<a class="a2a_dd" href="https://www.addtoany.com/share"></a>
+<a class="a2a_button_facebook"></a>
+<a class="a2a_button_twitter"></a>
+<a class="a2a_button_linkedin"></a>
+<a class="a2a_button_google_plus"></a>
+<a class="a2a_button_email"></a>
+</div>
+<script async src="https://static.addtoany.com/menu/page.js"></script>
+<!-- AddToAny END -->
+</div>
+	
+    <div class="list-blog-padding">
+
+            <p><p>In questo tutorial vediamo come implementare un algoritmo di multi-task learning in TensorFlow, imparando a predire <em>simultaneamente</em> più aspetti da un'unica foto di un volto in input. Nel corso dell'implementazione introdurremo numerosi moduli avanzati di TF, tra cui le librerie <code>tf.data</code> e <code>tf.image</code> per elaborare cartelle di immagini, i custom estimator per definire il modello (una rete convolutiva), e la nuovissima Head API (al momento in cui scrivo ancora in developer's preview) per la logica del multi-task learning. </p>
+<div class="notices blue">
+<p>Tutto il codice di questo post è disponibile online <a href="https://nbviewer.jupyter.org/github/datascienceroma/notebook/blob/master/[IAML]_Tutorial_Head_API.ipynb">sul nostro repository GitHub</a>. L'articolo è stato aggiornato dopo la sua pubblicazione iniziale.</p>
+</div>
+<p></p>
+<h2>(Brevissima) introduzione al multi-task learning</h2>
+<p>Chiunque abbia seguito almeno un tutorial introduttivo di deep learning ha familiarità con problemi di classificazione di immagini. In questi problemi, di solito siamo interessati a predire <strong>un singolo aspetto</strong> dell'immagine, come la presenza o meno di un determinato oggetto. In molti casi, però, le informazioni da estrarre potrebbero essere molteplici: prendendo come esempio un'applicazione di videosorveglianza, oltre a riconoscere una persona potrebbe essere utile capire se si tratta di un uomo o di una donna, la sua età, e così via. In queste situazioni si parla di <strong>multi-task learning</strong> (MTL), in opposizione al più classico <strong>single-task learning</strong>. Anche se potremmo affrontare ciascun problema separatamente, come vedremo tra pochissimo le reti neurali si prestano molto bene a considerare tutti i task simultaneamente, sia computazionalmente che logicamente.</p>
+<div class="notices yellow">
+<p>Questo post non vuole essere un'introduzione approfondita al MTL, che è un campo molto vasto. Se siete interessati, rimandiamo <a href="http://ruder.io/multi-task/">a questo articolo introduttivo</a> di Sebastian Ruder, pubblicato circa un anno fa.</p>
+</div>
+<h2>Contenuto del tutorial</h2>
+<p>Come esempio pratico di MTL, reimplementeremo una parte dell'articolo <a href="http://mmlab.ie.cuhk.edu.hk/projects/TCDCN.html">Facial Landmark Detection by Deep Multi-task Learning</a>, presentato all'European Conference on Computer Vision qualche anno fa.</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/multitask-learning-tensorflow/images/1.jpg"alt="Snapshot del dataset" />
+        </figure>
+<p>Il dataset su cui andremo a lavorare è composto da circa 13000 immagini di volti e, per ciascuno di questi volti siamo interessati a predire 14 attributi:</p>
+<ol>
+<li><strong>Landmark detection</strong>: le coordinate di occhi, naso ed estremi laterali della bocca (problemi di regressione);</li>
+<li><strong>Pose classification</strong>: sesso, se stanno sorridendo o meno, presenza di occhiali, orientamento del volto (problemi di classificazione).</li>
+</ol>
+<p>Per semplicità ne predirremo solo due, anche se il codice è molto facile da estendere per aggiungere tutti gli attributi mancanti. Procederemo in tre parti:</p>
+<ol>
+<li>
+<p>Prima di tutto vedremo come <strong>importare le cartelle del dataset</strong> e manipolare le immagini sfruttando i moduli ad alto livello <a href="https://www.tensorflow.org/api_docs/python/tf/data">tf.data</a> e <a href="https://www.tensorflow.org/api_docs/python/tf/image">tf.image</a> presenti in TF.</p>
+</li>
+<li>
+<p>Come secondo passo, vedremo come <strong>reimplementare la rete convolutiva</strong> descritta nell'articolo con i <a href="https://www.tensorflow.org/get_started/custom_estimators">custom estimator</a> di TensorFlow. Gli estimator sono una delle interfacce ad alto livello di TF, che supportano nativamente un grande numero di funzionalità, tra cui allenamento su GPU e checkpointing. Se avete già seguito il tutorial di base su questo argomento presente sul sito ufficiale, potete opzionalmente saltare questa parte.</p>
+</li>
+<li><a href="https://www.tensorflow.org/api_docs/python/tf/contrib/estimator">Le Head API</a> sono uno strumento ancora in developer's preview che semplificano la scrittura dei custom estimator, implementando al loro interno la maggior parte della logica relativa a ciascun problema affrontabile in pratica (es., classificazione). Vedremo come usarle per <strong>riscrivere il codice di prima ed estenderlo al caso di multi-task learning</strong>.</li>
+</ol>
+<p>Cominciamo!</p>
+<h3>Requisiti / ottenere il dataset</h3>
+<p>Per seguire al meglio questo articolo vi consiglio di aggiornare la versione di TensorFlow in vostro possesso, preferibilmente alla 1.6 o superiore. Per scaricare i dati, useremo anche i moduli <a href="https://pypi.python.org/pypi/tqdm">tqdm</a> e <a href="http://docs.python-requests.org/en/master/">requests</a>:</p>
+<blockquote>
+<p>pip install tensorflow tqdm requests --upgrade</p>
+</blockquote>
+<p>Per scaricare il dataset potete eseguire questo codice (con <a href="https://stackoverflow.com/questions/22676/how-do-i-download-a-file-over-http-using-python">un piccolo ringraziamento a Stack Overflow</a>):</p>
+<pre><code class="language-py">from tqdm import tqdm
+import requests
+
+url = "http://mmlab.ie.cuhk.edu.hk/projects/TCDCN/data/MTFL.zip"
+response = requests.get(url, stream=True)
+
+with open("MTFL", "wb") as handle:
+    for data in tqdm(response.iter_content(), unit=' KB'):
+        handle.write(data)</code></pre>
+<p>Decomprimendo il file vi dovreste ritrovare tre cartelle (all'interno delle quali trovate le immagini che compongono l'intero dataset), oltre a tre file di testo con le annotazioni delle immagini e la descrizione del dataset stesso.</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/multitask-learning-tensorflow/images/Aaron_Eckhart_0001.jpg"alt="Un esempio di immagine nel dataset" />
+        </figure>
+<figcaption>Esempio di immagine presente nel dataset.</figcaption>
+<p></p>
+<h2>Parte 1a - Caricare i file in Pandas</h2>
+<p>Cominciamo caricando i file di testo con Pandas:</p>
+<pre><code class="language-py">import pandas as pd
+train_data = pd.read_csv('training.txt', sep=' ', \
+    header=None, skipinitialspace=True, nrows=10000)
+test_data = pd.read_csv('testing.txt', sep=' ', \
+    header=None, skipinitialspace=True, nrows=2995)</code></pre>
+<p>Il formato di ciascun file è abbastanza immediato:</p>
+<pre><code class="language-py">print(train_data.iloc[0])
+# 0     lfw_5590\Aaron_Eckhart_0001.jpg
+# 1                              107.25
+# 2                              147.75
+# ...
+# 13                                  2
+# 14                                  3
+# Name: 0, dtype: object</code></pre>
+<p>La prima riga rappresenta il path dell'immagine, e per ciascuna immagine abbiamo 14 caratteristiche da predire, di cui dieci sono coordinate spaziali (es., le coordinate dell'occhio sinistro), e le altre sono attributi categorici (es., se la persona sta sorridendo o meno). Il formato del path dell'immagine potrebbe dare alcuni problemi su piattaforme Unix, quindi rimpiazziamo rapidamente i backslash prima di continuare:</p>
+<pre><code class="language-py">train_data.iloc[:, 0] = \
+    train_data.iloc[:, 0].apply(lambda s: s.replace('\\', '/'))
+test_data.iloc[:, 0] = \
+    test_data.iloc[:, 0].apply(lambda s: s.replace('\\', '/'))</code></pre>
+<h2>Parte 1b - Caricare e processare le immagini con tf.data</h2>
+<p>Nelle ultime versioni, la maniera consigliata di caricare dati all'interno di TensorFlow è l'utilizzo dei <a href="https://www.tensorflow.org/get_started/datasets_quickstart">Dataset</a>, che permettono di gestire grandi moli di dati (eventualmente in modo distribuito) oltre a processare nativamente immagini (tramite il pacchetto <code>tf.image</code>), testo, e molto altro. In questa sezione vediamo nel dettaglio come costruire una funzione per importare i nostri dati, e rimandiamo <a href="https://www.tensorflow.org/programmers_guide/datasets">alla guida ufficiale</a> per più informazioni su molte altre funzionalità di <code>tf.data</code>.</p>
+<p>Ovviamente, il primo passo è importare tutti i dati da Pandas all'interno di TF (per ora consideriamo solo i dati di training):</p>
+<pre><code class="language-py">filenames = tf.constant(train_data.iloc[:, 0].tolist())
+label = tf.constant(train_data.iloc[:, 1:].values)</code></pre>
+<p>Se non siete familiari con i Dataset, il loro utilizzo è abbastanza semplice. <code>Dataset</code> è in realtà una classe astratta che permette di caricare dati da numerose sorgenti; una volta caricati, possiamo poi instanziare un iteratore che ci permette di processarli in sequenza:</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/multitask-learning-tensorflow/images/dataset_classes.png"alt="Schema logico dei dataset in TensorFlow" />
+        </figure>
+<figcaption>Figura presa da <a href="https://www.tensorflow.org/get_started/premade_estimators" target="_blank">Premade Estimators (tensorflow.org)</a>.</figcaption>
+<p>Caricare dataset partendo da tensori TF dovrebbe essere abbastanza familiare se avete seguito <a href="https://www.tensorflow.org/get_started/premade_estimators">le guide di partenza</a>. Come ripasso, carichiamo i tensori, dividiamo il dataset in mini-batch di 64 elementi, creiamo un iteratore e stampiamo il primo elemento su schermo:</p>
+<pre><code class="language-py"># Crea il dataset
+dataset = tf.data.Dataset.from_tensor_slices((filenames, labels))
+
+# Crea l'iteratore
+it = dataset.batch(64).make_one_shot_iterator().get_next()
+
+# Richiama il primo mini-batch
+with tf.Session() as sess:
+  (imgs, labels) = sess.run(it)
+  print(imgs[0])
+
+# Prints: b'lfw_5590/Aaron_Eckhart_0001.jpg'</code></pre>
+<p>Ovviamente, quello che vogliamo processare sono le immagini, e non i loro path. Non solo quello, ma il caricamento delle immagini in questo caso non è banale, in quanto oltre ad avere dimensioni diverse, possono presentarsi sia in bianco e nero che a colori. Fortunatamente, TensorFlow <a href="https://www.tensorflow.org/programmers_guide/datasets#preprocessing_data_with_datasetmap">ha una soluzione (quasi) pronta</a> per questa situazione!</p>
+<p>Come prima cosa, possiamo usare il pacchetto <code>tf.image</code> per gestire il caricamento di una singola immagine (la funzione <a href="https://www.tensorflow.org/programmers_guide/datasets#preprocessing_data_with_datasetmap">è adattata da qui</a>):</p>
+<pre><code class="language-py">def _parse_function(filename, label):
+  image_string = tf.read_file(filename) 
+  image_decoded = tf.image.decode_jpeg(image_string, channels=3)
+  image_resized = tf.image.resize_images(image_decoded, [40, 40])
+  image_shape = tf.cast(tf.shape(image_decoded), tf.float32)
+  label = tf.concat([label[0:5] / image_shape[0], label[5:10] / image_shape[1], label[10:]], axis=0)
+  return {"x": image_resized}, label</code></pre>
+<p>La funzione gestisce quasi tutti i problemi descritti prima:</p>
+<ol>
+<li><code>tf.image.decode_jpeg</code> prende il file binario e lo decodifica come immagine. Il parametro <code>channels=3</code> ci assicura di avere 3 canali in output, anche nel caso di immagini in bianco e nero.</li>
+<li><code>resize_images</code> ridimensiona tutte le immagini al formato desiderato (qui seguiamo l'articolo ed usiamo immagini 40x40).</li>
+<li>Normalizziamo tutte le coordinate tra 0 ed 1 rispetto alle dimensioni dell'immagine stessa.</li>
+<li>In output ritorniamo un dizionario <code>{"x": image_resized}</code> invece che <code>image_resized</code>, semplicemente perché è il formato richiesto dagli Estimators in TF.</li>
+</ol>
+<p>Possiamo applicare la funzione sull'intero dataset, immagine per immagine, sfruttando la funzione <code>map</code> del Dataset:</p>
+<pre><code class="language-py">dataset = dataset.map(_parse_function)</code></pre>
+<p>A questo punto possiamo scrivere l'intera funzione di input, aggiungendo un minimo di logica condizionale per gestire lo shuffling e la ripetizione del dataset in fase di training:</p>
+<pre><code class="language-py">def input_fn(data, is_eval=False):
+
+  # Path delle immagini
+  filenames = tf.constant(data.iloc[:, 0].tolist())
+
+  # Etichette delle immagini
+  labels = tf.constant(data.iloc[:, 1:].values.astype(np.float32))
+
+  # Costruisco il dataset
+  dataset = tf.data.Dataset.from_tensor_slices((filenames, labels))
+  dataset = dataset.map(_parse_function)
+
+  # Logica di training / testing
+  if is_eval:
+    dataset = dataset.batch(64)
+  else:
+    dataset = dataset.repeat().shuffle(1000).batch(64)
+
+  # Costruisco l'iteratore
+  return dataset.make_one_shot_iterator().get_next()</code></pre>
+<p>Testiamo la funzione stampando la prima immagine di training:</p>
+<pre><code class="language-py">import matplotlib.pyplot as plt
+with tf.Session() as sess:
+  (imgs, _) = sess.run(input_fn(train_data, True))
+  plt.imshow(imgs["x"][0] / 255)</code></pre>
+<figure role="group">
+        <img src="https://iaml.it/blog/multitask-learning-tensorflow/images/example_image.png"alt="Esempio di immagine in input all'Estimator" />
+        </figure>
+<h2>Parte 2 - Single-task estimator</h2>
+<p>Passiamo ora alla parte più interessante del tutorial, e cominciamo predicendo un singolo attributo dell'immagine, sviluppando il modello con <a href="https://www.tensorflow.org/get_started/custom_estimators">i custom estimator</a> di TensorFlow.</p>
+<div class="notices yellow">
+<p>Se non siete familiari con le reti convolutive o con i custom estimator, questo è un buon momento <a href="https://www.tensorflow.org/get_started/custom_estimators">per ripassare</a>.</p>
+</div>
+<p>Come modello, seguiamo quello <a href="http://mmlab.ie.cuhk.edu.hk/projects/TCDCN.html">dell'articolo</a>, una rete convolutiva abbastanza semplice:</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/multitask-learning-tensorflow/images/TCDCN.png"alt="Struttura della rete convolutiva" />
+        </figure>
+<p>L'utilità delle reti convolutive per il multi-task learning sono evidenti già dalla figura: la prima parte della rete permette di estrarre delle feature dall'immagine <em>condivise</em> per ciascun task (100 in questo caso), a partire dalle quali vengono poi allenati una serie di modelli, uno per ciascun task. Allenando tutti questi modelli <em>simultaneamente</em>, possiamo ottenere feature che sono più robuste, oltre ovviamente a risparmiare un'enormità di tempo computazionale.</p>
+<p>Per cominciare definiamo la parte condivisa dell'architettura sfruttando i layers di TF:</p>
+<pre><code class="language-py">def extract_features(features):
+  # Input Layer
+  input_layer = tf.reshape(features["x"], [-1, 40, 40, 3])
+
+  # Primo layer convolutivo
+  conv1 = tf.layers.conv2d(inputs=input_layer, filters=16, kernel_size=[5, 5], padding="same", activation=tf.nn.relu)
+  pool1 = tf.layers.max_pooling2d(inputs=conv1, pool_size=[2, 2], strides=2)
+
+  # Secondo layer convolutivo
+  conv2 = tf.layers.conv2d(inputs=pool1, filters=48, kernel_size=[3, 3], padding="same", activation=tf.nn.relu)
+  pool2 = tf.layers.max_pooling2d(inputs=conv2, pool_size=[2, 2], strides=2)
+
+  # Terzo layer convolutivo
+  conv3 = tf.layers.conv2d(inputs=pool2, filters=64, kernel_size=[3, 3], padding="same", activation=tf.nn.relu)
+  pool3 = tf.layers.max_pooling2d(inputs=conv3, pool_size=[2, 2], strides=2)
+
+  # Quarto layer convolutivo
+  conv4 = tf.layers.conv2d(inputs=pool3, filters=64, kernel_size=[2, 2], padding="same", activation=tf.nn.relu)
+
+  # Dense Layer
+  flat = tf.reshape(conv4, [-1, 5 * 5 * 64])
+  dense = tf.layers.dense(inputs=flat, units=100, activation=tf.nn.relu)
+
+  return dense</code></pre>
+<p>Per il momento rimaniamo sul single-task learning, e definiamo un custom estimator per predire la posizione del naso. Una volta definito il modello sopra, il codice dell'estimator <a href="https://www.tensorflow.org/tutorials/layers">è preso quasi completamente dalla guida di TF</a>:</p>
+<pre><code class="language-py">def single_task_cnn_model_fn(features, labels, mode):
+
+  # Estrazione delle feature
+  dense = extract_features(features)
+
+  # Predizioni
+  predictions = tf.layers.dense(inputs=dense, units=2)
+
+  outputs = {
+      "predictions": predictions
+  }
+
+  if mode == tf.estimator.ModeKeys.PREDICT:
+    return tf.estimator.EstimatorSpec(mode=mode, predictions=outputs)
+
+  # Funzione costo (errore quadratico medio)
+  loss = tf.losses.mean_squared_error(labels=labels[:, 2:8:5], predictions=predictions)
+
+  # Ottimizzazione
+  if mode == tf.estimator.ModeKeys.TRAIN:
+    optimizer = tf.train.AdamOptimizer()
+    train_op = optimizer.minimize(loss=loss, global_step=tf.train.get_global_step())
+    return tf.estimator.EstimatorSpec(mode=mode, loss=loss, train_op=train_op)
+
+  # Valutazione del modello
+  eval_metric_ops = {
+      "rmse": tf.metrics.root_mean_squared_error(
+          labels=labels[:, 2:8:5], predictions=outputs["predictions"])}
+  return tf.estimator.EstimatorSpec(
+      mode=mode, loss=loss, eval_metric_ops=eval_metric_ops)</code></pre>
+<p>(Poiché le coordinate dell'occhio sinistro corrispondono rispettivamente alla terza ed ottava etichetta, nel codice estraiamo le colonne corrispondenti con <code>labels[:, 2:8:5]</code>.)</p>
+<p>Il motivo per cui il codice è abbastanza lungo è che la funzione deve gestire l'intera logica del modello, dalla predizione fino all'allenamento (vedremo tra pochissimo come semplificarlo). Per ora alleniamo il nostro modello per un po' di iterazioni:</p>
+<pre><code class="language-py">single_task_classifier.train(input_fn=lambda: input_fn(train_data), steps=1000)</code></pre>
+<p>Il modello ottiene già così un errore di circa 0.17 in media sul test set:</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/multitask-learning-tensorflow/images/example_prediction_nose.png"alt="Esempio di predizione del nostro primo modello" />
+        </figure>
+<figcaption>Esempio di predizione del nostro primo modello.</figcaption>
+<h2>Parte 3a - Semplificare il codice con le Head API</h2>
+<p>Prima di passare al multi-task learning, introduciamo <a href="https://www.tensorflow.org/api_docs/python/tf/contrib/estimator/regression_head">le Head API</a>, una funzionalità ancora in developer's preview che semplifica moltissimo la scrittura di un custom estimator.</p>
+<div class="notices yellow">
+<p>Attenzione a non confondere gli oggetti in <code>tf.contrib.estimator</code> con <code>tf.contrib.learn.Head</code>, un'implementazione più vecchia ora deprecata.</p>
+</div>
+<p>L'idea di base nasce dall'osservazione che buona parte dell'implementazione di <code>single_task_cnn_model_fn</code> è relativamente standard una volta scelto il nostro task (es., errore quadratico medio come funzione costo per problemi di regressione). Le Head API permettono di scindere la definizione del modello dall'implementazione della logica del task.</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/multitask-learning-tensorflow/images/head_dev_summit_screenshot.png"alt="Screenshot YouTube" />
+        </figure>
+<figcaption><a href="https://www.youtube.com/watch?v=4oNdaQk0Qv4&t=868s" target="_blank">The Practitioner's Guide with TF High Level APIs (TensorFlow Dev Summit 2018)</a></figcaption>
+<p>Molto più facile vederlo in pratica che descriverlo! Riscriviamo il nostro modello di prima, questa volta usando le nuove API:</p>
+<pre><code class="language-py">def single_head_cnn_model_fn(features, labels, mode):
+
+  # Estrazione delle feature
+  dense = extract_features(features)
+
+  # Predizioni
+  predictions = tf.layers.dense(inputs=dense, units=2)
+
+  # Ottimizzatore
+  optimizer = tf.train.AdamOptimizer()
+
+  # Modello finale
+  regression_head = tf.contrib.estimator.regression_head(label_dimension=2)
+  return regression_head.create_estimator_spec(features, mode, predictions, labels[:, 2:8:5], \
+    lambda x: optimizer.minimize(x, global_step = tf.train.get_or_create_global_step()))</code></pre>
+<p>Una volta definito il modo in cui calcolare le predizioni, e quale ottimizzatore usare, buona parte della logica di prima è ora implementata direttamente nella <code>regression_head</code>, che si occupa di gestire la creazione di tutte le strutture dati e gli oggetti da ritornare all'estimator. </p>
+<p>Arriviamo quindi al cuore dell'articolo, vedendo come usare questa funzionalità per semplificare il multi-task learning.</p>
+<h2>Parte 3b - Multi-task learning (finalmente!)</h2>
+<p>Ritornando alla figura di prima che definisce il modello, possiamo pensare ad una rete per fare multi-task learning come una rete che ha una parte di modello condivisa (per estrarre le feature) e poi diverse "head", ciascuna associata ad un particolare task. Questo è nativamente gestito in TF con la <code>multi_head</code>, che permette di associare una lista di head al nostro modello!</p>
+<p>Matematicamente parlando, l'ottimizzazione avviene minimizzando <strong>la somma</strong> delle funzioni costo, una per ciascun task. Ad esempio, avendo due task ed una funzione costo <span class="mathjax mathjax--inline">$L_1$</span> per il primo task ed una funzione costo <span class="mathjax mathjax--inline">$L_2$</span> per il secondo, andremo a minimizzare:</p>
+<p class="mathjax mathjax--block">$$
+L = L_1 + L_2$$</p>
+<p>Le due funzioni non sono però indipendenti, in quanto condividono una buona porzione della rete: questo contribuisce a velocizzare l'apprendimento, oltre a rendere le feature estratte più robuste e generiche. Per questo esempio consideriamo solo due task: la predizione della posizione del naso (come prima), unita alla predizione della <em>posa</em> del volto (profilo sinistro, sinistra, frontale, destra, profilo destro).</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/multitask-learning-tensorflow/images/mtl_images-001-2.png"alt="Rete neurale per multi-task learning" />
+        </figure>
+<figcaption>Diagramma di una rete neurale per MTL, preso da <a href="http://ruder.io/multi-task/">An Overview of Multi-Task Learning in Deep Neural Networks</a> (Sebastien Ruder).</a></figcaption>
+<p>Come prima cosa dobbiamo modificare la funzione di input, che in questo caso dovrà ritornare un dizionario di etichette associate alle varie head:</p>
+<pre><code class="language-py">def multihead_input_fn(data, is_eval=True):
+  features, labels = input_fn(data, is_eval=is_eval)
+  return features, {'head_nose': labels[:, 2:8:5], 'head_pose': tf.cast(labels[:, -1] - 1.0, tf.int32)}</code></pre>
+<p>A questo punto modifichiamo anche il modello, definendo una head appropriata per ciascun task:</p>
+<pre><code class="language-py">def multi_head_cnn_model_fn(features, labels, mode):
+
+  dense = extract_features(features)
+
+  # Predizioni della rete (per ciascun task)
+  predictions_nose = tf.layers.dense(inputs=dense, units=2)
+  predictions_pose = tf.layers.dense(inputs=dense, units=5)
+  logits = {'head_nose': predictions_nose, 'head_pose': predictions_pose}
+
+  # Ottimizzatore
+  optimizer = tf.train.AdamOptimizer()
+
+  # Definiamo le due head
+  regression_head = tf.contrib.estimator.regression_head(name='head_nose', label_dimension=2)
+  classification_head = tf.contrib.estimator.multi_class_head(name='head_pose', n_classes=5)
+
+  multi_head = tf.contrib.estimator.multi_head([regression_head, classification_head])
+
+  return multi_head.create_estimator_spec(features, mode, logits, labels, optimizer)</code></pre>
+<p>Il resto è uguale a prima! La differenza è che sia la valutazione che la predizione saranno fatte separatamente per ciascun task, relativamente alle head che abbiamo definito:</p>
+<pre><code class="language-py">multitask_classifier.train(input_fn=lambda: multihead_input_fn(train_data), steps=1000)
+multitask_classifier.evaluate(input_fn=lambda: multihead_input_fn(test_data, is_eval=True))
+
+# {'accuracy/head_pose': 0.6290484,
+#  'average_loss/head_nose': 0.0408225,
+#  'average_loss/head_pose': 1.1491545,
+#  'global_step': 1000,
+#  'loss': 78.43075,
+#  'loss/head_nose': 5.2026973,
+#  'loss/head_pose': 73.22804}</code></pre>
+<p>Come si vede, il modello ritorna sia la funzione costo combinata (<span class="mathjax mathjax--inline">$L$</span> sopra), sia quella calcolata separatamente sui due problemi, ed allo stesso modo abbiamo misure diverse di accuratezza per i task, adeguate al problema. Similmente se richiediamo delle predizioni:</p>
+<pre><code class="language-py">p = list(multitask_classifier.predict(lambda: input_fn_predict(test_data)))
+print(p[0])
+
+# {
+#  ('head_nose', 'predictions'): array([0.19438197, 0.14960444], dtype=float32), 
+#  ('head_pose', 'logits'): array([-1.1866168 , -0.17579822,  ... , -0.49098715], dtype=float32), 
+#  ('head_pose', 'probabilities'): array([0.04211354, 0.11572168, ... , 0.08443644], dtype=float32), 
+#  ('head_pose', 'class_ids'): array([2]), ('head_pose', 'classes'): array([b'2'], dtype=object)
+# }</code></pre>
+<p>Possiamo stampare entrambe le predizioni simultaneamente:</p>
+<pre><code class="language-py">with tf.Session() as sess:
+  imgs = sess.run(input_fn_predict(test_data))
+
+  prediction_nose = p[1][(('head_nose', 'predictions'))]
+  prediction_pose = p[1][(('head_pose', 'class_ids'))]
+
+  plt.imshow(imgs["x"][1] / 255)
+  plt.scatter(prediction_nose[0] * 40, prediction_nose[1] * 40, 500, marker='x', color='red', linewidth=5)
+  plt.text(5, 3, 'Predicted pose: {}'.format(prediction_pose))</code></pre>
+<figure role="group">
+        <img src="https://iaml.it/blog/multitask-learning-tensorflow/images/example_prediction_multitask.png"alt="Esempio di predizione multipla sul dataset" />
+        </figure>
+<p>Questo conclude il tutorial! Ci sono molte cose che potete testare da qui: allenare il modello per più iterazioni, aggiungere nuovi task, pesare diversamente le due funzioni costo...  Ancora una volta, vi invito a leggere il <a href="http://ruder.io/multi-task/">bellissimo articolo di Sebastien Ruder</a> per scoprire di più su questo affascinante problema.</p>
+<p>Ovviamente, essendo le head una feature ancora in developer's preview, è possibile che l'interfaccia si modificherà di qui al rilascio stabile.</p>
+<hr />
+<p>Se questo articolo ti è piaciuto e vuoi tenerti aggiornato sulle nostre attività, ricordati che l'<a href="../member.html">iscrizione all'Italian Association for Machine Learning</a> è gratuita! Puoi seguirci anche su <a href="https://www.facebook.com/machinelearningitalia/">Facebook</a> e su <a href="https://www.linkedin.com/company/18312943/">LinkedIn</a>.</p></p>
+            
+    
+        <p class="prev-next">
+                            <a class="button" href="alle-prese-con-pytorch-parte-2.html"><i class="fa fa-chevron-left"></i> Previous Post</a>
+            
+                            <a class="button" href="alle-prese-con-pytorch-parte-3.html">Next Post <i class="fa fa-chevron-right"></i></a>
+                    </p>
+    
+    </div>
+</div>
+			</div>
+			<div id="sidebar" class="g-block size-1-3 pure-u-1-3">
+				<div class="sidebar-content">
+    <h4>Search the blog</h4>
+    <input type="text" placeholder="Search..." value="" data-searchsidebar-input="/search/query" />
+<script>
+jQuery(document).ready(function($){
+    var input = $('[data-searchsidebar-input]');
+
+    input.on('keypress', function(event) {
+        if (event.which == 13 && input.val().length > 3) {
+            event.preventDefault();
+            window.location.href = input.data('searchsidebar-input') + ':' + input.val();
+        }
+    });
+});
+</script>
+</div>
+<!--
+<div class="sidebar-content">
+	<h4>Some Text Widget</h4>
+	<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna.</p>
+</div>
+!-->
+<div class="sidebar-content">
+    <h4>Categories</h4>
+    
+
+<ul class="archives">
+        <li>
+        <a href="categoryTutorials.html">Tutorials </a> (16)
+    </li>
+        <li>
+        <a href="categoryDiscussions.html">Discussions </a> (12)
+    </li>
+        <li>
+        <a href="categoryAnnouncements.html">Announcements </a> (4)
+    </li>
+        <li>
+        <a href="categoryTutorials (English).html">Tutorials (English) </a> (4)
+    </li>
+        <li>
+        <a href="categoryArticles' summaries.html">Articles' summaries </a> (3)
+    </li>
+        <li>
+        <a href="categoryDiscussions (English).html">Discussions (English) </a> (2)
+    </li>
+        <li>
+        <a href="categoryFocus-on.html">Focus-on </a> (1)
+    </li>
+        <li>
+        <a href="categoryReviews.html">Reviews </a> (1)
+    </li>
+        <li>
+        <a href="categoryDiscussion.html">Discussion </a> (1)
+    </li>
+    </ul>
+</div>
+<div class="sidebar-content">
+    <h4>Archives</h4>
+	<ul class="archives">
+    <li>
+    	<a href="archives_monthapr_2020.html">
+        <span class="archive_date">April 2020</span>
+                <span>(1)</span>
+                </a>
+    </li>
+</ul>
+</div>
+<div class="sidebar-content">
+    <h4>Popular Tags</h4>
+    
+
+<ul class="archives">
+        <li>
+        <a href="tagdeep learning.html">deep learning </a> (11)
+    </li>
+        <li>
+        <a href="tagpytorch.html">pytorch </a> (9)
+    </li>
+        <li>
+        <a href="tagreti neurali.html">reti neurali </a> (5)
+    </li>
+        <li>
+        <a href="taggoogle.html">google </a> (4)
+    </li>
+        <li>
+        <a href="tagjit.html">jit </a> (4)
+    </li>
+        <li>
+        <a href="tagtensorflow.html">tensorflow </a> (4)
+    </li>
+        <li>
+        <a href="tagottimizzazione.html">ottimizzazione </a> (4)
+    </li>
+        <li>
+        <a href="tagrete neurale.html">rete neurale </a> (3)
+    </li>
+        <li>
+        <a href="tagtime series.html">time series </a> (3)
+    </li>
+        <li>
+        <a href="tagkeras.html">keras </a> (3)
+    </li>
+        <li>
+        <a href="tagreti convolutive.html">reti convolutive </a> (3)
+    </li>
+        <li>
+        <a href="tagpipeline.html">pipeline </a> (2)
+    </li>
+        <li>
+        <a href="tagsklearn.html">sklearn </a> (2)
+    </li>
+        <li>
+        <a href="tagautodiff.html">autodiff </a> (2)
+    </li>
+        <li>
+        <a href="tagautomatic differentation.html">automatic differentation </a> (2)
+    </li>
+        <li>
+        <a href="tagreverse-mode.html">reverse-mode </a> (2)
+    </li>
+        <li>
+        <a href="tagderivate.html">derivate </a> (2)
+    </li>
+        <li>
+        <a href="tagdifferenziazione.html">differenziazione </a> (2)
+    </li>
+        <li>
+        <a href="tagmodel selection.html">model selection </a> (2)
+    </li>
+        <li>
+        <a href="tagcross validation.html">cross validation </a> (2)
+    </li>
+        <li>
+        <a href="tagc++.html">c++ </a> (2)
+    </li>
+        <li>
+        <a href="tagnumpy.html">numpy </a> (2)
+    </li>
+        <li>
+        <a href="tagvmap.html">vmap </a> (2)
+    </li>
+        <li>
+        <a href="tagcaffe.html">caffe </a> (2)
+    </li>
+        <li>
+        <a href="tagcompiler.html">compiler </a> (2)
+    </li>
+        <li>
+        <a href="tagjax.html">jax </a> (2)
+    </li>
+        <li>
+        <a href="tagcodemotion.html">codemotion </a> (1)
+    </li>
+        <li>
+        <a href="tagbias.html">bias </a> (1)
+    </li>
+        <li>
+        <a href="tagdiscrimination.html">discrimination </a> (1)
+    </li>
+        <li>
+        <a href="tagfairness.html">fairness </a> (1)
+    </li>
+        <li>
+        <a href="tagiaml.html">iaml </a> (1)
+    </li>
+        <li>
+        <a href="tagdatabase.html">database </a> (1)
+    </li>
+        <li>
+        <a href="tagiperparametri.html">iperparametri </a> (1)
+    </li>
+        <li>
+        <a href="tagautograph.html">autograph </a> (1)
+    </li>
+        <li>
+        <a href="taghead.html">head </a> (1)
+    </li>
+        <li>
+        <a href="tagmulti-task.html">multi-task </a> (1)
+    </li>
+        <li>
+        <a href="taglearning.html">learning </a> (1)
+    </li>
+        <li>
+        <a href="tagnovità.html">novità </a> (1)
+    </li>
+        <li>
+        <a href="tagdev summit.html">dev summit </a> (1)
+    </li>
+        <li>
+        <a href="tagcustom estimator.html">custom estimator </a> (1)
+    </li>
+        <li>
+        <a href="taghyperopt.html">hyperopt </a> (1)
+    </li>
+        <li>
+        <a href="taggoodfellow.html">goodfellow </a> (1)
+    </li>
+        <li>
+        <a href="tagnlp.html">nlp </a> (1)
+    </li>
+        <li>
+        <a href="tagdati mancanti.html">dati mancanti </a> (1)
+    </li>
+        <li>
+        <a href="tagtransformer.html">transformer </a> (1)
+    </li>
+        <li>
+        <a href="tagattenzione.html">attenzione </a> (1)
+    </li>
+        <li>
+        <a href="tagrobocop.html">robocop </a> (1)
+    </li>
+        <li>
+        <a href="tagyolo.html">yolo </a> (1)
+    </li>
+        <li>
+        <a href="tagobject detection.html">object detection </a> (1)
+    </li>
+        <li>
+        <a href="tagbayes.html">bayes </a> (1)
+    </li>
+        <li>
+        <a href="tagautoencoders.html">autoencoders </a> (1)
+    </li>
+        <li>
+        <a href="tagvariational.html">variational </a> (1)
+    </li>
+        <li>
+        <a href="tageager.html">eager </a> (1)
+    </li>
+        <li>
+        <a href="tagimputazione.html">imputazione </a> (1)
+    </li>
+        <li>
+        <a href="tagCIFAR.html">CIFAR </a> (1)
+    </li>
+        <li>
+        <a href="tagword embedding.html">word embedding </a> (1)
+    </li>
+        <li>
+        <a href="tagMNIST.html">MNIST </a> (1)
+    </li>
+        <li>
+        <a href="tagimmagini.html">immagini </a> (1)
+    </li>
+        <li>
+        <a href="tagclassificazione.html">classificazione </a> (1)
+    </li>
+        <li>
+        <a href="tagkpi.html">kpi </a> (1)
+    </li>
+        <li>
+        <a href="tagreprogramming.html">reprogramming </a> (1)
+    </li>
+        <li>
+        <a href="tagadversarial.html">adversarial </a> (1)
+    </li>
+        <li>
+        <a href="tagbrowser.html">browser </a> (1)
+    </li>
+        <li>
+        <a href="tagjavascript.html">javascript </a> (1)
+    </li>
+        <li>
+        <a href="tagreti ricorsive.html">reti ricorsive </a> (1)
+    </li>
+        <li>
+        <a href="tagreti ricorrenti.html">reti ricorrenti </a> (1)
+    </li>
+        <li>
+        <a href="tagftth.html">ftth </a> (1)
+    </li>
+        <li>
+        <a href="tagadversarial example.html">adversarial example </a> (1)
+    </li>
+        <li>
+        <a href="tagmanagement.html">management </a> (1)
+    </li>
+        <li>
+        <a href="tagrobotica.html">robotica </a> (1)
+    </li>
+        <li>
+        <a href="tagocr.html">ocr </a> (1)
+    </li>
+        <li>
+        <a href="tagfocus.html">focus </a> (1)
+    </li>
+        <li>
+        <a href="tagiphone.html">iphone </a> (1)
+    </li>
+        <li>
+        <a href="tagpython.html">python </a> (1)
+    </li>
+        <li>
+        <a href="tagface id.html">face id </a> (1)
+    </li>
+        <li>
+        <a href="tagmomento.html">momento </a> (1)
+    </li>
+        <li>
+        <a href="tagadam.html">adam </a> (1)
+    </li>
+        <li>
+        <a href="tagneuroscienza.html">neuroscienza </a> (1)
+    </li>
+        <li>
+        <a href="tagonde cerebrali.html">onde cerebrali </a> (1)
+    </li>
+        <li>
+        <a href="tagtorchvision.html">torchvision </a> (1)
+    </li>
+        <li>
+        <a href="taglatin.html">latin </a> (1)
+    </li>
+        <li>
+        <a href="tagpretrained.html">pretrained </a> (1)
+    </li>
+        <li>
+        <a href="tagrete convolutiva.html">rete convolutiva </a> (1)
+    </li>
+        <li>
+        <a href="tagautograd.html">autograd </a> (1)
+    </li>
+        <li>
+        <a href="tagswish.html">swish </a> (1)
+    </li>
+        <li>
+        <a href="tagattivazione.html">attivazione </a> (1)
+    </li>
+        <li>
+        <a href="tagcheckpoint.html">checkpoint </a> (1)
+    </li>
+        <li>
+        <a href="tagtensori.html">tensori </a> (1)
+    </li>
+        <li>
+        <a href="tagvariabili.html">variabili </a> (1)
+    </li>
+        <li>
+        <a href="taglineare.html">lineare </a> (1)
+    </li>
+        <li>
+        <a href="tagregressione.html">regressione </a> (1)
+    </li>
+        <li>
+        <a href="tagconvolutional networks.html">convolutional networks </a> (1)
+    </li>
+        <li>
+        <a href="tagVatican.html">Vatican </a> (1)
+    </li>
+        <li>
+        <a href="tagproject.html">project </a> (1)
+    </li>
+        <li>
+        <a href="tagkernel.html">kernel </a> (1)
+    </li>
+        <li>
+        <a href="tagICLR.html">ICLR </a> (1)
+    </li>
+        <li>
+        <a href="tagipotesi.html">ipotesi </a> (1)
+    </li>
+        <li>
+        <a href="tagsparsità.html">sparsità </a> (1)
+    </li>
+        <li>
+        <a href="tagfunzionale.html">funzionale </a> (1)
+    </li>
+        <li>
+        <a href="tagfunctional.html">functional </a> (1)
+    </li>
+        <li>
+        <a href="tagadversarial attack.html">adversarial attack </a> (1)
+    </li>
+        <li>
+        <a href="tagkmeans.html">kmeans </a> (1)
+    </li>
+        <li>
+        <a href="taganalysis.html">analysis </a> (1)
+    </li>
+        <li>
+        <a href="tagclustering.html">clustering </a> (1)
+    </li>
+        <li>
+        <a href="tagGoogle.html">Google </a> (1)
+    </li>
+        <li>
+        <a href="tagregression.html">regression </a> (1)
+    </li>
+        <li>
+        <a href="tagJAX.html">JAX </a> (1)
+    </li>
+        <li>
+        <a href="taggaussian process.html">gaussian process </a> (1)
+    </li>
+        <li>
+        <a href="tagensemble.html">ensemble </a> (1)
+    </li>
+        <li>
+        <a href="tagboosting.html">boosting </a> (1)
+    </li>
+        <li>
+        <a href="taggradient.html">gradient </a> (1)
+    </li>
+        <li>
+        <a href="tagsemi-supervised learning.html">semi-supervised learning </a> (1)
+    </li>
+        <li>
+        <a href="tagdocument classification.html">document classification </a> (1)
+    </li>
+        <li>
+        <a href="taggraphs.html">graphs </a> (1)
+    </li>
+        <li>
+        <a href="tagvariables.html">variables </a> (1)
+    </li>
+        <li>
+        <a href="taglinear.html">linear </a> (1)
+    </li>
+        <li>
+        <a href="tagk-NN.html">k-NN </a> (1)
+    </li>
+    </ul>
+</div>
+<div class="sidebar-content syndicate">
+    <h4>Syndicate</h4>
+    <a class="button" href="../blog.atom"><i class="fa fa-rss-square"></i> Atom 1.0</a>
+    <a class="button" href="../blog.rss"><i class="fa fa-rss-square"></i> RSS</a>
+</div>
+			</div>
+		</div>
+	
+                        <div class="modular-row footer ">
+    <div class="footer-items">
+        <div class="footer-module large">
+		<h4>About</h4>
+                            <p>Italian Association for Machine Learning (C.F. 97949550582)</p>
+            			<p>Write us: info@iaml.it</p>
+        </div>
+        <div class="footer-module"><h4>Address</h4>
+            <p>
+                                    <span><strong>Operational office</strong></span>
+                                    <span>IAML c/o Pi Campus, via Indonesia 23, 00144 Rome</span>
+                                    <span><strong>Legal office</strong></span>
+                                    <span>Via Cassia 964, 00189, Rome</span>
+                            </p>
+        </div>
+        <div class="footer-module"><h4>Quick Links</h4>
+         <ul class="quickmenu">
+                            <li><i class="fa fa-chevron-right"></i><a href="../home">Home</a></li>
+                            <li><i class="fa fa-chevron-right"></i><a href="https://iaml.it/documents">Documents (Italian)</a></li>
+                    </ul>
+    </div>
+   
+</div>
+<hr>
+<div class="footer-modules">
+    <div class="footer-copyright">
+        Copyright 2018 IAML.IT. All Rights Reserved.
+    </div>
+    <div class="footer-menu">
+    <ul class="othermenu">
+           <li><a href="https://learn.getgrav.org/">Powered by Grav</a></li>
+           <li><a href="https://github.com/getgrav/grav-theme-deliver">Theme (adapted) from Deliver</a></li>
+        </ul>
+    </div>
+</div>
+</div>                    </section>
+        
+    </div>
+    <div class="sb-slidebar sb-left sb-width-thin">
+        <div id="panel">
+        
+<ul class="navigation">
+                                                        <li class="">
+                    <a href="../index.html">
+                                                Home
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../activities">
+                                                Activities
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../supporters.html">
+                                                Supporters
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../member.html">
+                                                Become a member
+                    </a>
+                </li>
+                                                                <li class="active">
+                    <a href="../blog">
+                                                Blog
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../governance.html">
+                                                Governance
+                    </a>
+                </li>
+                                                                                                                                </ul>                   </div>
+    </div>
+        <script src="../user/plugins/simplesearch/js/simplesearch.js" type="text/javascript" ></script>
+
+    <script>
+    $(function () {
+        $(document).ready(function() {
+          $.slidebars({
+            hideControlClasses: true,
+            scrollLock: true
+          });
+        });
+    });
+    </script>
+    </body>
+</html>
+
+

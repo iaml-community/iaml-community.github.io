@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Grafi dinamici in TensorFlow con TF Eager (Tutorial) | Italian Association for Machine Learning</title>
+    <meta content="GravCMS"  />
+<meta content="The Italian Association for Machine Learning (IAML) is a not-for-profit organization with the purpose of promoting knowledge of machine learning in all aspects of the Italian public life, from universities to enterprises and IT professionals."  />
+<meta property="og:title" content="Grafi dinamici in TensorFlow con TF Eager (Tutorial) | IAML.it"  />
+<meta property="og:image" content="https://iaml.it/blog/tensorflow-eager/images/loss.png"  />
+<meta property="og:url" content="https://iaml.it/blog/tensorflow-eager"  />
+<meta property="og:description" content="Scopriamo come costruire dinamicamente grafi computazionali in TensorFlow con una nuova funzionalità in alpha."  />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="icon" type="image/png" href="../user/themes/deliver/images/favicon.png" />
+
+	<!-- Global site tag (gtag.js) - Google Ads: 774709547 --> <script async src="https://www.googletagmanager.com/gtag/js?id=AW-774709547"></script> <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'AW-774709547'); </script> 
+	
+		
+                            		                                                <link href="../user/themes/deliver/css-compiled/nucleus.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css-compiled/template.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css/custom.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css/toc.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css/font-awesome.min.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/facebook/css/facebook.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/facebook/assets/unitegallery/css/unite-gallery.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/facebook/assets/unitegallery/themes/default/ug-theme-default.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/markdown-notices/assets/notices.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/breadcrumbs/css/breadcrumbs.css" type="text/css" rel="stylesheet" />
+<link href="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/events/assets/events.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/form/assets/form-styles.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/mathjax/assets/css/mathjax.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/simplesearch/css/simplesearch.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/highlight/css/zenburn.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/login/css/login.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css/slidebars.min.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css/slideme.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/socialbuttons/vendor/rrssb/css/rrssb.css" type="text/css" rel="stylesheet" />
+
+
+                                                            <script src="../system/assets/jquery/jquery-2.x.min.js" type="text/javascript" ></script>
+<script src="../user/themes/deliver/js/modernizr.custom.71422.js" type="text/javascript" ></script>
+<script src="../user/plugins/facebook/assets/unitegallery/js/unitegallery.min.js" type="text/javascript" ></script>
+<script src="../user/plugins/facebook/assets/unitegallery/themes/default/ug-theme-default.js" type="text/javascript" ></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.js" type="text/javascript" ></script>
+<script src="../user/plugins/events/assets/events.js" type="text/javascript" ></script>
+<script src="../user/plugins/mathjax/assets/js/mathjax.js" type="text/javascript" ></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript" ></script>
+<script src="../user/plugins/highlight/js/highlight.pack.js" type="text/javascript" ></script>
+<script src="../user/themes/deliver/js/deliver.js" type="text/javascript" ></script>
+<script src="../user/themes/deliver/js/slidebars.min.js" type="text/javascript" ></script>
+<script src="../user/themes/deliver/js/jquery.slideme2.js" type="text/javascript" ></script>
+<script src="../user/plugins/socialbuttons/vendor/rrssb/js/rrssb.min.js" type="text/javascript" ></script>
+
+<script>
+window.addEventListener("load", function(){
+window.cookieconsent.initialise({
+"palette": {
+    "popup": {
+        "background": "#4d4d4d",
+        "text": "#fff"
+    },
+    "button": {
+        "background": "#f1d600",
+        "text": "#000",
+        "border": "#f1d600"
+    }
+},
+"position": "bottom",
+"theme": "block",
+"content": {
+    "message": "This website uses cookies to ensure you get the best experience on our website.",
+    "dismiss": "Got it!",
+    "link": "Learn more",
+    "href": "https://cookiesandyou.com"
+}
+})});
+hljs.initHighlightingOnLoad();
+
+</script>
+
+
+</head>
+<body id="top" class="header-lite fullwidth blogstyling">
+    <div id="sb-site">
+                <header id="header">
+                <div class="logo">
+                    <h3><a href="../index.html"><img src="../user/pages/images/IAML_logo_viola.png" /></a></h3>
+                                            <ul class="social-icons">
+            <li>
+            <a href="https://twitter.com/iaml_it">
+                <i class="fa fa-twitter"></i>            </a>
+        </li>
+            <li>
+            <a href="https://www.linkedin.com/company/iaml/">
+                <i class="fa fa-linkedin"></i>            </a>
+        </li>
+            <li>
+            <a href="https://www.facebook.com/machinelearningitalia/">
+                <i class="fa fa-facebook"></i>            </a>
+        </li>
+            <li>
+            <a href="blog.rss">
+                <i class="fa fa-rss"></i>            </a>
+        </li>
+    </ul>  
+                                    </div>
+                <div id="navbar">
+                                                            
+<ul class="navigation">
+                                                        <li class="">
+                    <a href="../index.html">
+                                                Home
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../activities">
+                                                Activities
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../supporters.html">
+                                                Supporters
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../member.html">
+                                                Become a member
+                    </a>
+                </li>
+                                                                <li class="active">
+                    <a href="../blog">
+                                                Blog
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../governance.html">
+                                                Governance
+                    </a>
+                </li>
+                                                                                                                                </ul>                                                   <form class="search-box">
+    <input type="search" placeholder="Search..." value="" data-search-input="/search/query" />
+    <script>
+    jQuery(document).ready(function($){
+        var input = $('[data-search-input]');
+
+        input.on('keypress', function(event) {
+            if (event.which == 13 && input.val().length > 3) {
+                event.preventDefault();
+                window.location.href = input.data('search-input') + ':' + input.val();
+            }
+        });
+    });
+    </script>
+    <i class="fa fa-search"></i>
+</form>                    <span class="panel-activation sb-toggle-left navbar-left menu-btn fa fa-bars"></span>
+                </div>
+        </header>
+        
+        
+                <section id="body" class="">
+                            
+				<div class="flush-top blog-header blog-header-image" style="background: #B4B093 url(/user/pages/05.blog/blue_header.jpg) no-repeat right;">
+            <h1>Grafi dinamici in TensorFlow con TF Eager (Tutorial)</h1>
+        </div>
+            
+        
+<div id="breadcrumbs" itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
+                                            <a href="../index.html" itemprop="url"><span itemprop="title">Home</span></a>
+                        <i class="fa fa-angle-right"></i>
+                                                <a href="../blog" itemprop="url"><span itemprop="title">Blog</span></a>
+                        <i class="fa fa-angle-right"></i>
+                                                <span itemprop="title">Grafi dinamici in TensorFlow con TF Eager (Tutorial)</span>
+                        </div>
+		
+		<div class="blog-content-item g-grid pure-g-r">
+			<div id="item" class="g-block pure-u-2-3">
+			    <div class="list-item">
+
+    <div class="list-blog-header">
+                    
+        
+                    <h4><a href="tensorflow-eager.html">Grafi dinamici in TensorFlow con TF Eager (Tutorial)</a></h4>
+        
+        <span class="list-blog-date">
+            <i class="fa fa-calendar"></i>
+            07, Jan
+        </span>
+                <span class="list-blog-author">
+            <i class="fa fa-user"></i>
+            Simone Scardapane
+        </span>
+                       <ul class="tags">
+            <i class="fa fa-tag"></i>
+                        <li><a href="taggoogle.html">google</a></li>
+                        <li><a href="tagtensorflow.html">tensorflow</a></li>
+                        <li><a href="tageager.html">eager</a></li>
+                    </ul>
+        
+    </div>
+
+	<div>
+	<br />
+	<!-- AddToAny BEGIN -->
+<div class="a2a_kit a2a_kit_size_32 a2a_default_style">
+<a class="a2a_dd" href="https://www.addtoany.com/share"></a>
+<a class="a2a_button_facebook"></a>
+<a class="a2a_button_twitter"></a>
+<a class="a2a_button_linkedin"></a>
+<a class="a2a_button_google_plus"></a>
+<a class="a2a_button_email"></a>
+</div>
+<script async src="https://static.addtoany.com/menu/page.js"></script>
+<!-- AddToAny END -->
+</div>
+	
+    <div class="list-blog-padding">
+
+            <p><p>Per chi è appassionato di deep learning, uno dei problemi principali (paradossalmente) è diventato districarsi nell'enormità di software disponibili. Fra le alternative più comuni troviamo sicuramente <a href="https://www.tensorflow.org/">TensorFlow</a>, rilasciato in open-source da Google nel 2015, e <a href="http://pytorch.org/">PyTorch</a>, rilasciato poco più di un anno dopo da Facebook. </p>
+<p>A prima vista, entrambi i framework sono molto simili, dando la possibilità di sviluppare modelli enormemente complessi automatizzandone la fase di training, oltre a semplificare il supporto verso la GPU, il caricamento dei dati, ed altre funzioni comuni. A livello commerciale, TensorFlow ha subito una crescita enorme nel periodo successivo al suo rilascio, diventando il software più usato in assoluto, ma già ad Aprile 2017 i suoi concorrenti come PyTorch erano in forte ascesa, mettendone in discussione la sua posizione da leader (da un <a href="https://twitter.com/fchollet/status/852194634470223873">tweet di François Chollet</a>):</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/tensorflow-eager/images/C9ObgtjUMAAWLtJ.png"alt="Deep learning software adoption" />
+        </figure>
+<p>Se i due framework sono così simili, come spiegare questi rapidi cambi? La differenza principale fra i due framework si riassume forse nella <strong>maggiore semplicità di utilizzo</strong> (e di debug) di PyTorch, che risulta molto più intuitivo per chi si avvicina al mondo del deep learning per la prima volta, o per chi ha alle spalle esperienza di NumPy (o R).</p>
+<p>In questo tutorial scopriamo insieme <a href="https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/eager">TensorFlow Eager Execution</a>, una nuova modalità di TensorFlow per ora ancora in alpha (annunciata ufficialmente da Google solo <a href="https://research.googleblog.com/2017/10/eager-execution-imperative-define-by.html">poche settimane fa</a>), che promette di rimuovere questa differenza <strong>semplificando di molto</strong> l'utilizzo di TensorFlow, rendondolo potenzialmente più appetibile anche a chi per ora gli preferisce framework alternativi.</p>
+<h2>TensorFlow vs. PyTorch vs. TF Eager</h2>
+<p>Tra i tanti motivi che influiscono sulla scelta di un software di deep learning, il più importante in questo caso (come già detto) è probabilmente la <em>semplicità di sviluppo</em>: creare e testare modelli in PyTorch è, oggettivamente, molto più semplice che in TensorFlow, e si discosta poco dallo sviluppare nativamente in NumPy o librerie simili. Questo per precise scelte di progettazione, che prendono origine storicamente dai primi software sviluppati nel campo, tra cui in particolare <a href="http://deeplearning.net/software/theano/">Theano</a>.</p>
+<p>Per capirlo, prendiamo uno degli esempi più semplici possibili in TensorFlow, la somma di due numeri:</p>
+<pre><code class="language-py">import tensorflow as tf
+c = tf.constant(3.0) + tf.constant(2.0)
+print(c)
+# Returns: Tensor("add:0", shape=(), dtype=float32)</code></pre>
+<p>Poiché TF separa la fase di definizione dalla fase di esecuzione, le uniche cose che possiamo conoscere della variabile <code>c</code> a questo punto sono il suo tipo (float32) e la sua dimensione (scalare). Per ottenerne il valore, dobbiamo eseguire l'operazione all'interno di una sessione:</p>
+<pre><code class="language-py">with tf.Session() as sess:
+    print(sess.run(c))</code></pre>
+<p>Anche se questo sembra innocuo, può diventare un problema appena inseriamo calcoli intermedi nel nostro grafo:</p>
+<pre><code class="language-py">a = tf.constant(3.0)
+b = a + 2.0
+with tf.Session() as sess:
+    c = sess.run(1.5*b)</code></pre>
+<p>Anche se il valore intermedio (b) viene calcolato da TF, non abbiamo modo di visualizzarlo a meno di non chiederlo esplicitamente all'interno di una sessione (es., con un'<a href="https://www.tensorflow.org/api_docs/python/tf/Print">operazione aggiuntiva per stampare valori</a>). Confrontiamo questo con il codice equivalente in PyTorch:</p>
+<pre><code class="language-py">import torch
+a = torch.ones(3.0)
+b = a + 2.0
+print(1.5*b)
+# Returns: 7.5000 [torch.FloatTensor of size 1]
+print(b)
+# Returns: 5.0 [torch.FloatTensor of size 1]</code></pre>
+<p>A differenza di TF, tutti i valori sono calcolati una volta definiti e possono essere visualizzati immediatamente, come succede in NumPy. Questa differenza, da sola, fa sì che sviluppare e testare codice in PyTorch è enormemente più semplice (soprattutto per chi ha minore esperienza con altri framework) appena il grafo computazionale diventa sufficientemente complesso. Nel gergo di un altro competitor di TF, <a href="https://chainer.org/">Chainer</a>, i framework come TF seguono un modello <em>define-and-run</em>, mentre quelli come PyTorch un modello <em>define-by-run</em>, ovvero molto più dinamico:</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/tensorflow-eager/images/dynamic_graph.gif"alt="Esempio di grafo computazionale dinamico in PyTorch" />
+        </figure>
+<p>Adesso vediamo come cambia il codice di TF se abilitiamo la modalità <strong>eager</strong>:</p>
+<pre><code class="language-py">a = tf.constant(3.0)
+b = a + 2.0
+print(1.5*b)
+# Returns: tf.Tensor(7.5, shape=(), dtype=float32)
+print(b)
+# Returns: tf.Tensor(5.0, shape=(), dtype=float32)</code></pre>
+<p>Equivalente a PyTorch! La possibilità di definire grafi dinamicamente è stata da subito una delle feature più richieste al team di sviluppo di Google, e la Eager Execution (seppure ancora in alpha) sembra promettere bene. Vediamo rapidamente come installarla ed abilitarla prima di passare ad un esempio più concreto.</p>
+<h2>Installare ed abilitare TF Eager Execution</h2>
+<p>Poiché Eager è ancora in alpha, per utilizzarlo è necessario <a href="https://www.tensorflow.org/install/install_sources">compilare TF da sorgente</a>, o installare la nightly build. Per chi non ha esperienza con la compilazione di TF, la seconda opzione è più comoda; ad esempio, per <a href="https://github.com/tensorflow/tensorflow/blob/master/README.md#installation">installarla con pip</a> è sufficiente digitare a riga di comando (in un ambiente dove TF non è ancora installato):</p>
+<blockquote>
+<p>pip install tf-nightly</p>
+</blockquote>
+<p>Sostituite tf-nightly con tf-nightly-gpu se volete la versione con supporto GPU. È anche disponibile una <a href="https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/eager#installation">immagine docker</a>.</p>
+<p>Una volta installato, importate il modulo eager ed abilitate la modalità dinamica come segue:</p>
+<pre><code class="language-py">import tensorflow as tf
+import tensorflow.contrib.eager as tfe
+tfe.enable_eager_execution()</code></pre>
+<p>Due commenti vanno fatti subito:</p>
+<ul>
+<li>Essendo in alpha, è possibile che la sintassi cambierà (anche in maniera significativa) da qui al rilascio ufficiale. Dai commenti su un <a href="https://www.reddit.com/r/MachineLearning/comments/79xj5h/n_tensorflow_eager_execution_an_imperative/">thread Reddit</a> si lascia intendere però che non ci dovrebbero essere grandi cambiamenti (se non in velocità), e che l'interfaccia non si stabilizzerà prima della versione 1.6 di TF.</li>
+<li>La modalità eager va abilitata <em>all'inizio del programma</em>; se avete già costrutti TF nel kernel, il metodo 'enable_eager_execution' ritornerà un errore.</li>
+</ul>
+<p>Vediamo ora un esempio più concreto di utilizzo di TF Eager.</p>
+<h2>Regressione logistica con Eager</h2>
+<p>Come demo, nulla di più semplice che una regressione logistica su <a href="https://archive.ics.uci.edu/ml/datasets/iris">Iris</a>! In questa parte assumiamo che abbiate già seguito il <a href="https://www.tensorflow.org/get_started/mnist/beginners">tutorial di base di TF</a>, in particolare per la definizione del modello di regressione logistica, e vediamo come allenare un modello simile ma utilizzando la eager execution, commentando le differenze principali.</p>
+<p>Cominciamo caricando il dataset (nella versione presente su scikit-learn), applicando qualche step di preprocessing agli input ed agli output:</p>
+<pre><code class="language-py">from sklearn import datasets, preprocessing, model_selection
+data = datasets.load_iris()
+X = preprocessing.MinMaxScaler(feature_range=(-1,+1))\
+        .fit_transform(data['data'])
+y = preprocessing.OneHotEncoder(sparse=False)\
+        .fit_transform(data['target'].reshape(-1, 1))</code></pre>
+<p>Per questo post ci focalizziamo su Eager, quindi non dividiamo i dati di test e ci concentriamo solo sulla fase di ottimizzazione. Per definire il modello, utilizziamo i layer di TF, che internamente richiamano i moduli di Keras:</p>
+<pre><code class="language-py">lin = tf.layers.Dense(units=3, use_bias=True, activation=None)</code></pre>
+<p>Possiamo subito definire la nostra funzione costo, prendendo direttamente le funzioni dai moduli di TF:</p>
+<pre><code class="language-py">def loss_fn(xb, yb, lin):
+  predictions = lin(xb)
+  return tf.reduce_mean(
+      tf.nn.softmax_cross_entropy_with_logits_v2(
+          logits=predictions, labels=yb))</code></pre>
+<p>Poiché stiamo lavorando in maniera dinamica, però, possiamo valutare subito la funzione costo senza bisogno di inizializzare una sessione o le variabili:</p>
+<pre><code class="language-py">print(loss_fn(tf.constant(X), tf.constant(y), lin))
+# Returns: &lt;tf.Tensor: id=213049, shape=(), dtype=float64, numpy=1.9096685348363727&gt;</code></pre>
+<p>Si noti come possiamo convertire da NumPy a tensori di TF in modo immediato. Una volta valutata la funzione costo per la prima volta, TF permette di accedere a tutte le variabili del modello per stamparne il valore:</p>
+<pre><code class="language-py">w, b = lin.variables
+print("w: " + str(w.read_value()))
+print("b: " + str(b.read_value()))</code></pre>
+<p>Per ottimizzare il modello, abbiamo bisogno di una funzione che calcoli il gradiente del modello ad ogni passo, ed un'altra funzione che applichi gli aggiornamenti alle variabili. Il primo step in TF Eager è automatizzato da una singola funzione:</p>
+<pre><code class="language-py">value_and_gradients_fn = tfe.implicit_value_and_gradients(loss_fn)</code></pre>
+<p>La funzione così ottenuta permette di calcolare automaticamente il valore (ed i gradienti) di <em>tutte</em> le variabili nel modello. Per altri casi d'uso (es., il gradiente di una singola variabile o gradienti custom), rimandiamo alla <a href="https://github.com/tensorflow/tensorflow/blob/master/tensorflow/contrib/eager/python/g3doc/guide.md#automatic-differentiation">documentazione ufficiale</a>. Come algoritmo di ottimizzazione, possiamo usare qualsiasi routine già definita in TF:</p>
+<pre><code class="language-py">optimizer = tf.train.GradientDescentOptimizer(learning_rate=0.1)</code></pre>
+<p>Siamo pronti ad allenare il modello! </p>
+<pre><code class="language-py">import numpy as np
+iters = 1000
+loss = np.zeros(iters)
+for i in range(iters):
+    # Calcola la funzione costo ed i gradienti
+    current_loss, gradients_and_variables = value_and_gradients_fn(X, y, lin)
+    # Applica l'update
+    optimizer.apply_gradients(gradients_and_variables)
+    # Salva il valore della funzione costo
+    loss[i] = current_loss.numpy()</code></pre>
+<p>Per verificare che tutto stia funzionando come desiderato, stampiamo l'evoluzione della funzione costo per visualizzarne la convergenza:</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/tensorflow-eager/images/loss.png"alt="Funzione costo" />
+        </figure>
+<h2>Limitazioni di Eager</h2>
+<p>In questo tutorial abbiamo visto solo qualche elemento base di Eager. Se siete interessati, vi invitiamo a leggere la <a href="https://github.com/tensorflow/tensorflow/blob/master/tensorflow/contrib/eager/python/g3doc/guide.md">guida ufficiale</a> per scoprire come strutturare modelli più sofisticati ed abilitare il supporto su GPU (che, a differenza di TF classico, è disabilitato di default).</p>
+<p>Chiaramente, come tutti i moduli in alpha la eager execution ha numerosi <a href="https://github.com/tensorflow/tensorflow/issues">bug ancora irrisolti</a>, oltre ad un'interfaccia per ora ancora volatile e soggetta a possibili cambiamenti repentini. Nonostante questo, dai primi test semplifica enormemente lo sviluppo in TF, senza andare ad intaccare (se non sommariamente) la velocità di esecuzione. Crediamo possa quindi diventare un componente essenziale nell'immediato futuro, e vale la pena farci pratica da subito.</p>
+<hr />
+<p>Se questo articolo ti è piaciuto e vuoi tenerti aggiornato sulle nostre attività, ricordati che l'<a href="../member.html">iscrizione all'Italian Association for Machine Learning</a> è gratuita! Puoi seguirci anche su <a href="https://www.facebook.com/machinelearningitalia/">Facebook</a> e su <a href="https://www.linkedin.com/company/18312943/">LinkedIn</a>.</p></p>
+            
+    
+        <p class="prev-next">
+                            <a class="button" href="nuova-era-database.html"><i class="fa fa-chevron-left"></i> Previous Post</a>
+            
+                            <a class="button" href="ottimizzare-pipeline-sklearn.html">Next Post <i class="fa fa-chevron-right"></i></a>
+                    </p>
+    
+    </div>
+</div>
+			</div>
+			<div id="sidebar" class="g-block size-1-3 pure-u-1-3">
+				<div class="sidebar-content">
+    <h4>Search the blog</h4>
+    <input type="text" placeholder="Search..." value="" data-searchsidebar-input="/search/query" />
+<script>
+jQuery(document).ready(function($){
+    var input = $('[data-searchsidebar-input]');
+
+    input.on('keypress', function(event) {
+        if (event.which == 13 && input.val().length > 3) {
+            event.preventDefault();
+            window.location.href = input.data('searchsidebar-input') + ':' + input.val();
+        }
+    });
+});
+</script>
+</div>
+<!--
+<div class="sidebar-content">
+	<h4>Some Text Widget</h4>
+	<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna.</p>
+</div>
+!-->
+<div class="sidebar-content">
+    <h4>Categories</h4>
+    
+
+<ul class="archives">
+        <li>
+        <a href="categoryTutorials.html">Tutorials </a> (16)
+    </li>
+        <li>
+        <a href="categoryDiscussions.html">Discussions </a> (12)
+    </li>
+        <li>
+        <a href="categoryAnnouncements.html">Announcements </a> (4)
+    </li>
+        <li>
+        <a href="categoryTutorials (English).html">Tutorials (English) </a> (4)
+    </li>
+        <li>
+        <a href="categoryArticles' summaries.html">Articles' summaries </a> (3)
+    </li>
+        <li>
+        <a href="categoryDiscussions (English).html">Discussions (English) </a> (2)
+    </li>
+        <li>
+        <a href="categoryFocus-on.html">Focus-on </a> (1)
+    </li>
+        <li>
+        <a href="categoryReviews.html">Reviews </a> (1)
+    </li>
+        <li>
+        <a href="categoryDiscussion.html">Discussion </a> (1)
+    </li>
+    </ul>
+</div>
+<div class="sidebar-content">
+    <h4>Archives</h4>
+	<ul class="archives">
+    <li>
+    	<a href="archives_monthapr_2020.html">
+        <span class="archive_date">April 2020</span>
+                <span>(1)</span>
+                </a>
+    </li>
+</ul>
+</div>
+<div class="sidebar-content">
+    <h4>Popular Tags</h4>
+    
+
+<ul class="archives">
+        <li>
+        <a href="tagdeep learning.html">deep learning </a> (11)
+    </li>
+        <li>
+        <a href="tagpytorch.html">pytorch </a> (9)
+    </li>
+        <li>
+        <a href="tagreti neurali.html">reti neurali </a> (5)
+    </li>
+        <li>
+        <a href="taggoogle.html">google </a> (4)
+    </li>
+        <li>
+        <a href="tagjit.html">jit </a> (4)
+    </li>
+        <li>
+        <a href="tagtensorflow.html">tensorflow </a> (4)
+    </li>
+        <li>
+        <a href="tagottimizzazione.html">ottimizzazione </a> (4)
+    </li>
+        <li>
+        <a href="tagrete neurale.html">rete neurale </a> (3)
+    </li>
+        <li>
+        <a href="tagtime series.html">time series </a> (3)
+    </li>
+        <li>
+        <a href="tagkeras.html">keras </a> (3)
+    </li>
+        <li>
+        <a href="tagreti convolutive.html">reti convolutive </a> (3)
+    </li>
+        <li>
+        <a href="tagpipeline.html">pipeline </a> (2)
+    </li>
+        <li>
+        <a href="tagsklearn.html">sklearn </a> (2)
+    </li>
+        <li>
+        <a href="tagautodiff.html">autodiff </a> (2)
+    </li>
+        <li>
+        <a href="tagautomatic differentation.html">automatic differentation </a> (2)
+    </li>
+        <li>
+        <a href="tagreverse-mode.html">reverse-mode </a> (2)
+    </li>
+        <li>
+        <a href="tagderivate.html">derivate </a> (2)
+    </li>
+        <li>
+        <a href="tagdifferenziazione.html">differenziazione </a> (2)
+    </li>
+        <li>
+        <a href="tagmodel selection.html">model selection </a> (2)
+    </li>
+        <li>
+        <a href="tagcross validation.html">cross validation </a> (2)
+    </li>
+        <li>
+        <a href="tagc++.html">c++ </a> (2)
+    </li>
+        <li>
+        <a href="tagnumpy.html">numpy </a> (2)
+    </li>
+        <li>
+        <a href="tagvmap.html">vmap </a> (2)
+    </li>
+        <li>
+        <a href="tagcaffe.html">caffe </a> (2)
+    </li>
+        <li>
+        <a href="tagcompiler.html">compiler </a> (2)
+    </li>
+        <li>
+        <a href="tagjax.html">jax </a> (2)
+    </li>
+        <li>
+        <a href="tagcodemotion.html">codemotion </a> (1)
+    </li>
+        <li>
+        <a href="tagbias.html">bias </a> (1)
+    </li>
+        <li>
+        <a href="tagdiscrimination.html">discrimination </a> (1)
+    </li>
+        <li>
+        <a href="tagfairness.html">fairness </a> (1)
+    </li>
+        <li>
+        <a href="tagiaml.html">iaml </a> (1)
+    </li>
+        <li>
+        <a href="tagdatabase.html">database </a> (1)
+    </li>
+        <li>
+        <a href="tagiperparametri.html">iperparametri </a> (1)
+    </li>
+        <li>
+        <a href="tagautograph.html">autograph </a> (1)
+    </li>
+        <li>
+        <a href="taghead.html">head </a> (1)
+    </li>
+        <li>
+        <a href="tagmulti-task.html">multi-task </a> (1)
+    </li>
+        <li>
+        <a href="taglearning.html">learning </a> (1)
+    </li>
+        <li>
+        <a href="tagnovità.html">novità </a> (1)
+    </li>
+        <li>
+        <a href="tagdev summit.html">dev summit </a> (1)
+    </li>
+        <li>
+        <a href="tagcustom estimator.html">custom estimator </a> (1)
+    </li>
+        <li>
+        <a href="taghyperopt.html">hyperopt </a> (1)
+    </li>
+        <li>
+        <a href="taggoodfellow.html">goodfellow </a> (1)
+    </li>
+        <li>
+        <a href="tagnlp.html">nlp </a> (1)
+    </li>
+        <li>
+        <a href="tagdati mancanti.html">dati mancanti </a> (1)
+    </li>
+        <li>
+        <a href="tagtransformer.html">transformer </a> (1)
+    </li>
+        <li>
+        <a href="tagattenzione.html">attenzione </a> (1)
+    </li>
+        <li>
+        <a href="tagrobocop.html">robocop </a> (1)
+    </li>
+        <li>
+        <a href="tagyolo.html">yolo </a> (1)
+    </li>
+        <li>
+        <a href="tagobject detection.html">object detection </a> (1)
+    </li>
+        <li>
+        <a href="tagbayes.html">bayes </a> (1)
+    </li>
+        <li>
+        <a href="tagautoencoders.html">autoencoders </a> (1)
+    </li>
+        <li>
+        <a href="tagvariational.html">variational </a> (1)
+    </li>
+        <li>
+        <a href="tageager.html">eager </a> (1)
+    </li>
+        <li>
+        <a href="tagimputazione.html">imputazione </a> (1)
+    </li>
+        <li>
+        <a href="tagCIFAR.html">CIFAR </a> (1)
+    </li>
+        <li>
+        <a href="tagword embedding.html">word embedding </a> (1)
+    </li>
+        <li>
+        <a href="tagMNIST.html">MNIST </a> (1)
+    </li>
+        <li>
+        <a href="tagimmagini.html">immagini </a> (1)
+    </li>
+        <li>
+        <a href="tagclassificazione.html">classificazione </a> (1)
+    </li>
+        <li>
+        <a href="tagkpi.html">kpi </a> (1)
+    </li>
+        <li>
+        <a href="tagreprogramming.html">reprogramming </a> (1)
+    </li>
+        <li>
+        <a href="tagadversarial.html">adversarial </a> (1)
+    </li>
+        <li>
+        <a href="tagbrowser.html">browser </a> (1)
+    </li>
+        <li>
+        <a href="tagjavascript.html">javascript </a> (1)
+    </li>
+        <li>
+        <a href="tagreti ricorsive.html">reti ricorsive </a> (1)
+    </li>
+        <li>
+        <a href="tagreti ricorrenti.html">reti ricorrenti </a> (1)
+    </li>
+        <li>
+        <a href="tagftth.html">ftth </a> (1)
+    </li>
+        <li>
+        <a href="tagadversarial example.html">adversarial example </a> (1)
+    </li>
+        <li>
+        <a href="tagmanagement.html">management </a> (1)
+    </li>
+        <li>
+        <a href="tagrobotica.html">robotica </a> (1)
+    </li>
+        <li>
+        <a href="tagocr.html">ocr </a> (1)
+    </li>
+        <li>
+        <a href="tagfocus.html">focus </a> (1)
+    </li>
+        <li>
+        <a href="tagiphone.html">iphone </a> (1)
+    </li>
+        <li>
+        <a href="tagpython.html">python </a> (1)
+    </li>
+        <li>
+        <a href="tagface id.html">face id </a> (1)
+    </li>
+        <li>
+        <a href="tagmomento.html">momento </a> (1)
+    </li>
+        <li>
+        <a href="tagadam.html">adam </a> (1)
+    </li>
+        <li>
+        <a href="tagneuroscienza.html">neuroscienza </a> (1)
+    </li>
+        <li>
+        <a href="tagonde cerebrali.html">onde cerebrali </a> (1)
+    </li>
+        <li>
+        <a href="tagtorchvision.html">torchvision </a> (1)
+    </li>
+        <li>
+        <a href="taglatin.html">latin </a> (1)
+    </li>
+        <li>
+        <a href="tagpretrained.html">pretrained </a> (1)
+    </li>
+        <li>
+        <a href="tagrete convolutiva.html">rete convolutiva </a> (1)
+    </li>
+        <li>
+        <a href="tagautograd.html">autograd </a> (1)
+    </li>
+        <li>
+        <a href="tagswish.html">swish </a> (1)
+    </li>
+        <li>
+        <a href="tagattivazione.html">attivazione </a> (1)
+    </li>
+        <li>
+        <a href="tagcheckpoint.html">checkpoint </a> (1)
+    </li>
+        <li>
+        <a href="tagtensori.html">tensori </a> (1)
+    </li>
+        <li>
+        <a href="tagvariabili.html">variabili </a> (1)
+    </li>
+        <li>
+        <a href="taglineare.html">lineare </a> (1)
+    </li>
+        <li>
+        <a href="tagregressione.html">regressione </a> (1)
+    </li>
+        <li>
+        <a href="tagconvolutional networks.html">convolutional networks </a> (1)
+    </li>
+        <li>
+        <a href="tagVatican.html">Vatican </a> (1)
+    </li>
+        <li>
+        <a href="tagproject.html">project </a> (1)
+    </li>
+        <li>
+        <a href="tagkernel.html">kernel </a> (1)
+    </li>
+        <li>
+        <a href="tagICLR.html">ICLR </a> (1)
+    </li>
+        <li>
+        <a href="tagipotesi.html">ipotesi </a> (1)
+    </li>
+        <li>
+        <a href="tagsparsità.html">sparsità </a> (1)
+    </li>
+        <li>
+        <a href="tagfunzionale.html">funzionale </a> (1)
+    </li>
+        <li>
+        <a href="tagfunctional.html">functional </a> (1)
+    </li>
+        <li>
+        <a href="tagadversarial attack.html">adversarial attack </a> (1)
+    </li>
+        <li>
+        <a href="tagkmeans.html">kmeans </a> (1)
+    </li>
+        <li>
+        <a href="taganalysis.html">analysis </a> (1)
+    </li>
+        <li>
+        <a href="tagclustering.html">clustering </a> (1)
+    </li>
+        <li>
+        <a href="tagGoogle.html">Google </a> (1)
+    </li>
+        <li>
+        <a href="tagregression.html">regression </a> (1)
+    </li>
+        <li>
+        <a href="tagJAX.html">JAX </a> (1)
+    </li>
+        <li>
+        <a href="taggaussian process.html">gaussian process </a> (1)
+    </li>
+        <li>
+        <a href="tagensemble.html">ensemble </a> (1)
+    </li>
+        <li>
+        <a href="tagboosting.html">boosting </a> (1)
+    </li>
+        <li>
+        <a href="taggradient.html">gradient </a> (1)
+    </li>
+        <li>
+        <a href="tagsemi-supervised learning.html">semi-supervised learning </a> (1)
+    </li>
+        <li>
+        <a href="tagdocument classification.html">document classification </a> (1)
+    </li>
+        <li>
+        <a href="taggraphs.html">graphs </a> (1)
+    </li>
+        <li>
+        <a href="tagvariables.html">variables </a> (1)
+    </li>
+        <li>
+        <a href="taglinear.html">linear </a> (1)
+    </li>
+        <li>
+        <a href="tagk-NN.html">k-NN </a> (1)
+    </li>
+    </ul>
+</div>
+<div class="sidebar-content syndicate">
+    <h4>Syndicate</h4>
+    <a class="button" href="../blog.atom"><i class="fa fa-rss-square"></i> Atom 1.0</a>
+    <a class="button" href="../blog.rss"><i class="fa fa-rss-square"></i> RSS</a>
+</div>
+			</div>
+		</div>
+	
+                        <div class="modular-row footer ">
+    <div class="footer-items">
+        <div class="footer-module large">
+		<h4>About</h4>
+                            <p>Italian Association for Machine Learning (C.F. 97949550582)</p>
+            			<p>Write us: info@iaml.it</p>
+        </div>
+        <div class="footer-module"><h4>Address</h4>
+            <p>
+                                    <span><strong>Operational office</strong></span>
+                                    <span>IAML c/o Pi Campus, via Indonesia 23, 00144 Rome</span>
+                                    <span><strong>Legal office</strong></span>
+                                    <span>Via Cassia 964, 00189, Rome</span>
+                            </p>
+        </div>
+        <div class="footer-module"><h4>Quick Links</h4>
+         <ul class="quickmenu">
+                            <li><i class="fa fa-chevron-right"></i><a href="../home">Home</a></li>
+                            <li><i class="fa fa-chevron-right"></i><a href="https://iaml.it/documents">Documents (Italian)</a></li>
+                    </ul>
+    </div>
+   
+</div>
+<hr>
+<div class="footer-modules">
+    <div class="footer-copyright">
+        Copyright 2018 IAML.IT. All Rights Reserved.
+    </div>
+    <div class="footer-menu">
+    <ul class="othermenu">
+           <li><a href="https://learn.getgrav.org/">Powered by Grav</a></li>
+           <li><a href="https://github.com/getgrav/grav-theme-deliver">Theme (adapted) from Deliver</a></li>
+        </ul>
+    </div>
+</div>
+</div>                    </section>
+        
+    </div>
+    <div class="sb-slidebar sb-left sb-width-thin">
+        <div id="panel">
+        
+<ul class="navigation">
+                                                        <li class="">
+                    <a href="../index.html">
+                                                Home
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../activities">
+                                                Activities
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../supporters.html">
+                                                Supporters
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../member.html">
+                                                Become a member
+                    </a>
+                </li>
+                                                                <li class="active">
+                    <a href="../blog">
+                                                Blog
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../governance.html">
+                                                Governance
+                    </a>
+                </li>
+                                                                                                                                </ul>                   </div>
+    </div>
+        <script src="../user/plugins/simplesearch/js/simplesearch.js" type="text/javascript" ></script>
+
+    <script>
+    $(function () {
+        $(document).ready(function() {
+          $.slidebars({
+            hideControlClasses: true,
+            scrollLock: true
+          });
+        });
+    });
+    </script>
+    </body>
+</html>
+
+

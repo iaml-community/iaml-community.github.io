@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>JAX, aka NumPy on steroids | Italian Association for Machine Learning</title>
+    <meta content="GravCMS"  />
+<meta content="The Italian Association for Machine Learning (IAML) is a not-for-profit organization with the purpose of promoting knowledge of machine learning in all aspects of the Italian public life, from universities to enterprises and IT professionals."  />
+<meta property="og:title" content="JAX, aka NumPy on steroids | IAML.it"  />
+<meta property="og:image" content="https://iaml.it/blog/jax-intro-english/images/lifecycle.png"  />
+<meta property="og:url" content="https://iaml.it/blog/jax-intro-english/"  />
+<meta property="og:description" content="JAX, a new research project by Google, has several features that make it interesting to a large audience. It looks like a NumPy wrapper, it makes  efficiency one of its strengths, and it is one of the first libraries whose soul is purely functional. "  />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="icon" type="image/png" href="/user/themes/deliver/images/favicon.png" />
+
+	<!-- Global site tag (gtag.js) - Google Ads: 774709547 --> <script async src="https://www.googletagmanager.com/gtag/js?id=AW-774709547"></script> <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'AW-774709547'); </script> 
+	
+		
+                            		                                                <link href="/user/themes/deliver/css-compiled/nucleus.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css-compiled/template.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/custom.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/toc.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/font-awesome.min.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/facebook/css/facebook.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/facebook/assets/unitegallery/css/unite-gallery.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/facebook/assets/unitegallery/themes/default/ug-theme-default.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/markdown-notices/assets/notices.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/breadcrumbs/css/breadcrumbs.css" type="text/css" rel="stylesheet" />
+<link href="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/events/assets/events.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/form/assets/form-styles.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/mathjax/assets/css/mathjax.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/simplesearch/css/simplesearch.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/highlight/css/zenburn.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/login/css/login.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/slidebars.min.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/slideme.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/socialbuttons/vendor/rrssb/css/rrssb.css" type="text/css" rel="stylesheet" />
+
+
+                                                            <script src="/system/assets/jquery/jquery-2.x.min.js" type="text/javascript" ></script>
+<script src="/user/themes/deliver/js/modernizr.custom.71422.js" type="text/javascript" ></script>
+<script src="/user/plugins/facebook/assets/unitegallery/js/unitegallery.min.js" type="text/javascript" ></script>
+<script src="/user/plugins/facebook/assets/unitegallery/themes/default/ug-theme-default.js" type="text/javascript" ></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.js" type="text/javascript" ></script>
+<script src="/user/plugins/events/assets/events.js" type="text/javascript" ></script>
+<script src="/user/plugins/mathjax/assets/js/mathjax.js" type="text/javascript" ></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript" ></script>
+<script src="/user/plugins/highlight/js/highlight.pack.js" type="text/javascript" ></script>
+<script src="/user/themes/deliver/js/deliver.js" type="text/javascript" ></script>
+<script src="/user/themes/deliver/js/slidebars.min.js" type="text/javascript" ></script>
+<script src="/user/themes/deliver/js/jquery.slideme2.js" type="text/javascript" ></script>
+<script src="/user/plugins/socialbuttons/vendor/rrssb/js/rrssb.min.js" type="text/javascript" ></script>
+
+<script>
+window.addEventListener("load", function(){
+window.cookieconsent.initialise({
+"palette": {
+    "popup": {
+        "background": "#4d4d4d",
+        "text": "#fff"
+    },
+    "button": {
+        "background": "#f1d600",
+        "text": "#000",
+        "border": "#f1d600"
+    }
+},
+"position": "bottom",
+"theme": "block",
+"content": {
+    "message": "This website uses cookies to ensure you get the best experience on our website.",
+    "dismiss": "Got it!",
+    "link": "Learn more",
+    "href": "https://cookiesandyou.com"
+}
+})});
+hljs.initHighlightingOnLoad();
+
+</script>
+
+
+</head>
+<body id="top" class="header-lite fullwidth blogstyling">
+    <div id="sb-site">
+                <header id="header">
+                <div class="logo">
+                    <h3><a href="https://iaml.it"><img src="/user/pages/images/IAML_logo_viola.png" /></a></h3>
+                                            <ul class="social-icons">
+            <li>
+            <a href="https://twitter.com/iaml_it">
+                <i class="fa fa-twitter"></i>            </a>
+        </li>
+            <li>
+            <a href="https://www.linkedin.com/company/iaml/">
+                <i class="fa fa-linkedin"></i>            </a>
+        </li>
+            <li>
+            <a href="https://www.facebook.com/machinelearningitalia/">
+                <i class="fa fa-facebook"></i>            </a>
+        </li>
+            <li>
+            <a href="blog.rss">
+                <i class="fa fa-rss"></i>            </a>
+        </li>
+    </ul>  
+                                    </div>
+                <div id="navbar">
+                                                            
+<ul class="navigation">
+                                                        <li class="">
+                    <a href="/">
+                                                Home
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/activities">
+                                                Activities
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/supporters">
+                                                Supporters
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/member">
+                                                Become a member
+                    </a>
+                </li>
+                                                                <li class="active">
+                    <a href="/blog">
+                                                Blog
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/governance">
+                                                Governance
+                    </a>
+                </li>
+                                                                                                                                </ul>                                                   <form class="search-box">
+    <input type="search" placeholder="Search..." value="" data-search-input="/search/query" />
+    <script>
+    jQuery(document).ready(function($){
+        var input = $('[data-search-input]');
+
+        input.on('keypress', function(event) {
+            if (event.which == 13 && input.val().length > 3) {
+                event.preventDefault();
+                window.location.href = input.data('search-input') + ':' + input.val();
+            }
+        });
+    });
+    </script>
+    <i class="fa fa-search"></i>
+</form>                    <span class="panel-activation sb-toggle-left navbar-left menu-btn fa fa-bars"></span>
+                </div>
+        </header>
+        
+        
+                <section id="body" class="">
+                            
+				<div class="flush-top blog-header blog-header-image" style="background: #B4B093 url(/user/pages/05.blog/blue_header.jpg) no-repeat right;">
+            <h1>JAX, aka NumPy on steroids</h1>
+        </div>
+            
+        
+<div id="breadcrumbs" itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
+                                            <a href="/" itemprop="url"><span itemprop="title">Home</span></a>
+                        <i class="fa fa-angle-right"></i>
+                                                <a href="/blog" itemprop="url"><span itemprop="title">Blog</span></a>
+                        <i class="fa fa-angle-right"></i>
+                                                <span itemprop="title">JAX, aka NumPy on steroids</span>
+                        </div>
+		
+		<div class="blog-content-item g-grid pure-g-r">
+			<div id="item" class="g-block pure-u-2-3">
+			    <div class="list-item">
+
+    <div class="list-blog-header">
+                    <img src="/images/7/4/6/3/a/7463a98e2ee66c94cf73809ef1d627dd5932429b-jaxlogo2.png" />
+        
+                    <h4><a href="/blog/jax-intro-english">JAX, aka NumPy on steroids</a></h4>
+        
+        <span class="list-blog-date">
+            <i class="fa fa-calendar"></i>
+            14, Jan
+        </span>
+                <span class="list-blog-author">
+            <i class="fa fa-user"></i>
+            Simone Scardapane / trad. Stefano Di Pietro
+        </span>
+                       <ul class="tags">
+            <i class="fa fa-tag"></i>
+                        <li><a href="/blog/tag:jax">jax</a></li>
+                        <li><a href="/blog/tag:jit">jit</a></li>
+                        <li><a href="/blog/tag:google">google</a></li>
+                        <li><a href="/blog/tag:numpy">numpy</a></li>
+                        <li><a href="/blog/tag:vmap">vmap</a></li>
+                        <li><a href="/blog/tag:functional">functional</a></li>
+                    </ul>
+        
+    </div>
+
+	<div>
+	<br />
+	<!-- AddToAny BEGIN -->
+<div class="a2a_kit a2a_kit_size_32 a2a_default_style">
+<a class="a2a_dd" href="https://www.addtoany.com/share"></a>
+<a class="a2a_button_facebook"></a>
+<a class="a2a_button_twitter"></a>
+<a class="a2a_button_linkedin"></a>
+<a class="a2a_button_google_plus"></a>
+<a class="a2a_button_email"></a>
+</div>
+<script async src="https://static.addtoany.com/menu/page.js"></script>
+<!-- AddToAny END -->
+</div>
+	
+    <div class="list-blog-padding">
+
+            <p><p>In the age of the 'big ones' (TensorFlow, PyTorch, ...), introducing and studying a new machine learning library might seem counterproductive. Yet <a href="https://github.com/google/jax">JAX</a>, a brand new research project by Google, has several features that make it interesting to a large audience. Firstly, it looks like a <strong>NumPy wrapper</strong>, making the transition from this library almost immediate. Secondly, it makes  efficiency one of its strengths, thanks to the transparent use of XLA, a linear algebra accelerator originally developed for TensorFlow. Finally, and it is perhaps the most intriguing novelty, it is one of the first libraries whose soul is purely <strong>functional</strong>.</p>
+<p></p>
+<h2>JAX - Comparing with the Big Ones</h2>
+<p>Basically, every neural networks library on the market can be categorised based on four key elements:</p>
+<ol>
+<li>The way it allows to write and manipulate operations on tensors (e.g. computational graphs vs. eager execution);</li>
+<li>Tools and methods for automatic gradient calculation (e.g. higher order gradients);</li>
+<li>The ability to speed up the code on GPUs, distributed systems, etc;</li>
+<li>The availability of high-level modules to build and train neural networks.</li>
+</ol>
+<p>These four points lead to an enormous differentiation in the ecosystem:
+<a href="https://keras.io/">Keras</a>, for example, was originally thought to be almost completely focused on point (4), leaving the other tasks to a backend engine. In 2015, on the other hand, <a href="https://github.com/HIPS/autograd">Autograd</a> focused on the first two points, allowing users to write code using only "classic" Python and NumPy constructs, providing subsequently many options for point (2).
+Autograd's simplicity greatly influenced the development of the libraries to follow, but it was penalized by the clear lack of the points (3) and (4), i.e. adequate techniques to speed up the code and sufficiently abstract modules for neural network development.</p>
+<p><strong>JAX is fundamentally Autograd 2.0</strong>: it takes up its whole philosophy, improving it with different acceleration techniques on GPU/TPU and with small high-level libraries for models prototyping and optimization.
+It can therefore be of great interest to different groups of users: for those who only want to speed up NumPy code as well as for those who love to develop "low level" without moving too much from the familiarity of NumPy.
+And, last but not least, for those looking for a library with a purely functional soul.</p>
+<p>In the rest of this article we will quickly explore the main functionalities of JAX available as of today (version 0.14), relying on parts of the original tutorial and extending them when necessary.</p>
+<div class="notices blue">
+<p>You can find the code used in this article <a href="https://colab.research.google.com/drive/1CeGy6qIy65eGAi_Co-PHyeW3REtEpKMQ">in a Google Colab notebook</a>.</p>
+</div>
+<h2>How to install JAX</h2>
+<p>Installing JAX requires you to compile XLA on your architecture, following the <a href="https://github.com/google/jax#installation">instructions on the website</a>. On Google Colab you can find a ready-made binary version that can be easily installed by running:</p>
+<pre><code class="language-bash">!pip install --upgrade https://storage.googleapis.com/jax-wheels/cuda92/jaxlib-0.1.4-py3-none-linux_x86_64.whl
+
+!pip install --upgrade jax</code></pre>
+<p>The rest of this tutorial assumes you are using this environment.</p>
+<h2>JAX core 1: NumPy wrapper</h2>
+<p>Let's start with the basics: some random NumPy instructions.</p>
+<pre><code class="language-py">import numpy as np
+
+x = np.ones((5000, 5000))
+y = np.arange(5000)
+
+z = np.sin(x) + np.cos(y)</code></pre>
+<p>In JAX we only have to import the appropriate wrapper for NumPy:</p>
+<pre><code class="language-py"># The only difference!
+import jax.numpy as np # Unica differenza!
+
+x = np.ones((5000, 5000))
+y = np.arange(5000)
+
+z = np.sin(x) + np.cos(y) </code></pre>
+<p>In the last code block the underlying XLA engine guarantees a good acceleration out of the box: on the GPU backend of Colab, it runs in 30 ms compared to the 480 ms of its NumPy equivalent. Not all NumPy/SciPy functions have been implemented yet, but they should be ready for the first stable release of the library. If, in addition to code acceleration, we want to use all the features described below (e.g. auto-differentiation), there are some additional constraints on the code we are able to write, also deriving from the functional nature of the library: for example, <a href="https://github.com/google/jax#whats-supported">you cannot change the values in an array using its indexes</a>.</p>
+<h2>JAX core 2: JIT compiler</h2>
+<p>The last block of code we have seen accelerates each instruction using the XLA engine, but in general you may want to accelerate entire blocks of code by exploiting any parallelization mechanism that might turn out to be useful.
+In this case, JAX provides a <em>tracing</em> compiler mechanism very similar to PyTorch's JIT compiler.</p>
+<p>The operation is very simple: we can use a decorator (or an explicit function) to tell JAX what to compile:</p>
+<pre><code class="language-py">from jax import jit
+
+@jit
+def fn(x, y):
+  z = np.sin(x)
+  w = np.cos(y)
+  return z + w
+
+# Or, without using a decorator:
+# fn = jit(fn)</code></pre>
+<p>In this case JAX will compile the function when it's called for the first time and will use directly the optimized version from the second call onwards. On the Colab GPU backend JIT compilation yields an additional 30% speed-up, reducing the average execution time to 20 ms. However, to leverage the JIT compiler we need to obey some additional constraints, <a href="https://github.com/google/jax#whats-supported">particularly when it comes to indexing and conditional flow instructions</a>.</p>
+<h2>JAX medium 1: auto-differencing</h2>
+<p>The self-differentiation mechanism is not very different to what is available in similar libraries. Given a Python function whose instructions are a sequence of tensor manipulations we can automatically invoke a new function yielding the gradient of its operations:</p>
+<pre><code class="language-py">from jax import grad
+
+@jit
+def simple_fun(x):
+  return np.sin(x) / x
+
+# Return the gradient of simple_fun with respect to x
+grad_simple_fun = grad(simple_fun)</code></pre>
+<p>We can call <code>grad</code> multiple times get higher order gradients:</p>
+<pre><code class="language-py"># Calculate the second-order gradient (Hessian matrix diagonal)
+grad_grad_simple_fun = grad(grad(simple_fun))</code></pre>
+<p>And of course we can graph everything!</p>
+<pre><code class="language-py">import matplotlib.pyplot as plt
+plt.plot(x_range, simple_fun(x_range), 'b')
+plt.plot(x_range, [grad_simple_fun(xi) for xi in x_range], '--r')
+plt.plot(x_range, [grad_grad_simple_fun(xi) for xi in x_range], '--g')
+plt.show()</code></pre>
+<figure role="group">
+        <img src="https://iaml.it/blog/jax-intro-english/images/simple_fun.png" />
+        </figure>
+<h2>JAX medium 2: advanced vectorization with vmap</h2>
+<p>JAX provides a third acceleration mechanism to be used when we want to apply the same function on one or more axes of a tensor.</p>
+<p>Let's look at a practical example using the gradient calculation we have seen before:</p>
+<pre><code class="language-py"># Gradient calculation (naive)
+[grad_simple_fun(xi) for xi in x_range]</code></pre>
+<p>As many other libraries, JAX assumes that the function we are differentiating has only one output. In this case, in order to calculate several gradients in parallel, we had to call it indipendently for each value. We can achieve the same result using the <strong>vmap</strong> operator:</p>
+<pre><code class="language-py">from jax import vmap
+grad_vect_simple_fun = vmap(grad_simple_fun)(x_range)</code></pre>
+<p><strong>vmap</strong> returns a new function that applies the original function (<strong>grad_simple_fun</strong>) to an entire vector. In this simple way, we get a 100x speedup on the execution (4 ms against 400 ms)!</p>
+<p><strong>grad</strong>, <strong>jit</strong> and <strong>vmap</strong> are three examples of what JAX calls <strong>modular transformations</strong>, i.e. operators that can be applied to a generic function and that can be combined together.</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/jax-intro-english/images/lifecycle.png"alt="JAX lifecycle" />
+        </figure>
+<figcaption>Schema of the "lifecycle" of a function in JAX. Source: <a href="https://github.com/google/jax#how-it-works">JAX GitHub</a>.</figcaption>
+<h2>JAX core 2.5: pseudo-random number generator</h2>
+<p>Before talking about some high-level modules for neural network training, it is necessary to briefly discuss the way JAX handles pseudo-random numbers. JAX implements its own PRNG which, unlike NumPy's one, has a purely functional interface, i.e. without side effects: among other things, a call to a pseudo-random method (eg, <strong>randn</strong>) does not change the internal state of the generator.</p>
+<p>So JAX users must explicitly call and manipulate the status of the PRNG through a key:</p>
+<pre><code class="language-py">from jax import random
+
+# Generate a key
+key = random.PRNGKey(0)
+
+# he key must be explicitly passed to create an array of pseudo-random numbers
+print(random.normal(key, shape=(3,)))</code></pre>
+<p>Important peculiarity, as mentioned, is that the key is not modified by the call to <strong>random.normal</strong>: subsequent calls to the function with the same key would produce the same array. To change the key, we must 'split it' with a specific call:</p>
+<pre><code class="language-py"># Get two different keys
+key, new_key = random.split(key)
+
+# Using two different keys we get two different results
+print(random.normal(key, shape=(3,)))
+print(random.normal(new_key, shape=(3,)))</code></pre>
+<p>As of today, perhaps, this is the least intuitive and most error prone aspect of the library. It might be modified/improved in the future.</p>
+<h2>JAX advanced 1: building neural networks with STAX</h2>
+<p>JAX also contains mini-libraries that highlight its potential. One of these, STAX, can be used to build neural networks, with an interface similar to other deep learning frameworks. For example, we can build a network as a "stack" of different "layers":</p>
+<pre><code class="language-py">from jax.experimental import stax
+from jax.experimental.stax import Dense, Relu, LogSoftmax
+
+net_init, net_apply = stax.serial(
+    Dense(10), Relu,
+    Dense(3), LogSoftmax,
+)</code></pre>
+<p>Unlike other frameworks, however, the resulting neural network exposes a functional interface: in particular, the network is defined by a pair of functions, respectively for parameter initialization and prediction.</p>
+<pre><code class="language-py"># Initialise the network with four inputs
+out_shape, net_params = net_init((-1, 4))
+
+# Get the predictions generated by the network
+print(net_apply(net_params, Xtrain))</code></pre>
+<h2>JAX advanced 2: optimisation with minmax</h2>
+<p>The second JAX library, minmax, allows optimization of cost functions. Suppose we define a cost function for our network (e.g. cross-entropy):</p>
+<pre><code class="language-py">def loss(params):
+  predictions = net_apply(params, Xtrain)
+  return - np.mean(ytrain * predictions)</code></pre>
+<p>Within minmax we find several algorithms already implemented, including Adam:</p>
+<pre><code class="language-py">from jax.experimental import minmax
+opt_init, opt_update = minmax.adam(step_size=0.01)</code></pre>
+<p>Even the optimiser, like the neural network, is not an object but is defined by two functions, one for initialization and one for the update step (given the gradients). Let's see the code for a single optimisation step:</p>
+<pre><code class="language-py">@jit
+def step(i, opt_state):
+  # Parameters for the optimisation algorithm
+  params = minmax.get_params(opt_state)
+  # Gradient of the loss function
+  g = grad(loss)(params)
+  # Update step
+  return opt_update(i, g, opt_state)</code></pre>
+<p>And the overall optimisation code:</p>
+<pre><code class="language-py"># Optimiser initialisation
+opt_state = opt_init(net_params)
+for i in range(100):
+  # Train step
+  opt_state = step(i, opt_state)
+# Final parameters after training
+net_params = minmax.get_params(opt_state)</code></pre>
+<figure role="group">
+        <img src="https://iaml.it/blog/jax-intro-english/images/funzione_costo.png" />
+        </figure>
+<h2>Recap</h2>
+<p>JAX is a very young but extremely promising library with a potentially large audience, both for those who want to implement "from scratch" using its strong acceleration features as well as for those who feel inspired by its extremely functional interface. Waiting for the release of the first stable version, we hope this short tutorial has got you excited!</p>
+<h2>About the authors</h2>
+<p><a href="http://ispac.diet.uniroma1.it/scardapane/">Simone Scardapane</a> is a research fellow at Sapienza University, and co-founder of the <a href="http://iaml.it">Italian Association for Machine Learning</a>. <a href="https://www.linkedin.com/in/stefanodipietro/">Stefano Di Pietro</a> is an IT and Machine Learning consultant and an Artificial Intelligence enthusiast.</p>
+<hr />
+<p>If you liked our article, remember that subscribing to the <a href="/member">Italian Association for Machine Learning</a> is free! You can follow us daily on <a href="https://www.facebook.com/machinelearningitalia/">Facebook</a>, <a href="https://www.linkedin.com/company/iaml/">LinkedIn</a>, and <a href="https://twitter.com/iaml_it">Twitter</a>.</p></p>
+            
+    
+        <p class="prev-next">
+                            <a class="button" href="/blog/panoramica-storia-recente-nlp"><i class="fa fa-chevron-left"></i> Previous Post</a>
+            
+                            <a class="button" href="/blog/focus-on-in-codice-ratio">Next Post <i class="fa fa-chevron-right"></i></a>
+                    </p>
+    
+    </div>
+</div>
+			</div>
+			<div id="sidebar" class="g-block size-1-3 pure-u-1-3">
+				<div class="sidebar-content">
+    <h4>Search the blog</h4>
+    <input type="text" placeholder="Search..." value="" data-searchsidebar-input="/search/query" />
+<script>
+jQuery(document).ready(function($){
+    var input = $('[data-searchsidebar-input]');
+
+    input.on('keypress', function(event) {
+        if (event.which == 13 && input.val().length > 3) {
+            event.preventDefault();
+            window.location.href = input.data('searchsidebar-input') + ':' + input.val();
+        }
+    });
+});
+</script>
+</div>
+<!--
+<div class="sidebar-content">
+	<h4>Some Text Widget</h4>
+	<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna.</p>
+</div>
+!-->
+<div class="sidebar-content">
+    <h4>Categories</h4>
+    
+
+<ul class="archives">
+        <li>
+        <a href="/blog/category:Tutorials">Tutorials </a> (16)
+    </li>
+        <li>
+        <a href="/blog/category:Discussions">Discussions </a> (12)
+    </li>
+        <li>
+        <a href="/blog/category:Announcements">Announcements </a> (4)
+    </li>
+        <li>
+        <a href="/blog/category:Tutorials%20%28English%29">Tutorials (English) </a> (4)
+    </li>
+        <li>
+        <a href="/blog/category:Articles%27%20summaries">Articles' summaries </a> (3)
+    </li>
+        <li>
+        <a href="/blog/category:Discussions%20%28English%29">Discussions (English) </a> (2)
+    </li>
+        <li>
+        <a href="/blog/category:Focus-on">Focus-on </a> (1)
+    </li>
+        <li>
+        <a href="/blog/category:Reviews">Reviews </a> (1)
+    </li>
+        <li>
+        <a href="/blog/category:Discussion">Discussion </a> (1)
+    </li>
+    </ul>
+</div>
+<div class="sidebar-content">
+    <h4>Archives</h4>
+	<ul class="archives">
+    <li>
+    	<a href="/blog/archives_month:apr_2020">
+        <span class="archive_date">April 2020</span>
+                <span>(1)</span>
+                </a>
+    </li>
+</ul>
+</div>
+<div class="sidebar-content">
+    <h4>Popular Tags</h4>
+    
+
+<ul class="archives">
+        <li>
+        <a href="/blog/tag:deep%20learning">deep learning </a> (11)
+    </li>
+        <li>
+        <a href="/blog/tag:pytorch">pytorch </a> (9)
+    </li>
+        <li>
+        <a href="/blog/tag:reti%20neurali">reti neurali </a> (5)
+    </li>
+        <li>
+        <a href="/blog/tag:google">google </a> (4)
+    </li>
+        <li>
+        <a href="/blog/tag:jit">jit </a> (4)
+    </li>
+        <li>
+        <a href="/blog/tag:tensorflow">tensorflow </a> (4)
+    </li>
+        <li>
+        <a href="/blog/tag:ottimizzazione">ottimizzazione </a> (4)
+    </li>
+        <li>
+        <a href="/blog/tag:rete%20neurale">rete neurale </a> (3)
+    </li>
+        <li>
+        <a href="/blog/tag:time%20series">time series </a> (3)
+    </li>
+        <li>
+        <a href="/blog/tag:keras">keras </a> (3)
+    </li>
+        <li>
+        <a href="/blog/tag:reti%20convolutive">reti convolutive </a> (3)
+    </li>
+        <li>
+        <a href="/blog/tag:pipeline">pipeline </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:sklearn">sklearn </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:autodiff">autodiff </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:automatic%20differentation">automatic differentation </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:reverse-mode">reverse-mode </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:derivate">derivate </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:differenziazione">differenziazione </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:model%20selection">model selection </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:cross%20validation">cross validation </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:c%2B%2B">c++ </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:numpy">numpy </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:vmap">vmap </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:caffe">caffe </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:compiler">compiler </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:jax">jax </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:codemotion">codemotion </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:bias">bias </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:discrimination">discrimination </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:fairness">fairness </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:iaml">iaml </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:database">database </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:iperparametri">iperparametri </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:autograph">autograph </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:head">head </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:multi-task">multi-task </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:learning">learning </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:novit%C3%A0">novità </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:dev%20summit">dev summit </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:custom%20estimator">custom estimator </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:hyperopt">hyperopt </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:goodfellow">goodfellow </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:nlp">nlp </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:dati%20mancanti">dati mancanti </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:transformer">transformer </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:attenzione">attenzione </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:robocop">robocop </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:yolo">yolo </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:object%20detection">object detection </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:bayes">bayes </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:autoencoders">autoencoders </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:variational">variational </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:eager">eager </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:imputazione">imputazione </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:CIFAR">CIFAR </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:word%20embedding">word embedding </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:MNIST">MNIST </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:immagini">immagini </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:classificazione">classificazione </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:kpi">kpi </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:reprogramming">reprogramming </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:adversarial">adversarial </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:browser">browser </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:javascript">javascript </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:reti%20ricorsive">reti ricorsive </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:reti%20ricorrenti">reti ricorrenti </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:ftth">ftth </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:adversarial%20example">adversarial example </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:management">management </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:robotica">robotica </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:ocr">ocr </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:focus">focus </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:iphone">iphone </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:python">python </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:face%20id">face id </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:momento">momento </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:adam">adam </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:neuroscienza">neuroscienza </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:onde%20cerebrali">onde cerebrali </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:torchvision">torchvision </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:latin">latin </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:pretrained">pretrained </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:rete%20convolutiva">rete convolutiva </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:autograd">autograd </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:swish">swish </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:attivazione">attivazione </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:checkpoint">checkpoint </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:tensori">tensori </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:variabili">variabili </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:lineare">lineare </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:regressione">regressione </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:convolutional%20networks">convolutional networks </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:Vatican">Vatican </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:project">project </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:kernel">kernel </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:ICLR">ICLR </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:ipotesi">ipotesi </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:sparsit%C3%A0">sparsità </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:funzionale">funzionale </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:functional">functional </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:adversarial%20attack">adversarial attack </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:kmeans">kmeans </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:analysis">analysis </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:clustering">clustering </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:Google">Google </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:regression">regression </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:JAX">JAX </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:gaussian%20process">gaussian process </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:ensemble">ensemble </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:boosting">boosting </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:gradient">gradient </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:semi-supervised%20learning">semi-supervised learning </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:document%20classification">document classification </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:graphs">graphs </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:variables">variables </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:linear">linear </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:k-NN">k-NN </a> (1)
+    </li>
+    </ul>
+</div>
+<div class="sidebar-content syndicate">
+    <h4>Syndicate</h4>
+    <a class="button" href="/blog.atom"><i class="fa fa-rss-square"></i> Atom 1.0</a>
+    <a class="button" href="/blog.rss"><i class="fa fa-rss-square"></i> RSS</a>
+</div>
+			</div>
+		</div>
+	
+                        <div class="modular-row footer ">
+    <div class="footer-items">
+        <div class="footer-module large">
+		<h4>About</h4>
+                            <p>Italian Association for Machine Learning (C.F. 97949550582)</p>
+            			<p>Write us: info@iaml.it</p>
+        </div>
+        <div class="footer-module"><h4>Address</h4>
+            <p>
+                                    <span><strong>Operational office</strong></span>
+                                    <span>IAML c/o Pi Campus, via Indonesia 23, 00144 Rome</span>
+                                    <span><strong>Legal office</strong></span>
+                                    <span>Via Cassia 964, 00189, Rome</span>
+                            </p>
+        </div>
+        <div class="footer-module"><h4>Quick Links</h4>
+         <ul class="quickmenu">
+                            <li><i class="fa fa-chevron-right"></i><a href="https://iaml.it/home">Home</a></li>
+                            <li><i class="fa fa-chevron-right"></i><a href="https://iaml.it/documents">Documents (Italian)</a></li>
+                    </ul>
+    </div>
+   
+</div>
+<hr>
+<div class="footer-modules">
+    <div class="footer-copyright">
+        Copyright 2018 IAML.IT. All Rights Reserved.
+    </div>
+    <div class="footer-menu">
+    <ul class="othermenu">
+           <li><a href="https://learn.getgrav.org/">Powered by Grav</a></li>
+           <li><a href="https://github.com/getgrav/grav-theme-deliver">Theme (adapted) from Deliver</a></li>
+        </ul>
+    </div>
+</div>
+</div>                    </section>
+        
+    </div>
+    <div class="sb-slidebar sb-left sb-width-thin">
+        <div id="panel">
+        
+<ul class="navigation">
+                                                        <li class="">
+                    <a href="/">
+                                                Home
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/activities">
+                                                Activities
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/supporters">
+                                                Supporters
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/member">
+                                                Become a member
+                    </a>
+                </li>
+                                                                <li class="active">
+                    <a href="/blog">
+                                                Blog
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/governance">
+                                                Governance
+                    </a>
+                </li>
+                                                                                                                                </ul>                   </div>
+    </div>
+        <script src="/user/plugins/simplesearch/js/simplesearch.js" type="text/javascript" ></script>
+
+    <script>
+    $(function () {
+        $(document).ready(function() {
+          $.slidebars({
+            hideControlClasses: true,
+            scrollLock: true
+          });
+        });
+    });
+    </script>
+    </body>
+</html>

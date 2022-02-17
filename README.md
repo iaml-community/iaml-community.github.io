@@ -1,37 +1,15 @@
-## Welcome to GitHub Pages
+# IAML Community
+   
+L'iniziativa IAML Community nasce per continuare il progetto iniziato da [IAML](/old/index.html), creare un network fra le realtà Italiane che si dedicano a machine learning ed intelligenza artificiale.   
 
-You can use the [editor on GitHub](https://github.com/iaml-community/iaml-community.github.io/edit/main/README.md) to maintain and preview the content for your website in Markdown files.
+The IAML Community initiative is born to continue on the project started by [IAML](/old/index.html), to create a network between the many Italian entities which are invested in machine learning and artificial intelligange.
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+## Channels 
 
-### Markdown
+[Discord](https://discord.gg/jcnytWM4Vk)    
+[Telegram](https://t.me/iaml_community)
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+## Contribute
 
-```markdown
-Syntax highlighted code block
+[GitHub Pages](https://github.com/iaml-community/iaml-community.github.io)
 
-# Header 1
-## Header 2
-### Header 3
-
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
-```
-
-For more details see [Basic writing and formatting syntax](https://docs.github.com/en/github/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/iaml-community/iaml-community.github.io/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.

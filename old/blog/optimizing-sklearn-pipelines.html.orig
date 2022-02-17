@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Building and optimizing pipelines in scikit-learn (Tutorial) | Italian Association for Machine Learning</title>
+    <meta content="GravCMS"  />
+<meta content="The Italian Association for Machine Learning (IAML) is a not-for-profit organization with the purpose of promoting knowledge of machine learning in all aspects of the Italian public life, from universities to enterprises and IT professionals."  />
+<meta property="og:title" content="Building and optimizing pipelines in scikit-learn (Tutorial) | IAML.it"  />
+<meta property="og:image" content="https://iaml.it/blog/optimizing-sklearn-pipelines/images/pipeline-diagram.png"  />
+<meta property="og:url" content="https://iaml.it/blog/optimizing-sklearn-pipelines"  />
+<meta property="og:description" content="Pipelines are a scikit-learn functionality for using existing methods as buildind blocks for more complicated workflows. In this tutorial, we will see how we can exploit pipelines to optimize simultaneously the entire process using a cross-validation routine."  />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="icon" type="image/png" href="/user/themes/deliver/images/favicon.png" />
+
+	<!-- Global site tag (gtag.js) - Google Ads: 774709547 --> <script async src="https://www.googletagmanager.com/gtag/js?id=AW-774709547"></script> <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'AW-774709547'); </script> 
+	
+		
+                            		                                                <link href="/user/themes/deliver/css-compiled/nucleus.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css-compiled/template.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/custom.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/toc.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/font-awesome.min.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/facebook/css/facebook.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/facebook/assets/unitegallery/css/unite-gallery.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/facebook/assets/unitegallery/themes/default/ug-theme-default.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/markdown-notices/assets/notices.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/breadcrumbs/css/breadcrumbs.css" type="text/css" rel="stylesheet" />
+<link href="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/events/assets/events.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/form/assets/form-styles.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/mathjax/assets/css/mathjax.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/simplesearch/css/simplesearch.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/highlight/css/zenburn.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/login/css/login.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/slidebars.min.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/slideme.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/socialbuttons/vendor/rrssb/css/rrssb.css" type="text/css" rel="stylesheet" />
+
+
+                                                            <script src="/system/assets/jquery/jquery-2.x.min.js" type="text/javascript" ></script>
+<script src="/user/themes/deliver/js/modernizr.custom.71422.js" type="text/javascript" ></script>
+<script src="/user/plugins/facebook/assets/unitegallery/js/unitegallery.min.js" type="text/javascript" ></script>
+<script src="/user/plugins/facebook/assets/unitegallery/themes/default/ug-theme-default.js" type="text/javascript" ></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.js" type="text/javascript" ></script>
+<script src="/user/plugins/events/assets/events.js" type="text/javascript" ></script>
+<script src="/user/plugins/mathjax/assets/js/mathjax.js" type="text/javascript" ></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript" ></script>
+<script src="/user/plugins/highlight/js/highlight.pack.js" type="text/javascript" ></script>
+<script src="/user/themes/deliver/js/deliver.js" type="text/javascript" ></script>
+<script src="/user/themes/deliver/js/slidebars.min.js" type="text/javascript" ></script>
+<script src="/user/themes/deliver/js/jquery.slideme2.js" type="text/javascript" ></script>
+<script src="/user/plugins/socialbuttons/vendor/rrssb/js/rrssb.min.js" type="text/javascript" ></script>
+
+<script>
+window.addEventListener("load", function(){
+window.cookieconsent.initialise({
+"palette": {
+    "popup": {
+        "background": "#4d4d4d",
+        "text": "#fff"
+    },
+    "button": {
+        "background": "#f1d600",
+        "text": "#000",
+        "border": "#f1d600"
+    }
+},
+"position": "bottom",
+"theme": "block",
+"content": {
+    "message": "This website uses cookies to ensure you get the best experience on our website.",
+    "dismiss": "Got it!",
+    "link": "Learn more",
+    "href": "https://cookiesandyou.com"
+}
+})});
+hljs.initHighlightingOnLoad();
+
+</script>
+
+
+</head>
+<body id="top" class="header-lite fullwidth blogstyling">
+    <div id="sb-site">
+                <header id="header">
+                <div class="logo">
+                    <h3><a href="https://iaml.it"><img src="/user/pages/images/IAML_logo_viola.png" /></a></h3>
+                                            <ul class="social-icons">
+            <li>
+            <a href="https://twitter.com/iaml_it">
+                <i class="fa fa-twitter"></i>            </a>
+        </li>
+            <li>
+            <a href="https://www.linkedin.com/company/iaml/">
+                <i class="fa fa-linkedin"></i>            </a>
+        </li>
+            <li>
+            <a href="https://www.facebook.com/machinelearningitalia/">
+                <i class="fa fa-facebook"></i>            </a>
+        </li>
+            <li>
+            <a href="blog.rss">
+                <i class="fa fa-rss"></i>            </a>
+        </li>
+    </ul>  
+                                    </div>
+                <div id="navbar">
+                                                            
+<ul class="navigation">
+                                                        <li class="">
+                    <a href="/">
+                                                Home
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/activities">
+                                                Activities
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/supporters">
+                                                Supporters
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/member">
+                                                Become a member
+                    </a>
+                </li>
+                                                                <li class="active">
+                    <a href="/blog">
+                                                Blog
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/governance">
+                                                Governance
+                    </a>
+                </li>
+                                                                                                                                </ul>                                                   <form class="search-box">
+    <input type="search" placeholder="Search..." value="" data-search-input="/search/query" />
+    <script>
+    jQuery(document).ready(function($){
+        var input = $('[data-search-input]');
+
+        input.on('keypress', function(event) {
+            if (event.which == 13 && input.val().length > 3) {
+                event.preventDefault();
+                window.location.href = input.data('search-input') + ':' + input.val();
+            }
+        });
+    });
+    </script>
+    <i class="fa fa-search"></i>
+</form>                    <span class="panel-activation sb-toggle-left navbar-left menu-btn fa fa-bars"></span>
+                </div>
+        </header>
+        
+        
+                <section id="body" class="">
+                            
+				<div class="flush-top blog-header blog-header-image" style="background: #B4B093 url(/user/pages/05.blog/blue_header.jpg) no-repeat right;">
+            <h1>Building and optimizing pipelines in scikit-learn (Tutorial)</h1>
+        </div>
+            
+        
+<div id="breadcrumbs" itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
+                                            <a href="/" itemprop="url"><span itemprop="title">Home</span></a>
+                        <i class="fa fa-angle-right"></i>
+                                                <a href="/blog" itemprop="url"><span itemprop="title">Blog</span></a>
+                        <i class="fa fa-angle-right"></i>
+                                                <span itemprop="title">Building and optimizing pipelines in scikit-learn (Tutorial)</span>
+                        </div>
+		
+		<div class="blog-content-item g-grid pure-g-r">
+			<div id="item" class="g-block pure-u-2-3">
+			    <div class="list-item">
+
+    <div class="list-blog-header">
+                    
+        
+                    <h4><a href="/blog/optimizing-sklearn-pipelines">Building and optimizing pipelines in scikit-learn (Tutorial)</a></h4>
+        
+        <span class="list-blog-date">
+            <i class="fa fa-calendar"></i>
+            28, Feb
+        </span>
+                <span class="list-blog-author">
+            <i class="fa fa-user"></i>
+            Gabriele Randelli
+        </span>
+                       <ul class="tags">
+            <i class="fa fa-tag"></i>
+                        <li><a href="/blog/tag:sklearn">sklearn</a></li>
+                        <li><a href="/blog/tag:pipeline">pipeline</a></li>
+                        <li><a href="/blog/tag:model selection">model selection</a></li>
+                        <li><a href="/blog/tag:cross validation">cross validation</a></li>
+                    </ul>
+        
+    </div>
+
+	<div>
+	<br />
+	<!-- AddToAny BEGIN -->
+<div class="a2a_kit a2a_kit_size_32 a2a_default_style">
+<a class="a2a_dd" href="https://www.addtoany.com/share"></a>
+<a class="a2a_button_facebook"></a>
+<a class="a2a_button_twitter"></a>
+<a class="a2a_button_linkedin"></a>
+<a class="a2a_button_google_plus"></a>
+<a class="a2a_button_email"></a>
+</div>
+<script async src="https://static.addtoany.com/menu/page.js"></script>
+<!-- AddToAny END -->
+</div>
+	
+    <div class="list-blog-padding">
+
+            <p><p>A well-known development practice for data scientists involves the definition of <strong>machine learning pipelines</strong> (aka workflows) to execute a sequence of typical tasks: data normalization, imputation of missing values, outlier elicitation, dimensionality reduction, classification. Scikit-learn provides a <a href="http://scikit-learn.org/stable/modules/pipeline.html">pipeline</a> module to automate this process. In this tutorial we will introduce this module, with a particular focus on:</p>
+<ul>
+<li>Creating the pipeline;</li>
+<li>Automatic parameters' optimization for each component of the pipeline;</li>
+<li>Automatic selection of the pipeline's building blocks.</li>
+</ul>
+<p>This tutorial extends an example taken from the <a href="http://scikit-learn.org/stable/modules/pipeline.html#pipeline">official documentation for the library</a>. In order to start, install scikit-learn v0.19.1 (the most recent version while we are writing this):</p>
+<blockquote>
+<p>pip install sklearn=0.19.1 </p>
+</blockquote>
+<p>Almost everything should work with older versions of the library, except for some methods that have been moved between different modules.</p>
+<blockquote>
+<blockquote>
+<blockquote>
+<p>This tutorial is an abridged version of the Italian one: if you are interested, <a href="https://iaml.it/blog/ottimizzare-pipeline-sklearn">check out the original version</a>.</p>
+</blockquote>
+</blockquote>
+</blockquote>
+<h2>Pipeline Setup</h2>
+<p>Let's start by loading a dataset available within scikit-learn, and split it between training and testing parts: </p>
+<pre><code class="language-py">from sklearn.datasets import load_boston
+from sklearn.model_selection import train_test_split
+data = load_boston()
+X_train, X_test, y_train, y_test = train_test_split(data['data'], data['target'])</code></pre>
+<p>The <a href="http://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_boston.html">Boston dataset</a>  is a small set composed of 506 samples and 13 features used for regression problems. Let us import all the modules required throughout this tutorial:</p>
+<pre><code class="language-py">from sklearn.preprocessing import StandardScaler, RobustScaler, QuantileTransformer
+from sklearn.feature_selection import SelectKBest, f_regression
+from sklearn.decomposition import PCA
+from sklearn.linear_model import Ridge</code></pre>
+<p>The pipeline we are going to setup is composed of the following tasks: </p>
+<ol>
+<li><strong>Data Normalization</strong>: in this tutorial we have selected three different normalization methods, including the <code>QuantileTransformer</code> (<a href="http://scikit-learn.org/stable/modules/preprocessing.html#preprocessing-transformer">check out the documentation</a>)..</li>
+<li><strong>Dimensionality Reduction</strong>: we selected Principal Component Analysis (PCA) and a univariate feature selection algorithm as possible candidates.</li>
+<li><strong>Regression</strong>: we apply a simple regularized linear method, although the method is easily extendable to other learning algorithms.</li>
+</ol>
+<p>We begin by manually implementing a pipeline without any dedicated scikit-learn module, to highlight how many repetitive activities are necessary. We are going to manually instantiate and initialize a single method for every step of the pipeline: </p>
+<pre><code class="language-py">scaler = StandardScaler()
+pca = PCA()
+ridge = Ridge()</code></pre>
+<p>Now, we chain the different components in a pipeline-like approach, by manually passing the training dataset to every step: </p>
+<pre><code class="language-py">X_train = scaler.fit_transform(X_train)
+X_train = pca.fit_transform(X_train)
+ridge.fit(X_train, y_train)</code></pre>
+<p>Quite repetitive, isn't it? Let's show how this can be accomplished by using a scikit-learn pipeline object:</p>
+<pre><code class="language-py">from sklearn.pipeline import Pipeline
+pipe = Pipeline([
+        ('scaler', StandardScaler()),
+        ('reduce_dim', PCA()),
+        ('regressor', Ridge())
+        ])</code></pre>
+<p>The pipeline is just a list of ordered elements, each with a name and a corresponding object instance. The pipeline module leverages on the common interface that every scikit-learn library must implement, such as: <code>fit</code>, <code>transform</code> and <code>predict</code>. </p>
+<p>Given the pipeline so far created, it is possible to train and test it by using just a couple of commands:</p>
+<pre><code class="language-py">pipe = pipe.fit(X_train, y_train)
+print('Testing score: ', pipe.score(X_test, y_test))</code></pre>
+<p>It is also possible to index the pipeline to access a specific element and retrieve a single value, for example the explained variance in the PCA step: </p>
+<pre><code class="language-py">print(pipe.steps[1][1].explained_variance_)</code></pre>
+<blockquote>
+<p>[ 6.17666461  1.40357729  1.22791087  0.89037592  0.84781455  0.65543078
+0.4911068   0.40790576  0.27463223  0.21616899  0.20742042  0.16826568
+0.06711765]</p>
+</blockquote>
+<p>The following picture illustrates both the training and testing data flow within the pipeline structure (copyright by <a href="https://nbviewer.jupyter.org/github/rasbt/python-machine-learning-book/blob/master/code/ch06/ch06.ipynb#Combining-transformers-and-estimators-in-a-pipeline">Sebastian Raschka</a>): </p>
+<figure role="group">
+        <img src="https://iaml.it/blog/optimizing-sklearn-pipelines/images/pipeline-diagram.png"alt="Pipeline" />
+        </figure>
+<p>On every object within the pipeline the methods <code>fit_transform</code> are invoked during training, while  <code>transform</code> (or <code>predict</code>) are called during test. So far using pipelines is just a matter of code cleaness and minimization. Now let's jump into model's <strong>hyper-parameter tuning</strong>. </p>
+<h2>Pipeline Tuning (Base Version)</h2>
+<p>Hyper-parameters are parameters that are manually tuned by a human operator to maximize the model performance against a validation set through a grid search.<br />
+Let's start with a trivial example, where we aim at optimizing the number of components selected by the PCA and the regularization factor of the linear regression model. If you are not familiar with the <code>GridSearchCV</code> module in sklearn, this is the right moment to <a href="http://scikit-learn.org/stable/modules/grid_search.html#grid-search">read the official tutorial about this module</a>. </p>
+<p>Concerning PCA, we want to evaluate how accuracy varies with the number of components, from 1 to 10: </p>
+<pre><code class="language-py">import numpy as np
+n_features_to_test = np.arange(1, 11)</code></pre>
+<p>As for the regularization factor, we consider an exponential range of values (as suggested in the aforementioned tutorial): </p>
+<pre><code class="language-py">alpha_to_test = 2.0**np.arange(-6, +6)</code></pre>
+<p>It's possible to notice that the two parameters are correlated, and should be optimized in combination. That is, a variation in the number of PCA components might imply a variation in the regularization factor, and viceversa. Thereby, it is important to evaluate all their possible combinations, and this is where the pipeline module really supports us. First of all, we define a dictionary with all the parameters we would like to combine in the evaluation: </p>
+<pre><code class="language-py">params = {'reduce_dim__n_components': n_features_to_test,\
+              'regressor__alpha': alpha_to_test}</code></pre>
+<p>It is worth remarking the convention adopted to name the parameters: name of the pipeline step, followed by a double underscore (__), then finally the name of the parameter within the step. The optimization is invoked as follows: </p>
+<pre><code class="language-py">from sklearn.model_selection import GridSearchCV
+gridsearch = GridSearchCV(pipe, params, verbose=1).fit(X_train, y_train)
+print('Final score is: ', gridsearch.score(X_test, y_test))</code></pre>
+<pre><code class="language-py">In[*]: gridsearch.best_params_
+Out[*]: {'reduce_dim__n_components': 8, 'regressor__alpha': 8.0}</code></pre>
+<p>In the next section we show how to automatically select the best performing algorithms to adopt in the pipeline. </p>
+<h2>Pipeline Tuning (Advanced Version)</h2>
+<p>So far we selected a range of values for every parameter to be optimized. We can follow the same approach, this time to decide which algorithm we should use, for example, to perform data normalization:</p>
+<pre><code class="language-py">scalers_to_test = [StandardScaler(), RobustScaler(), QuantileTransformer()]</code></pre>
+<p>The intuition under the hood is to tackle this task as a new hyper-parameter that contains three possible categorical alternatives, one per candidate algorithm. Thanks to the pipeline module we can add this new hyper-parameter to the same grid search:</p>
+<pre><code class="language-py">params = {'scaler': scalers_to_test,
+        'reduce_dim__n_components': n_features_to_test,\
+        'regressor__alpha': alpha_to_test}</code></pre>
+<p>The second and third arguments follow the aforementioned naming convention, identifying a specific parameter within the step, while this time the first argument addresses the whole step. In theory, we could also apply the same approach to the dimensionality reduction step, for example to choose between <code>PCA</code> and  <code>SelectKBest</code>. The only problem in this case is that <code>PCA</code> relies on a parameter named <code>n_components</code>, while <code>SelectKBest</code> requires to optimize a parameter named <code>k</code>. </p>
+<p>Luckily, <code>GridSearchCV</code> also allows to optimize <strong>lists</strong> of parameter dictionaries, which solves this issue as well: </p>
+<pre><code class="language-py">params = [
+        {'scaler': scalers_to_test,
+         'reduce_dim': [PCA()],
+         'reduce_dim__n_components': n_features_to_test,\
+         'regressor__alpha': alpha_to_test},
+
+        {'scaler': scalers_to_test,
+         'reduce_dim': [SelectKBest(f_regression)],
+         'reduce_dim__k': n_features_to_test,\
+         'regressor__alpha': alpha_to_test}
+        ]</code></pre>
+<p>We can then launch again our grid-search: </p>
+<pre><code class="language-py">gridsearch = GridSearchCV(pipe, params, verbose=1).fit(X_train, y_train)
+print('Final score is: ', gridsearch.score(X_test, y_test))</code></pre>
+<p>In our example, we ended up by selecting a robust scaling, a 9-component PCA, and a linear regression with low regularization: </p>
+<pre><code class="language-py">In[*]: gridsearch.best_params_
+Out[*]: 
+{'reduce_dim': PCA(copy=True, iterated_power='auto', n_components=9, random_state=None,
+   svd_solver='auto', tol=0.0, whiten=False),
+ 'reduce_dim__n_components': 9,
+ 'regressor__alpha': 8.0,
+ 'scaler': RobustScaler(copy=True, quantile_range=(25.0, 75.0), with_centering=True,
+        with_scaling=True)}</code></pre>
+<p>Needless to say, such a small dataset is not significantly realistic, but the same approach can be easily applied to more complex use cases. When the overall number of hyper-parameters is very high, we might need to replace the optimization method (e.g. applying a <a href="http://scikit-learn.org/stable/modules/grid_search.html#randomized-parameter-optimization">randomized grid search</a>).</p>
+<hr />
+<p>If you liked this post and you would like to keep in touch with our activities, you can <a href="/member">become a member of the Italian Association for Machine Learning</a>, or follow us on <a href="https://www.facebook.com/machinelearningitalia/">Facebook</a> or <a href="https://www.linkedin.com/company/18312943/">LinkedIn</a>.</p></p>
+            
+    
+        <p class="prev-next">
+                            <a class="button" href="/blog/adversarial-examples"><i class="fa fa-chevron-left"></i> Previous Post</a>
+            
+                            <a class="button" href="/blog/fun-with-pytorch-part-1">Next Post <i class="fa fa-chevron-right"></i></a>
+                    </p>
+    
+    </div>
+</div>
+			</div>
+			<div id="sidebar" class="g-block size-1-3 pure-u-1-3">
+				<div class="sidebar-content">
+    <h4>Search the blog</h4>
+    <input type="text" placeholder="Search..." value="" data-searchsidebar-input="/search/query" />
+<script>
+jQuery(document).ready(function($){
+    var input = $('[data-searchsidebar-input]');
+
+    input.on('keypress', function(event) {
+        if (event.which == 13 && input.val().length > 3) {
+            event.preventDefault();
+            window.location.href = input.data('searchsidebar-input') + ':' + input.val();
+        }
+    });
+});
+</script>
+</div>
+<!--
+<div class="sidebar-content">
+	<h4>Some Text Widget</h4>
+	<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna.</p>
+</div>
+!-->
+<div class="sidebar-content">
+    <h4>Categories</h4>
+    
+
+<ul class="archives">
+        <li>
+        <a href="/blog/category:Tutorials">Tutorials </a> (16)
+    </li>
+        <li>
+        <a href="/blog/category:Discussions">Discussions </a> (12)
+    </li>
+        <li>
+        <a href="/blog/category:Announcements">Announcements </a> (4)
+    </li>
+        <li>
+        <a href="/blog/category:Tutorials%20%28English%29">Tutorials (English) </a> (4)
+    </li>
+        <li>
+        <a href="/blog/category:Articles%27%20summaries">Articles' summaries </a> (3)
+    </li>
+        <li>
+        <a href="/blog/category:Discussions%20%28English%29">Discussions (English) </a> (2)
+    </li>
+        <li>
+        <a href="/blog/category:Focus-on">Focus-on </a> (1)
+    </li>
+        <li>
+        <a href="/blog/category:Reviews">Reviews </a> (1)
+    </li>
+        <li>
+        <a href="/blog/category:Discussion">Discussion </a> (1)
+    </li>
+    </ul>
+</div>
+<div class="sidebar-content">
+    <h4>Archives</h4>
+	<ul class="archives">
+    <li>
+    	<a href="/blog/archives_month:apr_2020">
+        <span class="archive_date">April 2020</span>
+                <span>(1)</span>
+                </a>
+    </li>
+</ul>
+</div>
+<div class="sidebar-content">
+    <h4>Popular Tags</h4>
+    
+
+<ul class="archives">
+        <li>
+        <a href="/blog/tag:deep%20learning">deep learning </a> (11)
+    </li>
+        <li>
+        <a href="/blog/tag:pytorch">pytorch </a> (9)
+    </li>
+        <li>
+        <a href="/blog/tag:reti%20neurali">reti neurali </a> (5)
+    </li>
+        <li>
+        <a href="/blog/tag:google">google </a> (4)
+    </li>
+        <li>
+        <a href="/blog/tag:jit">jit </a> (4)
+    </li>
+        <li>
+        <a href="/blog/tag:tensorflow">tensorflow </a> (4)
+    </li>
+        <li>
+        <a href="/blog/tag:ottimizzazione">ottimizzazione </a> (4)
+    </li>
+        <li>
+        <a href="/blog/tag:rete%20neurale">rete neurale </a> (3)
+    </li>
+        <li>
+        <a href="/blog/tag:time%20series">time series </a> (3)
+    </li>
+        <li>
+        <a href="/blog/tag:keras">keras </a> (3)
+    </li>
+        <li>
+        <a href="/blog/tag:reti%20convolutive">reti convolutive </a> (3)
+    </li>
+        <li>
+        <a href="/blog/tag:pipeline">pipeline </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:sklearn">sklearn </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:autodiff">autodiff </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:automatic%20differentation">automatic differentation </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:reverse-mode">reverse-mode </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:derivate">derivate </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:differenziazione">differenziazione </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:model%20selection">model selection </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:cross%20validation">cross validation </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:c%2B%2B">c++ </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:numpy">numpy </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:vmap">vmap </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:caffe">caffe </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:compiler">compiler </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:jax">jax </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:codemotion">codemotion </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:bias">bias </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:discrimination">discrimination </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:fairness">fairness </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:iaml">iaml </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:database">database </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:iperparametri">iperparametri </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:autograph">autograph </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:head">head </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:multi-task">multi-task </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:learning">learning </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:novit%C3%A0">novità </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:dev%20summit">dev summit </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:custom%20estimator">custom estimator </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:hyperopt">hyperopt </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:goodfellow">goodfellow </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:nlp">nlp </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:dati%20mancanti">dati mancanti </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:transformer">transformer </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:attenzione">attenzione </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:robocop">robocop </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:yolo">yolo </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:object%20detection">object detection </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:bayes">bayes </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:autoencoders">autoencoders </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:variational">variational </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:eager">eager </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:imputazione">imputazione </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:CIFAR">CIFAR </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:word%20embedding">word embedding </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:MNIST">MNIST </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:immagini">immagini </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:classificazione">classificazione </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:kpi">kpi </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:reprogramming">reprogramming </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:adversarial">adversarial </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:browser">browser </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:javascript">javascript </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:reti%20ricorsive">reti ricorsive </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:reti%20ricorrenti">reti ricorrenti </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:ftth">ftth </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:adversarial%20example">adversarial example </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:management">management </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:robotica">robotica </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:ocr">ocr </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:focus">focus </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:iphone">iphone </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:python">python </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:face%20id">face id </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:momento">momento </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:adam">adam </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:neuroscienza">neuroscienza </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:onde%20cerebrali">onde cerebrali </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:torchvision">torchvision </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:latin">latin </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:pretrained">pretrained </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:rete%20convolutiva">rete convolutiva </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:autograd">autograd </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:swish">swish </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:attivazione">attivazione </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:checkpoint">checkpoint </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:tensori">tensori </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:variabili">variabili </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:lineare">lineare </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:regressione">regressione </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:convolutional%20networks">convolutional networks </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:Vatican">Vatican </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:project">project </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:kernel">kernel </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:ICLR">ICLR </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:ipotesi">ipotesi </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:sparsit%C3%A0">sparsità </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:funzionale">funzionale </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:functional">functional </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:adversarial%20attack">adversarial attack </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:kmeans">kmeans </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:analysis">analysis </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:clustering">clustering </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:Google">Google </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:regression">regression </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:JAX">JAX </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:gaussian%20process">gaussian process </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:ensemble">ensemble </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:boosting">boosting </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:gradient">gradient </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:semi-supervised%20learning">semi-supervised learning </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:document%20classification">document classification </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:graphs">graphs </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:variables">variables </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:linear">linear </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:k-NN">k-NN </a> (1)
+    </li>
+    </ul>
+</div>
+<div class="sidebar-content syndicate">
+    <h4>Syndicate</h4>
+    <a class="button" href="/blog.atom"><i class="fa fa-rss-square"></i> Atom 1.0</a>
+    <a class="button" href="/blog.rss"><i class="fa fa-rss-square"></i> RSS</a>
+</div>
+			</div>
+		</div>
+	
+                        <div class="modular-row footer ">
+    <div class="footer-items">
+        <div class="footer-module large">
+		<h4>About</h4>
+                            <p>Italian Association for Machine Learning (C.F. 97949550582)</p>
+            			<p>Write us: info@iaml.it</p>
+        </div>
+        <div class="footer-module"><h4>Address</h4>
+            <p>
+                                    <span><strong>Operational office</strong></span>
+                                    <span>IAML c/o Pi Campus, via Indonesia 23, 00144 Rome</span>
+                                    <span><strong>Legal office</strong></span>
+                                    <span>Via Cassia 964, 00189, Rome</span>
+                            </p>
+        </div>
+        <div class="footer-module"><h4>Quick Links</h4>
+         <ul class="quickmenu">
+                            <li><i class="fa fa-chevron-right"></i><a href="https://iaml.it/home">Home</a></li>
+                            <li><i class="fa fa-chevron-right"></i><a href="https://iaml.it/documents">Documents (Italian)</a></li>
+                    </ul>
+    </div>
+   
+</div>
+<hr>
+<div class="footer-modules">
+    <div class="footer-copyright">
+        Copyright 2018 IAML.IT. All Rights Reserved.
+    </div>
+    <div class="footer-menu">
+    <ul class="othermenu">
+           <li><a href="https://learn.getgrav.org/">Powered by Grav</a></li>
+           <li><a href="https://github.com/getgrav/grav-theme-deliver">Theme (adapted) from Deliver</a></li>
+        </ul>
+    </div>
+</div>
+</div>                    </section>
+        
+    </div>
+    <div class="sb-slidebar sb-left sb-width-thin">
+        <div id="panel">
+        
+<ul class="navigation">
+                                                        <li class="">
+                    <a href="/">
+                                                Home
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/activities">
+                                                Activities
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/supporters">
+                                                Supporters
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/member">
+                                                Become a member
+                    </a>
+                </li>
+                                                                <li class="active">
+                    <a href="/blog">
+                                                Blog
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/governance">
+                                                Governance
+                    </a>
+                </li>
+                                                                                                                                </ul>                   </div>
+    </div>
+        <script src="/user/plugins/simplesearch/js/simplesearch.js" type="text/javascript" ></script>
+
+    <script>
+    $(function () {
+        $(document).ready(function() {
+          $.slidebars({
+            hideControlClasses: true,
+            scrollLock: true
+          });
+        });
+    });
+    </script>
+    </body>
+</html>

@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Governance | Italian Association for Machine Learning</title>
+    <meta content="GravCMS"  />
+<meta content="The Italian Association for Machine Learning (IAML) is a not-for-profit organization with the purpose of promoting knowledge of machine learning in all aspects of the Italian public life, from universities to enterprises and IT professionals."  />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="icon" type="image/png" href="/user/themes/deliver/images/favicon.png" />
+
+	<!-- Global site tag (gtag.js) - Google Ads: 774709547 --> <script async src="https://www.googletagmanager.com/gtag/js?id=AW-774709547"></script> <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'AW-774709547'); </script> 
+	
+		
+                            		                                                <link href="/user/themes/deliver/css-compiled/nucleus.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css-compiled/template.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/custom.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/toc.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/font-awesome.min.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/facebook/css/facebook.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/facebook/assets/unitegallery/css/unite-gallery.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/facebook/assets/unitegallery/themes/default/ug-theme-default.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/markdown-notices/assets/notices.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/breadcrumbs/css/breadcrumbs.css" type="text/css" rel="stylesheet" />
+<link href="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/events/assets/events.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/form/assets/form-styles.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/mathjax/assets/css/mathjax.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/simplesearch/css/simplesearch.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/highlight/css/zenburn.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/login/css/login.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/slidebars.min.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/slideme.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/socialbuttons/vendor/rrssb/css/rrssb.css" type="text/css" rel="stylesheet" />
+
+
+                                                                
+    <script src="/system/assets/jquery/jquery-2.x.min.js" type="text/javascript" ></script>
+<script src="/user/themes/deliver/js/modernizr.custom.71422.js" type="text/javascript" ></script>
+<script src="/user/plugins/facebook/assets/unitegallery/js/unitegallery.min.js" type="text/javascript" ></script>
+<script src="/user/plugins/facebook/assets/unitegallery/themes/default/ug-theme-default.js" type="text/javascript" ></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.js" type="text/javascript" ></script>
+<script src="/user/plugins/events/assets/events.js" type="text/javascript" ></script>
+<script src="/user/plugins/mathjax/assets/js/mathjax.js" type="text/javascript" ></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript" ></script>
+<script src="/user/plugins/highlight/js/highlight.pack.js" type="text/javascript" ></script>
+<script src="/user/themes/deliver/js/deliver.js" type="text/javascript" ></script>
+<script src="/user/themes/deliver/js/slidebars.min.js" type="text/javascript" ></script>
+<script src="/user/themes/deliver/js/jquery.slideme2.js" type="text/javascript" ></script>
+<script src="/user/plugins/socialbuttons/vendor/rrssb/js/rrssb.min.js" type="text/javascript" ></script>
+
+<script>
+window.addEventListener("load", function(){
+window.cookieconsent.initialise({
+"palette": {
+    "popup": {
+        "background": "#4d4d4d",
+        "text": "#fff"
+    },
+    "button": {
+        "background": "#f1d600",
+        "text": "#000",
+        "border": "#f1d600"
+    }
+},
+"position": "bottom",
+"theme": "block",
+"content": {
+    "message": "This website uses cookies to ensure you get the best experience on our website.",
+    "dismiss": "Got it!",
+    "link": "Learn more",
+    "href": "https://cookiesandyou.com"
+}
+})});
+hljs.initHighlightingOnLoad();
+
+</script>
+
+
+</head>
+<body id="top" class="modular header-lite fullwidth">
+    <div id="sb-site">
+                <header id="header">
+                <div class="logo">
+                    <h3><a href="https://iaml.it"><img src="/user/pages/images/IAML_logo_viola.png" /></a></h3>
+                                            <ul class="social-icons">
+            <li>
+            <a href="https://twitter.com/iaml_it">
+                <i class="fa fa-twitter"></i>            </a>
+        </li>
+            <li>
+            <a href="https://www.linkedin.com/company/iaml/">
+                <i class="fa fa-linkedin"></i>            </a>
+        </li>
+            <li>
+            <a href="https://www.facebook.com/machinelearningitalia/">
+                <i class="fa fa-facebook"></i>            </a>
+        </li>
+            <li>
+            <a href="blog.rss">
+                <i class="fa fa-rss"></i>            </a>
+        </li>
+    </ul>  
+                                    </div>
+                <div id="navbar">
+                                                                        
+<ul class="navigation">
+                                                        <li class="">
+                    <a href="/">
+                                                Home
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/activities">
+                                                Activities
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/supporters">
+                                                Supporters
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/member">
+                                                Become a member
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/blog">
+                                                Blog
+                    </a>
+                </li>
+                                                                <li class="active">
+                    <a href="/governance">
+                                                Governance
+                    </a>
+                </li>
+                                                                                                                                </ul>                               
+                        <form class="search-box">
+    <input type="search" placeholder="Search..." value="" data-search-input="/search/query" />
+    <script>
+    jQuery(document).ready(function($){
+        var input = $('[data-search-input]');
+
+        input.on('keypress', function(event) {
+            if (event.which == 13 && input.val().length > 3) {
+                event.preventDefault();
+                window.location.href = input.data('search-input') + ':' + input.val();
+            }
+        });
+    });
+    </script>
+    <i class="fa fa-search"></i>
+</form>                    <span class="panel-activation sb-toggle-left navbar-left menu-btn fa fa-bars"></span>
+                </div>
+        </header>
+        
+        
+                <section id="body" class="">
+                        <div class="flush-top blog-header blog-header-image" style="background: #B4B093 url(/user/pages/06.governance/blue_header.jpg) no-repeat right;">
+    <h1>Governance</h1>
+    </div>
+        
+            <div id="_members"></div>
+        <div class="modular-row bottom ">
+    <h2>Executive Board</h2>
+<p><br /></p>
+<div class="grow">
+  <div class="gcolumn">
+    <div class="gcard">
+      <img src="governance/_members/scardapane.jpg">
+      <div class="gcontainer">
+        <h3><a href="http://ispac.diet.uniroma1.it/scardapane/">Simone Scardapane</a></h3>
+        <p>Chairman</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="gcolumn">
+    <div class="gcard">
+      <img src="governance/_members/nocco.jpg">
+      <div class="gcontainer">
+        <h3><a href="https://www.linkedin.com/in/gabriele-nocco-a1780640/?originalSubdomain=it">Gabriele Nocco</a></h3>
+        <p>Co-founder</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="gcolumn">
+    <div class="gcard">
+      <img src="governance/_members/randelli.jpg">
+      <div class="gcontainer">
+        <h3><a href="https://www.linkedin.com/in/gabrielerandelli?originalSubdomain=it">Gabriele Randelli</a></h3>
+        <p>Co-founder</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="gcolumn">
+    <div class="gcard">
+      <img src="governance/_members/alma.jpg">
+      <div class="gcontainer">
+        <h3><a href="https://www.linkedin.com/in/roberto-alma-92560328/">Roberto Alma</a></h3>
+        <p>Co-founder</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+<h2>Advisory Board</h2>
+<p><br /></p>
+<div class="grow">
+  <div class="gcolumn">
+    <div class="gcard">
+      <img src="governance/_members/bratieres.jpg">
+      <div class="gcontainer">
+        <h3><a href="https://www.linkedin.com/in/sebastien-bratieres/?originalSubdomain=it">Sébastien Bratières</a></h3>
+        <p>Director of Artificial Intelligence @ Translated</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="gcolumn">
+    <div class="gcard">
+      <img src="governance/_members/chiappa.jpg">
+      <div class="gcontainer">
+        <h3><a href="https://csilviavr.github.io/">Silvia Chiappa</a></h3>
+        <p>Research Scientist @ DeepMind</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="gcolumn">
+    <div class="gcard">
+      <img src="governance/_members/frasconi.jpg">
+      <div class="gcontainer">
+        <h3><a href="http://ai.dinfo.unifi.it/paolo/">Paolo Frasconi</a></h3>
+        <p>Full Professor @ University of Florence</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="gcolumn">
+    <div class="gcard">
+      <img src="governance/_members/rosasco.jpg">
+      <div class="gcontainer">
+        <h3><a href="http://web.mit.edu/lrosasco/www/">Lorenzo Rosasco</a></h3>
+        <p>Associate Professor @ University of Genoa</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="gcolumn">
+    <div class="gcard">
+      <img src="governance/_members/trombetti.jpg">
+      <div class="gcontainer">
+        <h3><a href="https://www.linkedin.com/in/marco-trombetti-707330/?originalSubdomain=it">Marco Trombetti</a></h3>
+        <p>Entrepeneur / Co-founder @ Pi Campus</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+<h2>Active team (volunteers)</h2>
+<p><br /></p>
+<div class="grow">
+
+  <div class="gcolumn">
+    <div class="gcard">
+      <img src="governance/_members/montresor.jpg">
+      <div class="gcontainer">
+        <h3><a href="https://www.linkedin.com/in/cmontresor/?originalSubdomain=it">Cesare Montresor</a></h3>
+        <p>Main promoter & Organizer of <a href="https://www.facebook.com/groups/TarallucciVinoMachineLearningVerona/">TVML</a>.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="gcolumn">
+    <div class="gcard">
+      <img src="governance/_members/cassara.jpg">
+      <div class="gcontainer">
+        <h3><a href="https://twitter.com/v2devnull?lang=en">Giulia Cassarà</a></h3>
+        <p>Social media team (<a href="https://twitter.com/iaml_it">Twitter</a>).</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="gcolumn">
+    <div class="gcard">
+      <img src="governance/_members/tibaldeschi2.jpg">
+      <div class="gcontainer">
+        <h3><a href="https://www.linkedin.com/in/marcotibaldeschi/">Marco Tibaldeschi</a></h3>
+        <p>Marketing advisor (AdWords).</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+<h2>Blog contributors</h2>
+<p><br /></p>
+<div class="grow">
+
+  <div class="gcolumn">
+    <div class="gcard">
+      <img src="governance/_members/palmieri.jpg">
+      <div class="gcontainer">
+        <h3><a href="https://www.lpalmieri.com/">Luca Palmieri</a></h3>
+        <p>Blog contributor.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="gcolumn">
+    <div class="gcard">
+      <img src="governance/_members/dipietro.png">
+      <div class="gcontainer">
+        <h3><a href="https://www.linkedin.com/in/stefanodipietro/">Stefano Di Pietro</a></h3>
+        <p>Blog contributor.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="gcolumn">
+    <div class="gcard">
+      <img src="governance/_members/panizza.png">
+      <div class="gcontainer">
+        <h3><a href="https://www.linkedin.com/in/andrea-panizza-7114025/">Andrea Panizza</a></h3>
+        <p>Blog contributor.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+<h2>Local Organizers (Meetups & Communities)</h2>
+<p><br /></p>
+<div class="grow">
+
+  <div class="gcolumn">
+    <div class="gcard">
+      <img src="governance/_members/manzari.jpg">
+      <div class="gcontainer">
+        <h3><a href="https://www.linkedin.com/in/benedetto-manzari/?originalSubdomain=it">Benedetto Manzari</a></h3>
+        <p>Mantainer of <a href="https://www.facebook.com/ilGeneraleCluster/"> Il Generale Cluster</a> (Facebook).</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="gcolumn">
+    <div class="gcard">
+      <img src="governance/_members/franco.jpg">
+      <div class="gcontainer">
+        <h3><a href="http://stefano.ninja/">Stefano Franco</a></h3>
+        <p>Organizer of <a href="https://www.meetup.com/it-IT/Ma-sci-Learning-MEETUP-BARI/">Machine Learning Meetup</a> in Bari.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="gcolumn">
+    <div class="gcard">
+      <img src="governance/_members/devincenzo.jpg">
+      <div class="gcontainer">
+        <h3><a href="https://www.linkedin.com/in/giodevincenzo/">Giovanna de Vincenzo</a></h3>
+        <p>Co-organizer of <a href="https://www.meetup.com/it-IT/R-Ladies-Bari/">R-Ladies Bari</a>.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="gcolumn">
+    <div class="gcard">
+      <img src="governance/_members/lamontanara.jpg">
+      <div class="gcontainer">
+        <h3><a href="https://www.linkedin.com/in/francesca-lamontanara-24b8a2128/">Francesca Lamontanara</a></h3>
+        <p>Co-organizer of <a href="https://www.meetup.com/it-IT/R-Ladies-Bari/">R-Ladies Bari</a>.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="gcolumn">
+    <div class="gcard">
+      <img src="governance/_members/naso.jpg">
+      <div class="gcontainer">
+        <h3><a href="https://www.linkedin.com/in/lucanaso/">Luca Naso</a></h3>
+        <p>Co-organizer of <a href="https://www.fablabcatania.eu/machine-learning-catania">Machine Learning Catania</a>.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="gcolumn">
+    <div class="gcard">
+      <img src="governance/_members/palermo.jpg">
+      <div class="gcontainer">
+        <h3><a href="https://www.linkedin.com/in/alfio-palermo-42b947158/">Alfio Palermo</a></h3>
+        <p>Co-organizer of <a href="https://www.fablabcatania.eu/machine-learning-catania">Machine Learning Catania</a>.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="gcolumn">
+    <div class="gcard">
+      <img src="governance/_members/annino.jpg">
+      <div class="gcontainer">
+        <h3><a href="https://facebook.com/idealarm.it">Nicolò Annino</a></h3>
+        <p>Co-organizer of <a href="https://www.fablabcatania.eu/machine-learning-catania">Machine Learning Catania</a>.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="gcolumn">
+    <div class="gcard">
+      <img src="governance/_members/russo.jpg">
+      <div class="gcontainer">
+        <h3><a href="https://www.linkedin.com/in/carmenrussofab/">Carmen Russo</a></h3>
+        <p>Co-organizer of <a href="https://www.fablabcatania.eu/machine-learning-catania">Machine Learning Catania</a>.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="gcolumn">
+    <div class="gcard">
+      <img src="governance/_members/lomonaco.jpg">
+      <div class="gcontainer">
+        <h3><a href="https://www.vincenzolomonaco.com">Vincenzo Lomonaco</a></h3>
+        <p>Organizer of <a href="https://continualai.org/home/">Continual AI</a> in Bologna.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="gcolumn">
+    <div class="gcard">
+      <img src="governance/_members/amabili.png">
+      <div class="gcontainer">
+        <h3><a href="https://www.linkedin.com/in/matteo-amabili-ab8921125/?locale=en_US">Matteo Amabili</a></h3>
+        <p>Co-organizer of <a href="https://www.datasciencebologna.eu/">Data Science Bologna</a>.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="gcolumn">
+    <div class="gcard">
+      <img src="governance/_members/savino.jpg">
+      <div class="gcontainer">
+        <h3><a href="https://www.linkedin.com/in/giuseppe-savino-7a6a60b5/">Giuseppe Savino</a></h3>
+        <p>Co-organizer of <a href="https://www.datasciencebologna.eu/">Data Science Bologna</a>.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="gcolumn">
+    <div class="gcard">
+      <img src="governance/_members/mattia.png">
+      <div class="gcontainer">
+        <h3><a href="https://www.linkedin.com/in/carminemattia">Carmine Mattia</a></h3>
+        <p>Co-organizer of <a href="https://www.meetup.com/it-IT/Cagliari-Machine-Learning-Meetup/">Cagliari Machine Learning Meetup</a>.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="gcolumn">
+    <div class="gcard">
+      <img src="governance/_members/morchio.jpg">
+      <div class="gcontainer">
+        <h3><a href="https://www.linkedin.com/in/marcello-morchio-4a9b967/?originalSubdomain=it">Marcello Morchio</a></h3>
+        <p>Organizer of <a href="https://www.meetup.com/it-IT/Data-Science-Seed-Meetup-Genova/">DataScienceSeed</a> in Genoa.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="gcolumn">
+    <div class="gcard">
+      <img src="governance/_members/volpetti.jpg">
+      <div class="gcontainer">
+        <h3><a href="https://www.linkedin.com/in/claudiavolpetti/">Claudia Volpetti</a></h3>
+        <p>Organizer of <a href="https://www.meetup.com/it-IT/Milan-Women-in-Machine-Learning-and-Data-Science/">WiMLDS Milan</a>.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="gcolumn">
+    <div class="gcard">
+      <img src="governance/_members/orsenigo.jpg">
+      <div class="gcontainer">
+        <h3><a href="https://www.linkedin.com/in/carlotta-orsenigo-272415b8/">Carlotta Orsenigo</a></h3>
+        <p>Organizer of <a href="https://www.meetup.com/it-IT/Milan-Women-in-Machine-Learning-and-Data-Science/">WiMLDS Milan</a>.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="gcolumn">
+    <div class="gcard">
+      <img src="governance/_members/pedretti.jpg">
+      <div class="gcontainer">
+        <h3><a href="https://www.linkedin.com/in/andrea-pedretti-4707221a/">Andrea Pedretti</a></h3>
+        <p>Co-organizer of <a href="https://www.facebook.com/DSAIinParma/">Data Science & AI in Parma</a>.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="gcolumn">
+    <div class="gcard">
+      <img src="governance/_members/antopolskiy3.jpg">
+      <div class="gcontainer">
+        <h3><a href="https://www.linkedin.com/in/antop/">Sergey Antopolskiy</a></h3>
+        <p>Co-organizer of <a href="https://www.facebook.com/DSAIinParma/">Data Science & AI in Parma</a>.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="gcolumn">
+    <div class="gcard">
+      <img src="governance/_members/vitali.jpg">
+      <div class="gcontainer">
+        <h3><a href="https://www.linkedin.com/in/michele-vitali-a1341320/">Michele Vitali</a></h3>
+        <p>Co-organizer of <a href="https://www.facebook.com/DSAIinParma/">Data Science & AI in Parma</a>.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="gcolumn">
+    <div class="gcard">
+      <img src="governance/_members/fontanili.jpg">
+      <div class="gcontainer">
+        <h3><a href="https://www.linkedin.com/in/luca-fontanili/">Luca Fontanili</a></h3>
+        <p>Co-organizer of <a href="https://www.facebook.com/DSAIinParma/">Data Science & AI in Parma</a>.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="gcolumn">
+    <div class="gcard">
+      <img src="governance/_members/dipalo.jpg">
+      <div class="gcontainer">
+        <h3><a href="https://medium.com/@normandipalo">Norman Di Palo</a></h3>
+        <p>Co-organizer of <a href="https://www.meetup.com/TensorFlow-x-Rome-Meetup/">TensorFlow x Rome</a>.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="gcolumn">
+    <div class="gcard">
+      <img src="governance/_members/gambitta.jpg">
+      <div class="gcontainer">
+        <h3><a href="https://www.linkedin.com/in/damianogambitta/">Damiano Gambitta</a></h3>
+        <p>Co-organizer of <a href="https://www.meetup.com/TensorFlow-x-Rome-Meetup/">TensorFlow x Rome</a>.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="gcolumn">
+    <div class="gcard">
+      <img src="governance/_members/grassi.jpg">
+      <div class="gcontainer">
+        <h3><a href="https://www.linkedin.com/in/pier-paolo-grassi-19300217/?originalSubdomain=it">Pier Paolo Grassi</a></h3>
+        <p>Organizer of <a href="https://www.meetup.com/it-IT/Machine-Learning-TO/">Machine Learning Meetup</a> in Turin.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+            </div>
+
+    
+                        <div class="modular-row footer ">
+    <div class="footer-items">
+        <div class="footer-module large">
+		<h4>About</h4>
+                            <p>Italian Association for Machine Learning (C.F. 97949550582)</p>
+            			<p>Write us: info@iaml.it</p>
+        </div>
+        <div class="footer-module"><h4>Address</h4>
+            <p>
+                                    <span><strong>Operational office</strong></span>
+                                    <span>IAML c/o Pi Campus, via Indonesia 23, 00144 Rome</span>
+                                    <span><strong>Legal office</strong></span>
+                                    <span>Via Cassia 964, 00189, Rome</span>
+                            </p>
+        </div>
+        <div class="footer-module"><h4>Quick Links</h4>
+         <ul class="quickmenu">
+                            <li><i class="fa fa-chevron-right"></i><a href="https://iaml.it/home">Home</a></li>
+                            <li><i class="fa fa-chevron-right"></i><a href="https://iaml.it/documents">Documents (Italian)</a></li>
+                    </ul>
+    </div>
+   
+</div>
+<hr>
+<div class="footer-modules">
+    <div class="footer-copyright">
+        Copyright 2018 IAML.IT. All Rights Reserved.
+    </div>
+    <div class="footer-menu">
+    <ul class="othermenu">
+           <li><a href="https://learn.getgrav.org/">Powered by Grav</a></li>
+           <li><a href="https://github.com/getgrav/grav-theme-deliver">Theme (adapted) from Deliver</a></li>
+        </ul>
+    </div>
+</div>
+</div>                    </section>
+        
+    </div>
+    <div class="sb-slidebar sb-left sb-width-thin">
+        <div id="panel">
+        
+<ul class="navigation">
+                                                        <li class="">
+                    <a href="/">
+                                                Home
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/activities">
+                                                Activities
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/supporters">
+                                                Supporters
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/member">
+                                                Become a member
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/blog">
+                                                Blog
+                    </a>
+                </li>
+                                                                <li class="active">
+                    <a href="/governance">
+                                                Governance
+                    </a>
+                </li>
+                                                                                                                                </ul>                   </div>
+    </div>
+            <script src="/user/plugins/simplesearch/js/simplesearch.js" type="text/javascript" ></script>
+
+    <script>
+    $(function () {
+        $(document).ready(function() {
+          $.slidebars({
+            hideControlClasses: true,
+            scrollLock: true
+          });
+        });
+    });
+    </script>
+    
+    </body>
+</html>

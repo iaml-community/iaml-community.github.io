@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Alle prese con PyTorch - Parte 4: Torchvision e reti convolutive | Italian Association for Machine Learning</title>
+    <meta content="GravCMS"  />
+<meta content="The Italian Association for Machine Learning (IAML) is a not-for-profit organization with the purpose of promoting knowledge of machine learning in all aspects of the Italian public life, from universities to enterprises and IT professionals."  />
+<meta property="og:title" content="Alle prese con PyTorch #4 (Torchvision e Reti Convolutive) | IAML.it"  />
+<meta property="og:image" content="https://iaml.it/blog/alle-prese-con-pytorch-parte-4/images/fmnist_examples.png"  />
+<meta property="og:url" content="https://iaml.it/blog/alle-prese-con-pytorch-parte-4/"  />
+<meta property="og:description" content="Nella quarta parte introduciamo una serie di strumenti essenziali per lavorare con le immagini: dataset già pronti, reti convolutive, e modelli pre-allenati."  />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="icon" type="image/png" href="../user/themes/deliver/images/favicon.png" />
+
+	<!-- Global site tag (gtag.js) - Google Ads: 774709547 --> <script async src="https://www.googletagmanager.com/gtag/js?id=AW-774709547"></script> <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'AW-774709547'); </script> 
+	
+		
+                            		                                                <link href="../user/themes/deliver/css-compiled/nucleus.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css-compiled/template.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css/custom.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css/toc.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css/font-awesome.min.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/facebook/css/facebook.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/facebook/assets/unitegallery/css/unite-gallery.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/facebook/assets/unitegallery/themes/default/ug-theme-default.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/markdown-notices/assets/notices.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/breadcrumbs/css/breadcrumbs.css" type="text/css" rel="stylesheet" />
+<link href="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/events/assets/events.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/form/assets/form-styles.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/mathjax/assets/css/mathjax.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/simplesearch/css/simplesearch.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/highlight/css/zenburn.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/login/css/login.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css/slidebars.min.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css/slideme.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/socialbuttons/vendor/rrssb/css/rrssb.css" type="text/css" rel="stylesheet" />
+
+
+                                                            <script src="../system/assets/jquery/jquery-2.x.min.js" type="text/javascript" ></script>
+<script src="../user/themes/deliver/js/modernizr.custom.71422.js" type="text/javascript" ></script>
+<script src="../user/plugins/facebook/assets/unitegallery/js/unitegallery.min.js" type="text/javascript" ></script>
+<script src="../user/plugins/facebook/assets/unitegallery/themes/default/ug-theme-default.js" type="text/javascript" ></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.js" type="text/javascript" ></script>
+<script src="../user/plugins/events/assets/events.js" type="text/javascript" ></script>
+<script src="../user/plugins/mathjax/assets/js/mathjax.js" type="text/javascript" ></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript" ></script>
+<script src="../user/plugins/highlight/js/highlight.pack.js" type="text/javascript" ></script>
+<script src="../user/themes/deliver/js/deliver.js" type="text/javascript" ></script>
+<script src="../user/themes/deliver/js/slidebars.min.js" type="text/javascript" ></script>
+<script src="../user/themes/deliver/js/jquery.slideme2.js" type="text/javascript" ></script>
+<script src="../user/plugins/socialbuttons/vendor/rrssb/js/rrssb.min.js" type="text/javascript" ></script>
+
+<script>
+window.addEventListener("load", function(){
+window.cookieconsent.initialise({
+"palette": {
+    "popup": {
+        "background": "#4d4d4d",
+        "text": "#fff"
+    },
+    "button": {
+        "background": "#f1d600",
+        "text": "#000",
+        "border": "#f1d600"
+    }
+},
+"position": "bottom",
+"theme": "block",
+"content": {
+    "message": "This website uses cookies to ensure you get the best experience on our website.",
+    "dismiss": "Got it!",
+    "link": "Learn more",
+    "href": "https://cookiesandyou.com"
+}
+})});
+hljs.initHighlightingOnLoad();
+
+</script>
+
+
+</head>
+<body id="top" class="header-lite fullwidth blogstyling">
+    <div id="sb-site">
+                <header id="header">
+                <div class="logo">
+                    <h3><a href="../index.html"><img src="../user/pages/images/IAML_logo_viola.png" /></a></h3>
+                                            <ul class="social-icons">
+            <li>
+            <a href="https://twitter.com/iaml_it">
+                <i class="fa fa-twitter"></i>            </a>
+        </li>
+            <li>
+            <a href="https://www.linkedin.com/company/iaml/">
+                <i class="fa fa-linkedin"></i>            </a>
+        </li>
+            <li>
+            <a href="https://www.facebook.com/machinelearningitalia/">
+                <i class="fa fa-facebook"></i>            </a>
+        </li>
+            <li>
+            <a href="blog.rss">
+                <i class="fa fa-rss"></i>            </a>
+        </li>
+    </ul>  
+                                    </div>
+                <div id="navbar">
+                                                            
+<ul class="navigation">
+                                                        <li class="">
+                    <a href="../index.html">
+                                                Home
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../activities">
+                                                Activities
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../supporters.html">
+                                                Supporters
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../member.html">
+                                                Become a member
+                    </a>
+                </li>
+                                                                <li class="active">
+                    <a href="../blog">
+                                                Blog
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../governance.html">
+                                                Governance
+                    </a>
+                </li>
+                                                                                                                                </ul>                                                   <form class="search-box">
+    <input type="search" placeholder="Search..." value="" data-search-input="/search/query" />
+    <script>
+    jQuery(document).ready(function($){
+        var input = $('[data-search-input]');
+
+        input.on('keypress', function(event) {
+            if (event.which == 13 && input.val().length > 3) {
+                event.preventDefault();
+                window.location.href = input.data('search-input') + ':' + input.val();
+            }
+        });
+    });
+    </script>
+    <i class="fa fa-search"></i>
+</form>                    <span class="panel-activation sb-toggle-left navbar-left menu-btn fa fa-bars"></span>
+                </div>
+        </header>
+        
+        
+                <section id="body" class="">
+                            
+				<div class="flush-top blog-header blog-header-image" style="background: #B4B093 url(/user/pages/05.blog/blue_header.jpg) no-repeat right;">
+            <h1>Alle prese con PyTorch - Parte 4: Torchvision e reti convolutive</h1>
+        </div>
+            
+        
+<div id="breadcrumbs" itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
+                                            <a href="../index.html" itemprop="url"><span itemprop="title">Home</span></a>
+                        <i class="fa fa-angle-right"></i>
+                                                <a href="../blog" itemprop="url"><span itemprop="title">Blog</span></a>
+                        <i class="fa fa-angle-right"></i>
+                                                <span itemprop="title">Alle prese con PyTorch - Parte 4: Torchvision e reti convolutive</span>
+                        </div>
+		
+		<div class="blog-content-item g-grid pure-g-r">
+			<div id="item" class="g-block pure-u-2-3">
+			    <div class="list-item">
+
+    <div class="list-blog-header">
+                    <img src="../images/c/3/5/e/b/c35eb9e328372dd7dc9a1718ba227d39ce068763-c2ujkgbviaaylf6.jpeg" />
+        
+                    <h4><a href="alle-prese-con-pytorch-parte-4.html">Alle prese con PyTorch - Parte 4: Torchvision e reti convolutive</a></h4>
+        
+        <span class="list-blog-date">
+            <i class="fa fa-calendar"></i>
+            20, Jun
+        </span>
+                <span class="list-blog-author">
+            <i class="fa fa-user"></i>
+            Simone Scardapane
+        </span>
+                       <ul class="tags">
+            <i class="fa fa-tag"></i>
+                        <li><a href="tagpytorch.html">pytorch</a></li>
+                        <li><a href="tagrete neurale.html">rete neurale</a></li>
+                        <li><a href="tagrete convolutiva.html">rete convolutiva</a></li>
+                        <li><a href="tagpretrained.html">pretrained</a></li>
+                        <li><a href="tagtorchvision.html">torchvision</a></li>
+                    </ul>
+        
+    </div>
+
+	<div>
+	<br />
+	<!-- AddToAny BEGIN -->
+<div class="a2a_kit a2a_kit_size_32 a2a_default_style">
+<a class="a2a_dd" href="https://www.addtoany.com/share"></a>
+<a class="a2a_button_facebook"></a>
+<a class="a2a_button_twitter"></a>
+<a class="a2a_button_linkedin"></a>
+<a class="a2a_button_google_plus"></a>
+<a class="a2a_button_email"></a>
+</div>
+<script async src="https://static.addtoany.com/menu/page.js"></script>
+<!-- AddToAny END -->
+</div>
+	
+    <div class="list-blog-padding">
+
+            <p><p><a href="http://pytorch.org/">PyTorch</a> è un framework di deep learning, sviluppato principalmente dal <em>Facebook AI Research</em> (FAIR) group, che ha guadagnato una enorme popolarità fra gli sviluppatori grazie alla combinazione di semplicità ed efficienza. Questi tutorial sono dedicati ad esplorare la libreria, partendo dai concetti più semplici fino alla definizione di modelli estremamente sofisticati. </p>
+<p>Nella quarta parte introduciamo una serie di strumenti essenziali per lavorare con le immagini: dataset già pronti, reti convolutive, e modelli pre-allenati.</p>
+<div class="notices blue">
+<h3>Leggi tutti gli articoli della serie:</h3>
+<ul>
+<li><a href="https://iaml.it/blog/alle-prese-con-pytorch-parte-1">Alle prese con PyTorch - Parte 1: Tensori e Gradienti</a></li>
+<li><a href="https://iaml.it/blog/alle-prese-con-pytorch-parte-2">Alle prese con PyTorch - Parte 2: Reti Neurali ed Ottimizzatori</a></li>
+<li><a href="https://iaml.it/blog/alle-prese-con-pytorch-parte-3">Alle prese con PyTorch - Parte 3: Implementare Nuovi Moduli</a></li>
+<li>Alle prese con PyTorch - Parte 4: Torchvision e Reti Convolutive (questo)</li>
+<li><a href="alle-prese-con-pytorch-parte-5">Alle prese con PyTorch - Parte 5: JIT Compiler</a></li>
+</ul>
+</div>
+<div class="notices yellow">
+<p>Questi tutorial sono anche disponibili (parzialmente) in lingua inglese: <a href="https://iaml.it/blog/fun-with-pytorch-part-1/">Fun With PyTorch</a>.</p>
+</div>
+<p></p>
+<h2>Contenuto di questo tutorial</h2>
+<p>Ormai arrivati alla quarta parte del tutorial, siamo ben avviati per diventare esperti di PyTorch! In questo post ci occupiamo di una classe di algoritmi che per molti è diventata sinonimo di deep learning: <strong>classificazione di immagini e computer vision</strong>. Come molti framework di deep learning, PyTorch ha una serie di funzialità per aiutare lo sviluppo di applicazioni di questo tipo, che introduciamo nel resto dell'articolo:</p>
+<ul>
+<li>Un insieme di dataset già pronti su cui lavorare e testare modelli (es., il classico <a href="http://yann.lecun.com/exdb/mnist/">MNIST</a>).</li>
+<li>Tutti i moduli necessari a costruire <strong>reti neurali convolutive</strong>.</li>
+<li>Funzioni avanzate per processare le immagini.</li>
+<li>Alcuni modelli di classificazione di immagini già allenati, su cui eventualmente eseguire <strong>fine-tuning</strong> per nuovi oggetti.</li>
+</ul>
+<p>Molte di queste funzionalità sono presenti in un package aggiuntivo di PyTorch, <a href="https://github.com/pytorch/vision">Torchvision</a>. Per installarlo da terminale è sufficiente digitare:</p>
+<blockquote>
+<p>pip install torchvision</p>
+</blockquote>
+<p>Il resto del tutorial assume che il pacchetto sia stato correttamente installato.</p>
+<h2>Dataset, dataset, dataset!</h2>
+<p>Cominciamo da uno dei moduli più interessanti di Torchvision: <a href="https://pytorch.org/docs/stable/torchvision/datasets.html">datasets</a>, che contiene tantissimi dataset curati e pronti all'utilizzo per vari problemi di classificazione di immagini. </p>
+<div class="notices blue">
+<p>Tutti i dataset si basano sull'interfaccia di <code>torch.utils.data.Dataset</code> per manipolare dati. Ne avevamo parlato <a href="https://iaml.it/blog/alle-prese-con-pytorch-parte-2">nella seconda parte</a>, è un buon momento per un ripasso!</p>
+</div>
+<p>Per vedere come funziona l'interfaccia scegliamo <a href="https://github.com/zalandoresearch/fashion-mnist">Fashion MNIST</a>, una estensione del MNIST con immagini di vestiti al posto dei numeri, rilasciata dal team di Zalando l'anno scorso come semplice benchmark per algoritmi di deep learning. Tutte le istruzioni ovviamente si replicano per qualsiasi dataset presente nel modulo.</p>
+<p>Cominciamo scaricando il dataset:</p>
+<pre><code class="language-py">from torchvision import datasets
+fmnist = datasets.FashionMNIST('fmnist', train=True, download=True)</code></pre>
+<p>Due flag sono particolarmente importanti: <code>download</code> permette di scaricare il dataset in automatico al primo uso, mentre <code>train</code> carica solo la porzione dedicata al training. Tutti i dataset presenti in Torchvision hanno uno split predefinito per il test, e la parte di test si può caricare negando il flag:</p>
+<pre><code class="language-py">fmnist_test = datasets.FashionMNIST('fmnist', train=False)</code></pre>
+<p>Essendo un oggetto di tipo <code>Dataset</code>, possiamo indicizzarlo o ottenerne le dimensioni:</p>
+<pre><code class="language-py">print(len(fmnist))
+# Ritorna: 60000
+print(fmnist[0])
+# Ritorna: (&lt;PIL.Image.Image image mode=L size=28x28 at 0x7F20B7393048&gt;, tensor(9))</code></pre>
+<p>Come per il MNIST, abbiamo 60000 immagini di training, ciascuna di dimensione 28x28 ed in bianco e nero (mentre la parte di test ha altre 10000 immagini independenti rispetto alla parte di training). Si noti come le immagini non sono caricate direttamente come tensori, ma come oggetti di tipo <code>PIL.Image.Image</code> (PIL, acronimo di <a href="https://pillow.readthedocs.io/en/5.1.x/">Python Imaging Library</a>, è la libreria più diffusa per gestire immagini su Python). Questo ci permette di manipolare a piacimento le immagini prima di trasformarle in tensori ed usarle per i nostri modelli, come vediamo tra pochissimo.</p>
+<p>Prima di proseguire facciamo due brevissimi commenti:</p>
+<ol>
+<li>Una delle classi del modulo <code>datasets</code>, <a href="https://pytorch.org/docs/stable/torchvision/datasets.html#imagefolder">ImageFolder</a>, vi permette di caricare <em>qualsiasi</em> dataset di immagini organizzate in sotto-cartelle sul vostro disco.</li>
+<li>È possibile modificare il backend con cui vengono caricate le immagini, come menzionato <a href="https://github.com/pytorch/vision">sul sito</a>. Ad esempio, installare <a href="https://github.com/uploadcare/pillow-simd">Pillow-SIMD</a> (una versione più efficiente di Pillow), lo imposta automaticamente come default. Una terza alternativa, meno usata ma sviluppata nativamente dal team di PyTorch, è <a href="https://github.com/pytorch/accimage">accimage</a>, che però va abilitato esplicitamente (si vedano le istruzioni sul sito).</li>
+</ol>
+<h2>Elaborazione delle immagini</h2>
+<p>Una volta caricate le immagini, possiamo processarle in vari modi, ad esempio:</p>
+<ol>
+<li>trasformarle in tensori per allenare i modelli;</li>
+<li>effettuare ridimensionamenti automatici o cambi di scala di colore;</li>
+<li><a href="http://cs231n.stanford.edu/reports/2017/pdfs/300.pdf">aumentare il dataset</a> effettuando trasformazioni di vario tipo sulle immagini (es., rotazioni casuali).</li>
+</ol>
+<p>Tutto questo è reso possibile dal modulo <a href="https://pytorch.org/docs/stable/torchvision/transforms.html">Transforms</a>, che contiene una serie di operazioni che è possibile applicare in automatico su tutte le immagini del dataset. Per applicarle, è sufficiente passare le trasformazioni da eseguire al modulo di caricamento visto prima. Nel caso più semplice, ad esempio, possiamo trasformare le immagini in tensori di PyTorch con <code>transforms.ToTensor()</code>:</p>
+<pre><code class="language-py">from torchvision import transforms
+fmnist = datasets.FashionMNIST('fmnist', transform=transforms.ToTensor())</code></pre>
+<div class="notices blue">
+<p>Oltre a cambiare il tipo di dato, <code>ToTensor</code> ne modifica anche l'intervallo di valori, che passa da <span class="mathjax mathjax--inline">$[0, 255]$</span> a <span class="mathjax mathjax--inline">$[0, 1]$</span>.</p>
+</div>
+<p>Lavorando con tensori, possiamo ora (ad esempio) usare l'oggetto <code>DataLoader</code> (che avevamo visto a sua volta nella <a href="https://iaml.it/blog/alle-prese-con-pytorch-parte-2">seconda parte del tutorial</a>) per creare mini-batch di immagini ed allenare eventuali classificatori:</p>
+<pre><code class="language-py"># Creiamo un loader per mini-batch di sedici immagini
+from torch.utils import data
+data_loader = data.DataLoader(fmnist, batch_size=16)
+
+# Prendiamo il primo mini-batch
+xb, yb = next(iter(data_loader))
+
+# Lo stampiamo su schermo
+from torchvision import utils
+import matplotlib.pyplot as plt
+out = torchvision.utils.make_grid(xb)
+plt.imshow(out.numpy().transpose((1, 2, 0)))</code></pre>
+<figure role="group">
+        <img src="https://iaml.it/blog/alle-prese-con-pytorch-parte-4/images/fmnist_examples.png"alt="Esempi di immagini da F-MNIST" />
+        </figure>
+<div class="notices blue">
+<p>I dataset di immagini sono generalmente molto grandi: per questo, vale la pena leggere la <a href="https://pytorch.org/docs/stable/data.html#torch.utils.data.DataLoader">documentazione del DataLoader</a> per scoprire come gestire queste situazioni. Ad esempio, possiamo settare il flag <code>num_workers</code> per usare più processi in parallelo; oppure, lavorando su GPU, possiamo scegliere <code>pin_memory</code> per migliorare lo scambio di dati tra CPU e GPU.</p>
+</div>
+<p>La libreria contiene decine di trasformazioni, che possiamo combinare fra loro. Ad esempio, possiamo creare rotazioni casuali delle immagini per cercare di irrobustire il classificatore:</p>
+<pre><code class="language-py"># Dobbia trasformazione
+tr = transforms.Compose([
+    transforms.RandomRotation(degrees=75),
+    transforms.ToTensor()
+])
+fmnist = datasets.FashionMNIST('fmnist', train=True, transform=tr) </code></pre>
+<figure role="group">
+        <img src="https://iaml.it/blog/alle-prese-con-pytorch-parte-4/images/fmnist_rotated_examples.png"alt="Esempi di immagini da F-MNIST (ruotate)" />
+        </figure>
+<p><code>transforms.Compose</code> permette di concatenare varie trasformazioni; si noti inoltre come l'ordine è importante: <code>RandomRotation</code>, dovendo lavorare sulle immagini, deve essere eseguita prima di <code>ToTensor</code>. Possiamo anche applicare trasformazioni definite manualmente tramite <code>transforms.Lambda</code>; nell'esempio che segue mostriamo il suo uso binarizzando le immagini di partenza.</p>
+<pre><code class="language-py">tr = transforms.Compose([
+    transforms.ToTensor(),
+    transforms.Lambda(lambda x: (x &lt; 0.5).float())
+])
+fmnist = torchvision.datasets.FashionMNIST('fmnist', transform=tr)</code></pre>
+<figure role="group">
+        <img src="https://iaml.it/blog/alle-prese-con-pytorch-parte-4/images/fmnist_binary_examples.png"alt="Esempi di immagini da F-MNIST (binarizzate)" />
+        </figure>
+<p>Un'altra trasformazione molto utile è <code>transforms.Normalize</code>, che rinormalizza le immagini, ad esempio rendendole a media nulla e deviazione standard unitaria:</p>
+<pre><code class="language-py"># Calcola media e variazione standard
+import numpy as np
+im_mean = np.mean(fmnist.train_data.numpy())
+im_std = np.std(fmnist.train_data.numpy())
+
+# Applica la normalizzazione
+tr = transforms.Compose([
+    transforms.ToTensor(),
+    transforms.Normalize((im_mean / 255.0,), (im_std / 255.0,))
+])
+fmnist = torchvision.datasets.FashionMNIST('fmnist', train=True, transform=tr)</code></pre>
+<p>Vi consigliamo di <a href="https://pytorch.org/docs/stable/torchvision/transforms.html">leggere attentamente la documentazione</a> per scoprire tutte le trasformazioni possibili. Tra l'altro, è importante tenere a mente che le trasformazioni saranno in genere differenti per il training ed il test: ad esempio, trasformazioni usate per ingrandire il dataset, come <code>transforms.RandomRotation</code>, hanno generalmente poco senso se applicate all'insieme di test.</p>
+<h2>Dai dati ai modelli: reti convolutive</h2>
+<p>Una volta in possesso dei dati, passiamo ai modelli. Questa è probabilmente la parte più semplice del tutorial: PyTorch mette a disposizione tantissimi blocchi per reti convolutive nel modulo <code>nn</code>, che abbiamo già incontrato nella <a href="https://iaml.it/blog/alle-prese-con-pytorch-parte-2">seconda parte del tutorial</a>. Ad esempio, questa è una rete convolutiva relativamente semplice, con due blocchi convolutivi e due strati per la classificazione, presa da un <a href="https://github.com/pytorch/examples/blob/master/mnist/main.py">esempio sul repository ufficiale</a>:</p>
+<pre><code class="language-py">from torch import nn
+import torch.nn.functional as F
+
+class Net(nn.Module):
+    def __init__(self):
+        super(Net, self).__init__()
+        self.conv1 = nn.Conv2d(1, 10, kernel_size=5)
+        self.conv2 = nn.Conv2d(10, 20, kernel_size=5)
+        self.conv2_drop = nn.Dropout2d()
+        self.fc1 = nn.Linear(320, 50)
+        self.fc2 = nn.Linear(50, 10)
+
+    def forward(self, x):
+        x = F.relu(F.max_pool2d(self.conv1(x), 2))
+        x = F.relu(F.max_pool2d(self.conv2_drop(self.conv2(x)), 2))
+        x = x.view(-1, 320)
+        x = F.relu(self.fc1(x))
+        x = F.dropout(x, training=self.training)
+        x = self.fc2(x)
+        return F.log_softmax(x, dim=1)</code></pre>
+<p>Il modello si instanzia e si allena in maniera equivalente a quanto abbiamo visto in precedenza. Se non siete familiari con le reti convolutive, vi consigliamo di seguire il materiale del corso di Stanford CS231: <a href="http://cs231n.stanford.edu/">Convolutional Neural Networks for Visual Recognition</a>.</p>
+<h2>Modelli pre-allenati e fine-tuning</h2>
+<p>Concludiamo questa nostra panoramica con un altro dei moduli di Torchvision, <a href="https://pytorch.org/docs/stable/torchvision/models.html">models</a>, che contiene numerosi modelli pre-allenati da usare nelle vostre applicazioni.
+Ad esempio, con una sola istruzione possiamo scaricare una ResNet-18 (se siete curiosi sull'architettura, vi consigliamo la lettura dell'<a href="https://arxiv.org/abs/1512.03385">articolo di riferimento</a>):</p>
+<pre><code class="language-py">from torchvision import models
+net = models.resnet18(pretrained=True)</code></pre>
+<p>La ResNet-18 è pre-allenata su <a href="https://en.wikipedia.org/wiki/ImageNet">ImageNet</a>, con un'accuratezza di circa il 90% (calcolata sulle prime cinque predizioni) su 1000 classi di oggetti.</p>
+<div class="notices blue">
+<p>Trovate l'accuratezza di ciascun modello <a href="https://pytorch.org/docs/stable/torchvision/models.html">nella documentazione ufficiale</a>.</p>
+</div>
+<p>Possiamo testarla scaricando una foto a caso dal catalogo di Ikea:</p>
+<pre><code class="language-py">from PIL import Image
+import requests
+im = Image.open(requests.get('https://www.ikea.com/us/en/images/products/ekedalen-chair-gray__0516596_PE640434_S4.JPG', stream=True).raw)</code></pre>
+<figure role="group">
+        <img src="https://iaml.it/blog/alle-prese-con-pytorch-parte-4/images/ikea_chair.png"alt="Sedia" />
+        </figure>
+<div class="notices blue">
+<p>Se state eseguendo il tutorial su Google Colab, dovete installare la libreria <strong>requests</strong>. Potreste anche ricevere degli errori riguardanti Pillow; in questo caso, è sufficiente reinstallare la libreria e far ripartire il runtime:</p>
+<blockquote>
+<p>!pip install --no-cache-dir -I pillow</p>
+</blockquote>
+</div>
+<p>Per utilizzare la ResNet, le immagini devono essere convertite nel formato di ImageNet. Possiamo farlo facilmente utilizzando le trasformazioni viste prima ed applicandole manualmente:</p>
+<pre><code class="language-py">tr = transforms.Compose([
+    # Ridimensiona a 224 x 224
+    transforms.Resize(224),
+    # Transforma in tensore
+    transforms.ToTensor(),
+    # Normalizza
+    transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+])
+im = tr(im)</code></pre>
+<p>Richiediamo una predizione alla rete:</p>
+<pre><code class="language-py">net.eval()
+torch.argmax(net(im.unsqueeze(0)))</code></pre>
+<p>L'istruzione dovrebbe ritornare 559, l'indice corrispondente a <em>folding chair</em> nella <a href="https://gist.github.com/yrevar/942d3a0ac09ec9e5eb3a">tassonomia di ImageNet</a>.</p>
+<p>Ma non è finita! Possiamo usare i modelli pre-allenati per eseguire fine-tuning sui nostri problemi, semplicemente rimuovendo l'ultimo strato della rete ed aggiungendo uno strato di classificazione ad-hoc per nuove classi: in questo modo, possiamo sfruttare tutta la parte pre-allenata della rete per apprendere a riconoscere nuovi oggetti anche con pochissimi esempi.</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/alle-prese-con-pytorch-parte-4/images/transfer_learning_nathan.jpg"alt="Fine tuning di CNN" />
+        </figure>
+<figcaption>(Copyright immagine: <a href="https://indico.io/exploring-computer-vision-transfer-learning/">indico.io</a>)</figcaption>
+<p>Investigando <a href="https://github.com/pytorch/vision/blob/master/torchvision/models/resnet.py">il codice sorgente</a> del modello, potete vedere come l'ultimo strato corrisponda alla proprietà <code>fc</code> dell'oggetto. Per ottenere una nuova ResNet-18 da far girare sul Fashion MNIST, basta rimuovere lo strato e sostituirlo con un nuovo strato con sole dieci uscite (le classi del Fashion MNIST):</p>
+<pre><code class="language-py">net.fc = torch.nn.Linear(net.fc.in_features, 10)</code></pre>
+<p>Di default, allenando un modello in questo modo andremo a modificare <em>tutti</em> i parametri, come possiamo scoprire andando a contare i parametri allenabili (si veda <a href="https://discuss.pytorch.org/t/how-do-i-check-the-number-of-parameters-of-a-model/4325/7">questa discussione</a> per vari modi per contare i parametri di un modello):</p>
+<pre><code class="language-py">print(sum(p.numel() for p in net.parameters() if p.requires_grad))
+# Ritorna: 11689512</code></pre>
+<p>Il modello ha più di <em>11 milioni di parametri</em>! Possiamo semplicare di molto il problema bloccando l'aggiornamento di tutti gli strati ad esclusione dell'ultimo:</p>
+<pre><code class="language-py">for param in net.parameters():
+    param.requires_grad = False
+net.fc = torch.nn.Linear(net.fc.in_features, 10)</code></pre>
+<p>Questo nuovo modello ha solo 5130 parametri, ma prestazioni equivalenti. Se siete interessati all'argomento, vi consigliamo la <a href="https://pytorch.org/tutorials/beginner/transfer_learning_tutorial.html">guida al transfer learning</a> che trovate nella documentazione ufficiale della libreria.</p>
+<p>Anche per questa volta è tutto! La <a href="alle-prese-con-pytorch-parte-5">quinta parte di questa serie</a> introduce la possibilità di compilare i propri modelli per portarli in produzione.</p>
+<div class="notices blue">
+<h3>Leggi tutti gli articoli della serie:</h3>
+<ul>
+<li><a href="https://iaml.it/blog/alle-prese-con-pytorch-parte-1">Alle prese con PyTorch - Parte 1: Tensori e Gradienti</a></li>
+<li><a href="https://iaml.it/blog/alle-prese-con-pytorch-parte-2">Alle prese con PyTorch - Parte 2: Reti Neurali ed Ottimizzatori</a></li>
+<li><a href="https://iaml.it/blog/alle-prese-con-pytorch-parte-3">Alle prese con PyTorch - Parte 3: Implementare Nuovi Moduli</a></li>
+<li>Alle prese con PyTorch - Parte 4: Torchvision e Reti Convolutive (questo)</li>
+<li><a href="alle-prese-con-pytorch-parte-5">Alle prese con PyTorch - Parte 5: JIT Compiler</a></li>
+</ul>
+</div>
+<hr />
+<p>Se questo articolo ti è piaciuto e vuoi tenerti aggiornato sulle nostre attività, ricordati che l'<a href="../member.html">iscrizione all'Italian Association for Machine Learning</a> è gratuita! Puoi seguirci anche su <a href="https://www.facebook.com/machinelearningitalia/">Facebook</a> e su <a href="https://www.linkedin.com/company/18312943/">LinkedIn</a>.</p></p>
+            
+    
+        <p class="prev-next">
+                            <a class="button" href="dalle-onde-cerebrali-alla-robotica.html"><i class="fa fa-chevron-left"></i> Previous Post</a>
+            
+                            <a class="button" href="ottimizzare-keras-hyperopt.html">Next Post <i class="fa fa-chevron-right"></i></a>
+                    </p>
+    
+    </div>
+</div>
+			</div>
+			<div id="sidebar" class="g-block size-1-3 pure-u-1-3">
+				<div class="sidebar-content">
+    <h4>Search the blog</h4>
+    <input type="text" placeholder="Search..." value="" data-searchsidebar-input="/search/query" />
+<script>
+jQuery(document).ready(function($){
+    var input = $('[data-searchsidebar-input]');
+
+    input.on('keypress', function(event) {
+        if (event.which == 13 && input.val().length > 3) {
+            event.preventDefault();
+            window.location.href = input.data('searchsidebar-input') + ':' + input.val();
+        }
+    });
+});
+</script>
+</div>
+<!--
+<div class="sidebar-content">
+	<h4>Some Text Widget</h4>
+	<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna.</p>
+</div>
+!-->
+<div class="sidebar-content">
+    <h4>Categories</h4>
+    
+
+<ul class="archives">
+        <li>
+        <a href="categoryTutorials.html">Tutorials </a> (16)
+    </li>
+        <li>
+        <a href="categoryDiscussions.html">Discussions </a> (12)
+    </li>
+        <li>
+        <a href="categoryAnnouncements.html">Announcements </a> (4)
+    </li>
+        <li>
+        <a href="categoryTutorials (English).html">Tutorials (English) </a> (4)
+    </li>
+        <li>
+        <a href="categoryArticles' summaries.html">Articles' summaries </a> (3)
+    </li>
+        <li>
+        <a href="categoryDiscussions (English).html">Discussions (English) </a> (2)
+    </li>
+        <li>
+        <a href="categoryFocus-on.html">Focus-on </a> (1)
+    </li>
+        <li>
+        <a href="categoryReviews.html">Reviews </a> (1)
+    </li>
+        <li>
+        <a href="categoryDiscussion.html">Discussion </a> (1)
+    </li>
+    </ul>
+</div>
+<div class="sidebar-content">
+    <h4>Archives</h4>
+	<ul class="archives">
+    <li>
+    	<a href="archives_monthapr_2020.html">
+        <span class="archive_date">April 2020</span>
+                <span>(1)</span>
+                </a>
+    </li>
+</ul>
+</div>
+<div class="sidebar-content">
+    <h4>Popular Tags</h4>
+    
+
+<ul class="archives">
+        <li>
+        <a href="tagdeep learning.html">deep learning </a> (11)
+    </li>
+        <li>
+        <a href="tagpytorch.html">pytorch </a> (9)
+    </li>
+        <li>
+        <a href="tagreti neurali.html">reti neurali </a> (5)
+    </li>
+        <li>
+        <a href="taggoogle.html">google </a> (4)
+    </li>
+        <li>
+        <a href="tagjit.html">jit </a> (4)
+    </li>
+        <li>
+        <a href="tagtensorflow.html">tensorflow </a> (4)
+    </li>
+        <li>
+        <a href="tagottimizzazione.html">ottimizzazione </a> (4)
+    </li>
+        <li>
+        <a href="tagrete neurale.html">rete neurale </a> (3)
+    </li>
+        <li>
+        <a href="tagtime series.html">time series </a> (3)
+    </li>
+        <li>
+        <a href="tagkeras.html">keras </a> (3)
+    </li>
+        <li>
+        <a href="tagreti convolutive.html">reti convolutive </a> (3)
+    </li>
+        <li>
+        <a href="tagpipeline.html">pipeline </a> (2)
+    </li>
+        <li>
+        <a href="tagsklearn.html">sklearn </a> (2)
+    </li>
+        <li>
+        <a href="tagautodiff.html">autodiff </a> (2)
+    </li>
+        <li>
+        <a href="tagautomatic differentation.html">automatic differentation </a> (2)
+    </li>
+        <li>
+        <a href="tagreverse-mode.html">reverse-mode </a> (2)
+    </li>
+        <li>
+        <a href="tagderivate.html">derivate </a> (2)
+    </li>
+        <li>
+        <a href="tagdifferenziazione.html">differenziazione </a> (2)
+    </li>
+        <li>
+        <a href="tagmodel selection.html">model selection </a> (2)
+    </li>
+        <li>
+        <a href="tagcross validation.html">cross validation </a> (2)
+    </li>
+        <li>
+        <a href="tagc++.html">c++ </a> (2)
+    </li>
+        <li>
+        <a href="tagnumpy.html">numpy </a> (2)
+    </li>
+        <li>
+        <a href="tagvmap.html">vmap </a> (2)
+    </li>
+        <li>
+        <a href="tagcaffe.html">caffe </a> (2)
+    </li>
+        <li>
+        <a href="tagcompiler.html">compiler </a> (2)
+    </li>
+        <li>
+        <a href="tagjax.html">jax </a> (2)
+    </li>
+        <li>
+        <a href="tagcodemotion.html">codemotion </a> (1)
+    </li>
+        <li>
+        <a href="tagbias.html">bias </a> (1)
+    </li>
+        <li>
+        <a href="tagdiscrimination.html">discrimination </a> (1)
+    </li>
+        <li>
+        <a href="tagfairness.html">fairness </a> (1)
+    </li>
+        <li>
+        <a href="tagiaml.html">iaml </a> (1)
+    </li>
+        <li>
+        <a href="tagdatabase.html">database </a> (1)
+    </li>
+        <li>
+        <a href="tagiperparametri.html">iperparametri </a> (1)
+    </li>
+        <li>
+        <a href="tagautograph.html">autograph </a> (1)
+    </li>
+        <li>
+        <a href="taghead.html">head </a> (1)
+    </li>
+        <li>
+        <a href="tagmulti-task.html">multi-task </a> (1)
+    </li>
+        <li>
+        <a href="taglearning.html">learning </a> (1)
+    </li>
+        <li>
+        <a href="tagnovità.html">novità </a> (1)
+    </li>
+        <li>
+        <a href="tagdev summit.html">dev summit </a> (1)
+    </li>
+        <li>
+        <a href="tagcustom estimator.html">custom estimator </a> (1)
+    </li>
+        <li>
+        <a href="taghyperopt.html">hyperopt </a> (1)
+    </li>
+        <li>
+        <a href="taggoodfellow.html">goodfellow </a> (1)
+    </li>
+        <li>
+        <a href="tagnlp.html">nlp </a> (1)
+    </li>
+        <li>
+        <a href="tagdati mancanti.html">dati mancanti </a> (1)
+    </li>
+        <li>
+        <a href="tagtransformer.html">transformer </a> (1)
+    </li>
+        <li>
+        <a href="tagattenzione.html">attenzione </a> (1)
+    </li>
+        <li>
+        <a href="tagrobocop.html">robocop </a> (1)
+    </li>
+        <li>
+        <a href="tagyolo.html">yolo </a> (1)
+    </li>
+        <li>
+        <a href="tagobject detection.html">object detection </a> (1)
+    </li>
+        <li>
+        <a href="tagbayes.html">bayes </a> (1)
+    </li>
+        <li>
+        <a href="tagautoencoders.html">autoencoders </a> (1)
+    </li>
+        <li>
+        <a href="tagvariational.html">variational </a> (1)
+    </li>
+        <li>
+        <a href="tageager.html">eager </a> (1)
+    </li>
+        <li>
+        <a href="tagimputazione.html">imputazione </a> (1)
+    </li>
+        <li>
+        <a href="tagCIFAR.html">CIFAR </a> (1)
+    </li>
+        <li>
+        <a href="tagword embedding.html">word embedding </a> (1)
+    </li>
+        <li>
+        <a href="tagMNIST.html">MNIST </a> (1)
+    </li>
+        <li>
+        <a href="tagimmagini.html">immagini </a> (1)
+    </li>
+        <li>
+        <a href="tagclassificazione.html">classificazione </a> (1)
+    </li>
+        <li>
+        <a href="tagkpi.html">kpi </a> (1)
+    </li>
+        <li>
+        <a href="tagreprogramming.html">reprogramming </a> (1)
+    </li>
+        <li>
+        <a href="tagadversarial.html">adversarial </a> (1)
+    </li>
+        <li>
+        <a href="tagbrowser.html">browser </a> (1)
+    </li>
+        <li>
+        <a href="tagjavascript.html">javascript </a> (1)
+    </li>
+        <li>
+        <a href="tagreti ricorsive.html">reti ricorsive </a> (1)
+    </li>
+        <li>
+        <a href="tagreti ricorrenti.html">reti ricorrenti </a> (1)
+    </li>
+        <li>
+        <a href="tagftth.html">ftth </a> (1)
+    </li>
+        <li>
+        <a href="tagadversarial example.html">adversarial example </a> (1)
+    </li>
+        <li>
+        <a href="tagmanagement.html">management </a> (1)
+    </li>
+        <li>
+        <a href="tagrobotica.html">robotica </a> (1)
+    </li>
+        <li>
+        <a href="tagocr.html">ocr </a> (1)
+    </li>
+        <li>
+        <a href="tagfocus.html">focus </a> (1)
+    </li>
+        <li>
+        <a href="tagiphone.html">iphone </a> (1)
+    </li>
+        <li>
+        <a href="tagpython.html">python </a> (1)
+    </li>
+        <li>
+        <a href="tagface id.html">face id </a> (1)
+    </li>
+        <li>
+        <a href="tagmomento.html">momento </a> (1)
+    </li>
+        <li>
+        <a href="tagadam.html">adam </a> (1)
+    </li>
+        <li>
+        <a href="tagneuroscienza.html">neuroscienza </a> (1)
+    </li>
+        <li>
+        <a href="tagonde cerebrali.html">onde cerebrali </a> (1)
+    </li>
+        <li>
+        <a href="tagtorchvision.html">torchvision </a> (1)
+    </li>
+        <li>
+        <a href="taglatin.html">latin </a> (1)
+    </li>
+        <li>
+        <a href="tagpretrained.html">pretrained </a> (1)
+    </li>
+        <li>
+        <a href="tagrete convolutiva.html">rete convolutiva </a> (1)
+    </li>
+        <li>
+        <a href="tagautograd.html">autograd </a> (1)
+    </li>
+        <li>
+        <a href="tagswish.html">swish </a> (1)
+    </li>
+        <li>
+        <a href="tagattivazione.html">attivazione </a> (1)
+    </li>
+        <li>
+        <a href="tagcheckpoint.html">checkpoint </a> (1)
+    </li>
+        <li>
+        <a href="tagtensori.html">tensori </a> (1)
+    </li>
+        <li>
+        <a href="tagvariabili.html">variabili </a> (1)
+    </li>
+        <li>
+        <a href="taglineare.html">lineare </a> (1)
+    </li>
+        <li>
+        <a href="tagregressione.html">regressione </a> (1)
+    </li>
+        <li>
+        <a href="tagconvolutional networks.html">convolutional networks </a> (1)
+    </li>
+        <li>
+        <a href="tagVatican.html">Vatican </a> (1)
+    </li>
+        <li>
+        <a href="tagproject.html">project </a> (1)
+    </li>
+        <li>
+        <a href="tagkernel.html">kernel </a> (1)
+    </li>
+        <li>
+        <a href="tagICLR.html">ICLR </a> (1)
+    </li>
+        <li>
+        <a href="tagipotesi.html">ipotesi </a> (1)
+    </li>
+        <li>
+        <a href="tagsparsità.html">sparsità </a> (1)
+    </li>
+        <li>
+        <a href="tagfunzionale.html">funzionale </a> (1)
+    </li>
+        <li>
+        <a href="tagfunctional.html">functional </a> (1)
+    </li>
+        <li>
+        <a href="tagadversarial attack.html">adversarial attack </a> (1)
+    </li>
+        <li>
+        <a href="tagkmeans.html">kmeans </a> (1)
+    </li>
+        <li>
+        <a href="taganalysis.html">analysis </a> (1)
+    </li>
+        <li>
+        <a href="tagclustering.html">clustering </a> (1)
+    </li>
+        <li>
+        <a href="tagGoogle.html">Google </a> (1)
+    </li>
+        <li>
+        <a href="tagregression.html">regression </a> (1)
+    </li>
+        <li>
+        <a href="tagJAX.html">JAX </a> (1)
+    </li>
+        <li>
+        <a href="taggaussian process.html">gaussian process </a> (1)
+    </li>
+        <li>
+        <a href="tagensemble.html">ensemble </a> (1)
+    </li>
+        <li>
+        <a href="tagboosting.html">boosting </a> (1)
+    </li>
+        <li>
+        <a href="taggradient.html">gradient </a> (1)
+    </li>
+        <li>
+        <a href="tagsemi-supervised learning.html">semi-supervised learning </a> (1)
+    </li>
+        <li>
+        <a href="tagdocument classification.html">document classification </a> (1)
+    </li>
+        <li>
+        <a href="taggraphs.html">graphs </a> (1)
+    </li>
+        <li>
+        <a href="tagvariables.html">variables </a> (1)
+    </li>
+        <li>
+        <a href="taglinear.html">linear </a> (1)
+    </li>
+        <li>
+        <a href="tagk-NN.html">k-NN </a> (1)
+    </li>
+    </ul>
+</div>
+<div class="sidebar-content syndicate">
+    <h4>Syndicate</h4>
+    <a class="button" href="../blog.atom"><i class="fa fa-rss-square"></i> Atom 1.0</a>
+    <a class="button" href="../blog.rss"><i class="fa fa-rss-square"></i> RSS</a>
+</div>
+			</div>
+		</div>
+	
+                        <div class="modular-row footer ">
+    <div class="footer-items">
+        <div class="footer-module large">
+		<h4>About</h4>
+                            <p>Italian Association for Machine Learning (C.F. 97949550582)</p>
+            			<p>Write us: info@iaml.it</p>
+        </div>
+        <div class="footer-module"><h4>Address</h4>
+            <p>
+                                    <span><strong>Operational office</strong></span>
+                                    <span>IAML c/o Pi Campus, via Indonesia 23, 00144 Rome</span>
+                                    <span><strong>Legal office</strong></span>
+                                    <span>Via Cassia 964, 00189, Rome</span>
+                            </p>
+        </div>
+        <div class="footer-module"><h4>Quick Links</h4>
+         <ul class="quickmenu">
+                            <li><i class="fa fa-chevron-right"></i><a href="../home">Home</a></li>
+                            <li><i class="fa fa-chevron-right"></i><a href="https://iaml.it/documents">Documents (Italian)</a></li>
+                    </ul>
+    </div>
+   
+</div>
+<hr>
+<div class="footer-modules">
+    <div class="footer-copyright">
+        Copyright 2018 IAML.IT. All Rights Reserved.
+    </div>
+    <div class="footer-menu">
+    <ul class="othermenu">
+           <li><a href="https://learn.getgrav.org/">Powered by Grav</a></li>
+           <li><a href="https://github.com/getgrav/grav-theme-deliver">Theme (adapted) from Deliver</a></li>
+        </ul>
+    </div>
+</div>
+</div>                    </section>
+        
+    </div>
+    <div class="sb-slidebar sb-left sb-width-thin">
+        <div id="panel">
+        
+<ul class="navigation">
+                                                        <li class="">
+                    <a href="../index.html">
+                                                Home
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../activities">
+                                                Activities
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../supporters.html">
+                                                Supporters
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../member.html">
+                                                Become a member
+                    </a>
+                </li>
+                                                                <li class="active">
+                    <a href="../blog">
+                                                Blog
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../governance.html">
+                                                Governance
+                    </a>
+                </li>
+                                                                                                                                </ul>                   </div>
+    </div>
+        <script src="../user/plugins/simplesearch/js/simplesearch.js" type="text/javascript" ></script>
+
+    <script>
+    $(function () {
+        $(document).ready(function() {
+          $.slidebars({
+            hideControlClasses: true,
+            scrollLock: true
+          });
+        });
+    });
+    </script>
+    </body>
+</html>
+
+

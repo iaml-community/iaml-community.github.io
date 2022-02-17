@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Individuare pattern con il SAX encoding | Italian Association for Machine Learning</title>
+    <meta content="GravCMS"  />
+<meta content="The Italian Association for Machine Learning (IAML) is a not-for-profit organization with the purpose of promoting knowledge of machine learning in all aspects of the Italian public life, from universities to enterprises and IT professionals."  />
+<meta property="og:title" content="Individuare pattern con il SAX encoding | IAML.it"  />
+<meta property="og:image" content="https://iaml.it/blog/serie-storiche-2-sax-encoding/image1.png"  />
+<meta property="og:url" content="https://iaml.it/blog/serie-storiche-2-sax-encoding/"  />
+<meta property="og:description" content="Una introduzione al Symbolic Aggregate approXimation encoding, un metodo per semplificare le serie storiche. È stato inventato da Eamonn Keogh e Jessica Lin nel 2002.SAX è un modo di trasformare una serie temporale in una sequenza di simboli. L&#039;idea di base è che ogni simbolo rappresenta un intervallo. Questa tecnica permette di condurre una dimensionality reduction sulle serie storiche, quindi possiamo considerarlo un metodo non supervisionato."  />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="icon" type="image/png" href="../user/themes/deliver/images/favicon.png" />
+
+	<!-- Global site tag (gtag.js) - Google Ads: 774709547 --> <script async src="https://www.googletagmanager.com/gtag/js?id=AW-774709547"></script> <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'AW-774709547'); </script> 
+	
+		
+                            		                                                <link href="../user/themes/deliver/css-compiled/nucleus.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css-compiled/template.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css/custom.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css/toc.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css/font-awesome.min.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/facebook/css/facebook.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/facebook/assets/unitegallery/css/unite-gallery.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/facebook/assets/unitegallery/themes/default/ug-theme-default.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/markdown-notices/assets/notices.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/breadcrumbs/css/breadcrumbs.css" type="text/css" rel="stylesheet" />
+<link href="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/events/assets/events.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/form/assets/form-styles.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/mathjax/assets/css/mathjax.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/simplesearch/css/simplesearch.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/highlight/css/zenburn.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/login/css/login.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css/slidebars.min.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css/slideme.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/socialbuttons/vendor/rrssb/css/rrssb.css" type="text/css" rel="stylesheet" />
+
+
+                                                            <script src="../system/assets/jquery/jquery-2.x.min.js" type="text/javascript" ></script>
+<script src="../user/themes/deliver/js/modernizr.custom.71422.js" type="text/javascript" ></script>
+<script src="../user/plugins/facebook/assets/unitegallery/js/unitegallery.min.js" type="text/javascript" ></script>
+<script src="../user/plugins/facebook/assets/unitegallery/themes/default/ug-theme-default.js" type="text/javascript" ></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.js" type="text/javascript" ></script>
+<script src="../user/plugins/events/assets/events.js" type="text/javascript" ></script>
+<script src="../user/plugins/mathjax/assets/js/mathjax.js" type="text/javascript" ></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript" ></script>
+<script src="../user/plugins/highlight/js/highlight.pack.js" type="text/javascript" ></script>
+<script src="../user/themes/deliver/js/deliver.js" type="text/javascript" ></script>
+<script src="../user/themes/deliver/js/slidebars.min.js" type="text/javascript" ></script>
+<script src="../user/themes/deliver/js/jquery.slideme2.js" type="text/javascript" ></script>
+<script src="../user/plugins/socialbuttons/vendor/rrssb/js/rrssb.min.js" type="text/javascript" ></script>
+
+<script>
+window.addEventListener("load", function(){
+window.cookieconsent.initialise({
+"palette": {
+    "popup": {
+        "background": "#4d4d4d",
+        "text": "#fff"
+    },
+    "button": {
+        "background": "#f1d600",
+        "text": "#000",
+        "border": "#f1d600"
+    }
+},
+"position": "bottom",
+"theme": "block",
+"content": {
+    "message": "This website uses cookies to ensure you get the best experience on our website.",
+    "dismiss": "Got it!",
+    "link": "Learn more",
+    "href": "https://cookiesandyou.com"
+}
+})});
+hljs.initHighlightingOnLoad();
+
+</script>
+
+
+</head>
+<body id="top" class="header-lite fullwidth blogstyling">
+    <div id="sb-site">
+                <header id="header">
+                <div class="logo">
+                    <h3><a href="../index.html"><img src="../user/pages/images/IAML_logo_viola.png" /></a></h3>
+                                            <ul class="social-icons">
+            <li>
+            <a href="https://twitter.com/iaml_it">
+                <i class="fa fa-twitter"></i>            </a>
+        </li>
+            <li>
+            <a href="https://www.linkedin.com/company/iaml/">
+                <i class="fa fa-linkedin"></i>            </a>
+        </li>
+            <li>
+            <a href="https://www.facebook.com/machinelearningitalia/">
+                <i class="fa fa-facebook"></i>            </a>
+        </li>
+            <li>
+            <a href="blog.rss">
+                <i class="fa fa-rss"></i>            </a>
+        </li>
+    </ul>  
+                                    </div>
+                <div id="navbar">
+                                                            
+<ul class="navigation">
+                                                        <li class="">
+                    <a href="../index.html">
+                                                Home
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../activities">
+                                                Activities
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../supporters.html">
+                                                Supporters
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../member.html">
+                                                Become a member
+                    </a>
+                </li>
+                                                                <li class="active">
+                    <a href="../blog">
+                                                Blog
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../governance">
+                                                Governance
+                    </a>
+                </li>
+                                                                                                                                </ul>                                                   <form class="search-box">
+    <input type="search" placeholder="Search..." value="" data-search-input="/search/query" />
+    <script>
+    jQuery(document).ready(function($){
+        var input = $('[data-search-input]');
+
+        input.on('keypress', function(event) {
+            if (event.which == 13 && input.val().length > 3) {
+                event.preventDefault();
+                window.location.href = input.data('search-input') + ':' + input.val();
+            }
+        });
+    });
+    </script>
+    <i class="fa fa-search"></i>
+</form>                    <span class="panel-activation sb-toggle-left navbar-left menu-btn fa fa-bars"></span>
+                </div>
+        </header>
+        
+        
+                <section id="body" class="">
+                            
+				<div class="flush-top blog-header blog-header-image" style="background: #B4B093 url(/user/pages/05.blog/blue_header.jpg) no-repeat right;">
+            <h1>Individuare pattern con il SAX encoding</h1>
+        </div>
+            
+        
+<div id="breadcrumbs" itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
+                                            <a href="../index.html" itemprop="url"><span itemprop="title">Home</span></a>
+                        <i class="fa fa-angle-right"></i>
+                                                <a href="../blog" itemprop="url"><span itemprop="title">Blog</span></a>
+                        <i class="fa fa-angle-right"></i>
+                                                <span itemprop="title">Individuare pattern con il SAX encoding</span>
+                        </div>
+		
+		<div class="blog-content-item g-grid pure-g-r">
+			<div id="item" class="g-block pure-u-2-3">
+			    <div class="list-item">
+
+    <div class="list-blog-header">
+                    <img src="../images/6/4/9/7/b/6497bd9c427862ae3c9375afa7ea90668731d90a-image1.png" />
+        
+                    <h4><a href="serie-storiche-2-sax-encoding.html">Individuare pattern con il SAX encoding</a></h4>
+        
+        <span class="list-blog-date">
+            <i class="fa fa-calendar"></i>
+            24, Apr
+        </span>
+                <span class="list-blog-author">
+            <i class="fa fa-user"></i>
+            Nicola Procopio
+        </span>
+                       <ul class="tags">
+            <i class="fa fa-tag"></i>
+                        <li><a href="tagtime series.html">time series</a></li>
+                    </ul>
+        
+    </div>
+
+	<div>
+	<br />
+	<!-- AddToAny BEGIN -->
+<div class="a2a_kit a2a_kit_size_32 a2a_default_style">
+<a class="a2a_dd" href="https://www.addtoany.com/share"></a>
+<a class="a2a_button_facebook"></a>
+<a class="a2a_button_twitter"></a>
+<a class="a2a_button_linkedin"></a>
+<a class="a2a_button_google_plus"></a>
+<a class="a2a_button_email"></a>
+</div>
+<script async src="https://static.addtoany.com/menu/page.js"></script>
+<!-- AddToAny END -->
+</div>
+	
+    <div class="list-blog-padding">
+
+            <p><p>Il <a href="http://www.cs.ucr.edu/~eamonn/SAX.htm">Symbolic Aggregate approXimation</a> (SAX) encoding è un metodo per semplificare le serie storiche. È stato inventato da Eamonn Keogh e Jessica Lin nel 2002. SAX è un modo di trasformare una serie temporale in una sequenza di simboli. L'idea di base è che ogni simbolo rappresenta un intervallo. Questa tecnica permette di condurre una <em>dimensionality reduction</em> sulle serie storiche, quindi possiamo considerarlo un metodo non supervisionato.</p>
+<p>Bisogna evidenziare che il SAX è una tecnica molto robusta ai valori mancanti, e quindi utilizzabile quando si è in presenza di serie di lunghezza diversa.</p>
+<blockquote>
+<p>Per rafforzare l'ultima considerazione vi invito a leggere un <a href="https://www.kdnuggets.com/2019/09/time-series-baseball.html">articolo di KDNuggets dove viene utilizzato SAX Encoding</a> per trovare anomalie tra le stagioni di varie squadre di baseball. Non tutte le stagioni hanno lo stesso numero di match e alcuni dati sono mancanti.</p>
+</blockquote>
+<nav class="table-of-contents minitoc" role="navigation">
+                <span class="toctitle">Overview:</span>
+      
+                                                                                  
+  <ul>
+      
+        
+        
+              <li><a href="#dataset" class="toclink" title="Dataset">Dataset</a></li>
+      
+        
+        
+              <li><a href="#come-funziona-l-algoritmo" class="toclink" title="Come funziona l'algoritmo">Come funziona l'algoritmo</a></li>
+      
+                      <li><ul>
+          
+        
+              <li><a href="#step-1-standardizzare-la-serie" class="toclink" title="Step 1: Standardizzare la serie">Step 1: Standardizzare la serie</a></li>
+      
+        
+        
+              <li><a href="#step-2-piecewise-aggregate..." class="toclink" title="Step 2: Piecewise Aggregate Approximation">Step 2: Piecewise Aggregate Approximation</a></li>
+      
+        
+        
+              <li><a href="#step-3-sax" class="toclink" title="Step 3: SAX">Step 3: SAX</a></li>
+      
+                      </ul></li>
+          
+        
+              <li><a href="#come-utilizzare-le-sax-string" class="toclink" title="Come utilizzare le SAX String?">Come utilizzare le SAX String?</a></li>
+      
+                      <li><ul>
+          
+        
+              <li><a href="#anomaly-detection" class="toclink" title="Anomaly Detection">Anomaly Detection</a></li>
+      
+        
+        
+              <li><a href="#clustering" class="toclink" title="Clustering">Clustering</a></li>
+      
+        
+        
+              <li><a href="#classificazione" class="toclink" title="Classificazione">Classificazione</a></li>
+      
+        
+        
+              <li><a href="#stream-data" class="toclink" title="Stream Data">Stream Data</a></li>
+      
+        
+        
+              <li><a href="#ringraziamenti" class="toclink" title="Ringraziamenti">Ringraziamenti</a></li>
+      
+              </ul></li>
+      
+  </ul>
+</nav>
+
+
+<h2 id="dataset" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#dataset" title="Permanent link: Dataset" data-icon="#">Dataset</a></h2>
+<p>Visto il momento in cui viene scritto questo articolo, proverò a utilizzare il SAX Encoding sui <a href="https://github.com/pcm-dpc/COVID-19">dati della protezione civile</a> per cercare i pattern tra le serie regionali dei contagi da <a href="https://it.wikipedia.org/wiki/COVID-19"><em>Covid-19</em></a>.</p>
+<ul>
+<li>L'orizzonte temporale và dal 24/02/2020 al 21/04/2020.</li>
+<li>La distribuzione geografica è per Regione anche se il Trentino - Alto Adige è diviso nelle due province autonome.</li>
+</ul>
+<p>La colonna che useremo sarà <em>totale_positivi</em>. Riporto direttamente dal README del <a href="https://github.com/pcm-dpc/COVID-19">repository ufficiale della protezione civile</a>: <strong>Totale attualmente positivi (ospedalizzati + isolamento domiciliare)</strong>.</p>
+<blockquote>
+<h4 id="attenzione-importante" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#attenzione-importante" title="Permanent link: ATTENZIONE!!! IMPORTANTE." data-icon="#">ATTENZIONE!!! IMPORTANTE.</a></h4>
+<p><strong>Naturalmente non sono un medico/epidemiologo/virologo/... quindi il mio interesse è solo trovare un dataset che mi permettesse di spiegare come funziona l'algoritmo, non trarrò nessuna conclusione dai dati.</strong></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>data</th>
+<th>denominazione_regione</th>
+<th style="text-align: right;">totale_positivi</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2020-02-24T18:00:00</td>
+<td>Abruzzo</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td>2020-02-24T18:00:00</td>
+<td>Basilicata</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td>...</td>
+<td>...</td>
+<td style="text-align: right;">...</td>
+</tr>
+<tr>
+<td>2020-04-21T17:00:00</td>
+<td>Valle d'Aosta</td>
+<td style="text-align: right;">522</td>
+</tr>
+<tr>
+<td>2020-04-21T17:00:00</td>
+<td>Veneto</td>
+<td style="text-align: right;">10077</td>
+</tr>
+</tbody>
+</table>
+<p><a href="serie-storiche-2-sax-encoding/images/81Sr3Ua.png" target="_blank"><img src="serie-storiche-2-sax-encoding/images/81Sr3Ua.png" /></a></p>
+<blockquote>
+<p><a href="https://colab.research.google.com/drive/17ilXLaWGItP3NtxYTNj4j2vmpvQ-4bBC">Tutto il codice di questo articolo è disponibile</a> su un notebook Google Colab. Il dataset aggiornato può essere scaricato <a href="https://github.com/pcm-dpc/COVID-19/blob/master/dati-regioni/dpc-covid19-ita-regioni.csv">qui</a>.</p>
+</blockquote>
+<h2 id="come-funziona-l-algoritmo" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#come-funziona-l-algoritmo" title="Permanent link: Come funziona l'algoritmo" data-icon="#">Come funziona l'algoritmo</a></h2>
+<h3 id="step-1-standardizzare-la-serie" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#step-1-standardizzare-la-serie" title="Permanent link: Step 1: Standardizzare la serie" data-icon="#">Step 1: Standardizzare la serie</a></h3>
+<p>Per applicare questa tecnica bisogna avere la serie storica sulla riga e ad ogni colonna coinciderà uno step temporale.</p>
+<table>
+<thead>
+<tr>
+<th>Regione</th>
+<th style="text-align: right;">1</th>
+<th style="text-align: right;">2</th>
+<th style="text-align: right;">...</th>
+<th style="text-align: right;">57</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Abruzzo</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">...</td>
+<td style="text-align: right;">2067</td>
+</tr>
+<tr>
+<td>Basilicata</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">...</td>
+<td style="text-align: right;">...</td>
+<td style="text-align: right;">245</td>
+</tr>
+<tr>
+<td>...</td>
+<td style="text-align: right;">...</td>
+<td style="text-align: right;">...</td>
+<td style="text-align: right;">...</td>
+<td style="text-align: right;">...</td>
+</tr>
+<tr>
+<td>Veneto</td>
+<td style="text-align: right;">32</td>
+<td style="text-align: right;">...</td>
+<td style="text-align: right;">...</td>
+<td style="text-align: right;">10077</td>
+</tr>
+</tbody>
+</table>
+<p>Le serie devono essere standardizzate così da avere la stessa scala.</p>
+<p class="mathjax mathjax--block">\[
+Z = \frac{x - \mu}{\sigma}\]</p>
+<p><strong>Questa tecnica non si basa solo sui volumi ma anche sugli andamenti</strong>. In questo caso in numeri assoluti la Lombardia è molto distante dalle altre regioni, ma lo sarà anche come andamento? Questa è la domanda a cui ci aiuterà a rispondere SAX Encoding.</p>
+<pre><code class="language-python">tot_pos_pivot = totale_positivi.pivot(index="data", columns="denominazione_regione", values="totale_positivi").reset_index()
+
+df_stand = ((tot_pos_pivot.drop("data", axis=1) - tot_pos_pivot.mean())/tot_pos_pivot.std()).T</code></pre>
+<p>Ora abbiamo la nostra matrice con sull'indice il nome della serie, ovvero la regione e sulle colonne il periodo da 0 a 57.</p>
+<table>
+<thead>
+<tr>
+<th>Regione</th>
+<th style="text-align: right;">1</th>
+<th style="text-align: right;">2</th>
+<th style="text-align: right;">...</th>
+<th style="text-align: right;">57</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Abruzzo</td>
+<td style="text-align: right;">-1.067762</td>
+<td style="text-align: right;">-1.067762</td>
+<td style="text-align: right;">...</td>
+<td style="text-align: right;">1.699956</td>
+</tr>
+<tr>
+<td>Basilicata</td>
+<td style="text-align: right;">-1.063952</td>
+<td style="text-align: right;">...</td>
+<td style="text-align: right;">...</td>
+<td style="text-align: right;">1.041431</td>
+</tr>
+<tr>
+<td>...</td>
+<td style="text-align: right;">...</td>
+<td style="text-align: right;">...</td>
+<td style="text-align: right;">...</td>
+<td style="text-align: right;">...</td>
+</tr>
+<tr>
+<td>Veneto</td>
+<td style="text-align: right;">-1.244880</td>
+<td style="text-align: right;">...</td>
+<td style="text-align: right;">...</td>
+<td style="text-align: right;">10766</td>
+</tr>
+</tbody>
+</table>
+<p><br /></p>
+<h3 id="step-2-piecewise-aggregate..." class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#step-2-piecewise-aggregate..." title="Permanent link: Step 2: Piecewise Aggregate Approximation" data-icon="#">Step 2: Piecewise Aggregate Approximation</a></h3>
+<p>Come accennato inzialmente questo metodo riduce la dimensionalità della serie e lo fa proprio con la <a href="https://vigne.sh/posts/piecewise-aggregate-approx/">Piecewise Aggregate Approximation</a> (PAA), l'idea alla base è "<em>riassumere</em>" la sequenza in una serie di segmenti che ne riducano la lunghezza ma ne rappresentino ugualmente l'informazione.</p>
+<p>Data una time series <span class="mathjax mathjax--inline">$Y =$</span> [<span class="mathjax mathjax--inline">$Y_{1}$</span>, <span class="mathjax mathjax--inline">$Y_{2}$</span>, ..., <span class="mathjax mathjax--inline">$Y_{n}$</span>] che può essere ridotta in una sequenza <span class="mathjax mathjax--inline">$X =$</span> [<span class="mathjax mathjax--inline">$X_{1}$</span>, <span class="mathjax mathjax--inline">$X_{2}$</span>, ..., <span class="mathjax mathjax--inline">$X_{m}$</span>] con <span class="mathjax mathjax--inline">$m \leq n$</span> l'equazione che sintetizza gli elementi della time series originale per adattarli alla nuova dimensione è la seguente:</p>
+<p class="mathjax mathjax--block">\[
+\bar{X}_i = \frac{m}{n} \cdot \sum_{j=n/N(i-1) + 1}^{(n/M)\cdot i} x_j\]</p>
+<p>Quindi la media per ogni finestra temporale che costituirà la nuova sequenza. Si possono notare subito due casi particolari:</p>
+<ul>
+<li><span class="mathjax mathjax--inline">$m = n$</span>, la nuova sequenza è identica alla serie storica originale</li>
+<li><span class="mathjax mathjax--inline">$m = 1$</span>, la nuova sequenza ha un solo valore equivalente alla media dei valori dell'intera time series</li>
+</ul>
+<p><a href="serie-storiche-2-sax-encoding/images/PAAStepFinal.png" target="_blank"><img src="serie-storiche-2-sax-encoding/images/PAAStepFinal.png" /></a></p>
+<p>Per applicare la P.A.A. avremo bisogno di scegliere la dimensione della finestra temporale su cui calcolare l'informazione, questo influirà anche su  quanti segmenti verranno utilizzati per ricostruire la serie storica.</p>
+<blockquote>
+<p>In questo caso, visto che i vari ragionamenti (sentiti in TV, ribadisco di non avere nessuna competenza) si basano su un tempo di 2 settimane, imposterò il parametro (window) <span class="mathjax mathjax--inline">$w=14$</span>.</p>
+</blockquote>
+<p>Ridimensionata, ogni serie sarà una sequenza di <em>lunghezza_serie</em>/<em>w</em> periodi, nella quale si prende la media del periodo come nuovo valore.</p>
+<blockquote>
+<p><strong>Attenzione:</strong> Bisogna impostare un controllo per non perdere informazioni, quindi <strong>se il nuovo numero di periodi non è un intero, esso và sempre arrotondato per eccesso.</strong></p>
+</blockquote>
+<pre><code class="language-python">windows = 14
+
+new_len = int(np.ceil((df_stand.shape[1]/windows)))
+
+# Crea il nuovo dataFrame
+df_PAA = pd.DataFrame(index = df_stand.index, columns = range(0, new_len))
+
+# Calcola la media di ogni window
+ind = 0
+for i in range(0,df_stand.shape[1], windows):
+    avg = df_stand.iloc[:,i:i+windows].mean(axis=1)
+    df_PAA[ind] = avg.values
+    ind +=1</code></pre>
+<table>
+<thead>
+<tr>
+<th>denominazione_regione</th>
+<th style="text-align: right;">0</th>
+<th style="text-align: right;">1</th>
+<th style="text-align: right;">2</th>
+<th style="text-align: right;">3</th>
+<th style="text-align: right;">4</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Abruzzo</td>
+<td style="text-align: right;">-1.060876</td>
+<td style="text-align: right;">-0.785615</td>
+<td style="text-align: right;">0.352059</td>
+<td style="text-align: right;">1.252060</td>
+<td style="text-align: right;">1.696609</td>
+</tr>
+<tr>
+<td>Basilicata</td>
+<td style="text-align: right;">-1.055972</td>
+<td style="text-align: right;">-0.846662</td>
+<td style="text-align: right;">0.516006</td>
+<td style="text-align: right;">1.239693</td>
+<td style="text-align: right;">1.028541</td>
+</tr>
+<tr>
+<td>Calabria</td>
+<td style="text-align: right;">-1.088706</td>
+<td style="text-align: right;">-0.797959</td>
+<td style="text-align: right;">0.449874</td>
+<td style="text-align: right;">1.246324</td>
+<td style="text-align: right;">1.333274</td>
+</tr>
+</tbody>
+</table>
+<p><br /></p>
+<h3 id="step-3-sax" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#step-3-sax" title="Permanent link: Step 3: SAX" data-icon="#">Step 3: SAX</a></h3>
+<p>Preparato il dato si può lavorare a ciò che contraddistingue questa tecnica. Adesso il dato numerico verrà converito in stringa. La SAX String è derivazione del numero di livelli in cui si vuole suddividere la serie, ogni livello avrà un'etichetta, queste etichette verranno successivamente concatenate creando la SAX String. La scelta dei livelli influisce sul risultato, quindi bisognerebbe sempre farsi affiancare da un esperto di dominio, il consiglio è quello di non creare troppi livelli altrimenti si ha un'eterogeneità troppo alta e non si troverebbero pattern.</p>
+<p>I livelli possono essere fissati oppure calcolati ad ogni periodo, in questo caso si preferisce la seconda opzione. </p>
+<p>Non conoscendo il fenomeno, supporrò 3 livelli ["A", "B", "C"], e suddividerò i valori:</p>
+<ul>
+<li>dal minimo fino al primo quartile;</li>
+<li>tra primo e terzo quartile;</li>
+<li>superiore al terzo quartile.</li>
+</ul>
+<p>In questi caso, potremmo interpretarli come:</p>
+<ul>
+<li>pochi contagi, ottima situazione;</li>
+<li>situazione nella media;</li>
+<li>grave emergenza.</li>
+</ul>
+<p>Una volta definiti i livelli questi vengono concatenati in un'unica stringa detta appunto "<em>SAX string</em>", es. ABAAB.</p>
+<pre><code class="language-python"># Sto ridondando con i DataFrame creati ma è per mostrare i vari step, sorry.
+binned = pd.DataFrame(index = df_PAA.index, columns = df_PAA.columns)
+
+for j in range(0, df_PAA.shape[1]):
+            bins = []
+            bins.append(df_PAA[j].min()-.01)
+            bins.append(df_PAA[j].quantile([0.25]).values[0])
+            bins.append(df_PAA[j].quantile([0.75]).values[0])
+            bins.append(df_PAA[j].max()+.01)
+            labels = ["A", "B", "C"]
+            binned[j] = pd.cut(df_PAA[j], bins, labels=labels)
+binned['SAX_string'] = binned.apply(''.join, axis=1)</code></pre>
+<p>Il risultato finale del SAX Encoding lo si può vedere in tabella.</p>
+<table>
+<thead>
+<tr>
+<th>denominazione_regione</th>
+<th style="text-align: right;">SAX_string</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Abbruzzo</td>
+<td style="text-align: right;">CAABC</td>
+</tr>
+<tr>
+<td>Basilicata</td>
+<td style="text-align: right;">CABBA</td>
+</tr>
+<tr>
+<td>Calabria</td>
+<td style="text-align: right;">BABBB</td>
+</tr>
+<tr>
+<td>...</td>
+<td style="text-align: right;">...</td>
+</tr>
+</tbody>
+</table>
+<p><br /></p>
+<h2 id="come-utilizzare-le-sax-string" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#come-utilizzare-le-sax-string" title="Permanent link: Come utilizzare le SAX String?" data-icon="#">Come utilizzare le SAX String?</a></h2>
+<h3 id="anomaly-detection" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#anomaly-detection" title="Permanent link: Anomaly Detection" data-icon="#">Anomaly Detection</a></h3>
+<p>Il SAX Encoding può essere considerato un metodo non supervisionato di <em>anomaly detection</em> dove per anomalia (o outlier) non si intende la singola osservazione ma l'intera serie storica.</p>
+<p>Possiamo calcolare la frequenza di ogni SAX String, impostato il limite che per noi determina  un outlier etichettare come tale tutte le serie con frequenza della SAX String minore o uguale al bound.</p>
+<blockquote>
+<p>Nell'immagine ho impostato come bound 1.</p>
+</blockquote>
+<p>In rosso abbiamo gli outlier, blu le sequenze con frequenza maggiore di 1, vediamo che quasi ogni regione ha un suo andamento, questo dovuto a diversi fattori (territorio, controlli, ...)</p>
+<p><a href="serie-storiche-2-sax-encoding/images/Idsost8.png" target="_blank"><img src="serie-storiche-2-sax-encoding/images/Idsost8.png" /></a></p>
+<h3 id="clustering" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#clustering" title="Permanent link: Clustering" data-icon="#">Clustering</a></h3>
+<p>Sempre rimanendo nel campo dei modelli non supervisionati, le SAX String possono essere utilizzate per il clustering.</p>
+<p>Un'applicazione che mi viene in mente è il clustering gerarchico utilizzando come misura di similarità (o dissimilarità a seconda se agglomerativo o divisivo) la <a href="https://it.wikipedia.org/wiki/Distanza_di_Levenshtein">distanza di Levenshtein</a>.</p>
+<h3 id="classificazione" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#classificazione" title="Permanent link: Classificazione" data-icon="#">Classificazione</a></h3>
+<p>Passando ai metodi supervisionati, avendo già delle serie storiche etichettate, penso ad esempio a quelle sul consumo energetico che hanno anche una certa stagionalità, si potrebbe applicare il KNN alla sequenza per classificare le nuove serie.</p>
+<h3 id="stream-data" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#stream-data" title="Permanent link: Stream Data" data-icon="#">Stream Data</a></h3>
+<p>Nel precedente paragrafo ho citato la stagionalità perchè in questo articolo non è stato trattato un tema di forte interesse come il <strong>dato in stream</strong>. Con la diffusione dell'IoT le time series in stream sono un tema sempre più caldo sia per quanto riguarda l'immagazzinamento dei dati che per quanto riguarda le analisi.</p>
+<p>Nel caso di serie con stagionalità, o forti componenti cicliche, oltre alla finestra temporale per la P.A.A. si potrebbe pensare ad una finestra per l'aggiornamento dei periodi con lo stesso timing dell'effetto. Ad esempio, se ho una serie con ciclicità mensile e voglio valutare i pattern su finestre settimanali potrei impostare:</p>
+<ul>
+<li>orizzonte di aggiornamento mensile;</li>
+<li>finestra per il SAX Encoding settimanale.</li>
+</ul>
+<p>In questo modo sarebbe possibile studiare SAX String di lunghezza 4 o 5.</p>
+<p>Naturalmente con fenomeni fortemente erratici questo è più complicato da decidere, quasi sicuramente i risultati dei nostri modelli (anomaly detection, classificazione, clustering, ...) varierebbero molto frequentemente.</p>
+<p>Prendendo ad esempio il nostro dataset: se ci fermassimo una settimana prima, nel grafico seguente i dati si fermano al 13 aprile, le sequenze non singleton sarebbero molte di più. Questo solo per rimarcare ancora una volta l'importanza della scelta dela giusta finestra temporale e del periodo di osservazione in relazione al fenomeno che si và ad analizzare.</p>
+<p><a href="serie-storiche-2-sax-encoding/images/8VrDJaq.png" target="_blank"><img src="serie-storiche-2-sax-encoding/images/8VrDJaq.png" /></a></p>
+<blockquote>
+<p>Se volete approfondire questo tema vi consiglio il paper <a href="https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=4&cad=rja&uact=8&ved=2ahUKEwipqu-n6PnoAhUPY8AKHZfhCVwQFjADegQIAxAB&url=http%3A%2F%2Fwww.cs.ucr.edu%2F~eamonn%2FSAX.pdf&usg=AOvVaw1Fq0YZQeLmB1WXQFoVZFJw"><em>"A Symbolic Representation of Time Series, with Implications for
+Streaming Algorithms"</em> di Jessica Lin, Eamonn Keogh, Stefano Lonardi, Bill Chiu</a>.</p>
+</blockquote>
+<h3 id="ringraziamenti" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#ringraziamenti" title="Permanent link: Ringraziamenti" data-icon="#">Ringraziamenti</a></h3>
+<p>L'immagine di copertina è riadattata da (Yankov et al., 2007, <a href="https://dl.acm.org/doi/abs/10.1145/1281192.1281282">Detecting time series motifs under uniform scaling</a>, ACM SIGKDD).</p>
+<hr />
+<div class="notices blue">
+<p>Se questo articolo ti è piaciuto e vuoi tenerti aggiornato sulle nostre attività, ricordati che l'<a href="../member.html">iscrizione all'Italian Association for Machine Learning</a> è gratuita! Puoi seguirci su <a href="https://www.facebook.com/machinelearningitalia/">Facebook</a>, <a href="https://www.linkedin.com/company/iaml/">LinkedIn</a>, e <a href="https://twitter.com/iaml_it">Twitter</a>.</p>
+</div></p>
+            
+    
+        <p class="prev-next">
+                            <a class="button" href="serie-storiche-1-dati-mancanti.html"><i class="fa fa-chevron-left"></i> Previous Post</a>
+            
+                            <a class="button" href="serie-storiche-3-dynamic-time-warping.html">Next Post <i class="fa fa-chevron-right"></i></a>
+                    </p>
+    
+    </div>
+</div>
+			</div>
+			<div id="sidebar" class="g-block size-1-3 pure-u-1-3">
+				<div class="sidebar-content">
+    <h4>Search the blog</h4>
+    <input type="text" placeholder="Search..." value="" data-searchsidebar-input="/search/query" />
+<script>
+jQuery(document).ready(function($){
+    var input = $('[data-searchsidebar-input]');
+
+    input.on('keypress', function(event) {
+        if (event.which == 13 && input.val().length > 3) {
+            event.preventDefault();
+            window.location.href = input.data('searchsidebar-input') + ':' + input.val();
+        }
+    });
+});
+</script>
+</div>
+<!--
+<div class="sidebar-content">
+	<h4>Some Text Widget</h4>
+	<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna.</p>
+</div>
+!-->
+<div class="sidebar-content">
+    <h4>Categories</h4>
+    
+
+<ul class="archives">
+        <li>
+        <a href="categoryTutorials">Tutorials </a> (16)
+    </li>
+        <li>
+        <a href="categoryDiscussions">Discussions </a> (12)
+    </li>
+        <li>
+        <a href="categoryAnnouncements.html">Announcements </a> (4)
+    </li>
+        <li>
+        <a href="categoryTutorials (English).html">Tutorials (English) </a> (4)
+    </li>
+        <li>
+        <a href="categoryArticles' summaries.html">Articles' summaries </a> (3)
+    </li>
+        <li>
+        <a href="categoryDiscussions (English).html">Discussions (English) </a> (2)
+    </li>
+        <li>
+        <a href="categoryFocus-on.html">Focus-on </a> (1)
+    </li>
+        <li>
+        <a href="categoryReviews.html">Reviews </a> (1)
+    </li>
+        <li>
+        <a href="categoryDiscussion.html">Discussion </a> (1)
+    </li>
+    </ul>
+</div>
+<div class="sidebar-content">
+    <h4>Archives</h4>
+	<ul class="archives">
+    <li>
+    	<a href="archives_monthapr_2020.html">
+        <span class="archive_date">April 2020</span>
+                <span>(1)</span>
+                </a>
+    </li>
+</ul>
+</div>
+<div class="sidebar-content">
+    <h4>Popular Tags</h4>
+    
+
+<ul class="archives">
+        <li>
+        <a href="tagdeep learning">deep learning </a> (11)
+    </li>
+        <li>
+        <a href="tagpytorch">pytorch </a> (9)
+    </li>
+        <li>
+        <a href="tagreti neurali.html">reti neurali </a> (5)
+    </li>
+        <li>
+        <a href="taggoogle.html">google </a> (4)
+    </li>
+        <li>
+        <a href="tagjit.html">jit </a> (4)
+    </li>
+        <li>
+        <a href="tagtensorflow.html">tensorflow </a> (4)
+    </li>
+        <li>
+        <a href="tagottimizzazione.html">ottimizzazione </a> (4)
+    </li>
+        <li>
+        <a href="tagrete neurale.html">rete neurale </a> (3)
+    </li>
+        <li>
+        <a href="tagtime series.html">time series </a> (3)
+    </li>
+        <li>
+        <a href="tagkeras.html">keras </a> (3)
+    </li>
+        <li>
+        <a href="tagreti convolutive.html">reti convolutive </a> (3)
+    </li>
+        <li>
+        <a href="tagpipeline.html">pipeline </a> (2)
+    </li>
+        <li>
+        <a href="tagsklearn.html">sklearn </a> (2)
+    </li>
+        <li>
+        <a href="tagautodiff.html">autodiff </a> (2)
+    </li>
+        <li>
+        <a href="tagautomatic differentation.html">automatic differentation </a> (2)
+    </li>
+        <li>
+        <a href="tagreverse-mode.html">reverse-mode </a> (2)
+    </li>
+        <li>
+        <a href="tagderivate.html">derivate </a> (2)
+    </li>
+        <li>
+        <a href="tagdifferenziazione.html">differenziazione </a> (2)
+    </li>
+        <li>
+        <a href="tagmodel selection.html">model selection </a> (2)
+    </li>
+        <li>
+        <a href="tagcross validation.html">cross validation </a> (2)
+    </li>
+        <li>
+        <a href="tagc++.html">c++ </a> (2)
+    </li>
+        <li>
+        <a href="tagnumpy.html">numpy </a> (2)
+    </li>
+        <li>
+        <a href="tagvmap.html">vmap </a> (2)
+    </li>
+        <li>
+        <a href="tagcaffe.html">caffe </a> (2)
+    </li>
+        <li>
+        <a href="tagcompiler.html">compiler </a> (2)
+    </li>
+        <li>
+        <a href="tagjax.html">jax </a> (2)
+    </li>
+        <li>
+        <a href="tagcodemotion.html">codemotion </a> (1)
+    </li>
+        <li>
+        <a href="tagbias.html">bias </a> (1)
+    </li>
+        <li>
+        <a href="tagdiscrimination.html">discrimination </a> (1)
+    </li>
+        <li>
+        <a href="tagfairness.html">fairness </a> (1)
+    </li>
+        <li>
+        <a href="tagiaml.html">iaml </a> (1)
+    </li>
+        <li>
+        <a href="tagdatabase.html">database </a> (1)
+    </li>
+        <li>
+        <a href="tagiperparametri.html">iperparametri </a> (1)
+    </li>
+        <li>
+        <a href="tagautograph.html">autograph </a> (1)
+    </li>
+        <li>
+        <a href="taghead.html">head </a> (1)
+    </li>
+        <li>
+        <a href="tagmulti-task.html">multi-task </a> (1)
+    </li>
+        <li>
+        <a href="taglearning.html">learning </a> (1)
+    </li>
+        <li>
+        <a href="tagnovità.html">novità </a> (1)
+    </li>
+        <li>
+        <a href="tagdev summit.html">dev summit </a> (1)
+    </li>
+        <li>
+        <a href="tagcustom estimator.html">custom estimator </a> (1)
+    </li>
+        <li>
+        <a href="taghyperopt.html">hyperopt </a> (1)
+    </li>
+        <li>
+        <a href="taggoodfellow.html">goodfellow </a> (1)
+    </li>
+        <li>
+        <a href="tagnlp.html">nlp </a> (1)
+    </li>
+        <li>
+        <a href="tagdati mancanti.html">dati mancanti </a> (1)
+    </li>
+        <li>
+        <a href="tagtransformer.html">transformer </a> (1)
+    </li>
+        <li>
+        <a href="tagattenzione.html">attenzione </a> (1)
+    </li>
+        <li>
+        <a href="tagrobocop.html">robocop </a> (1)
+    </li>
+        <li>
+        <a href="tagyolo.html">yolo </a> (1)
+    </li>
+        <li>
+        <a href="tagobject detection.html">object detection </a> (1)
+    </li>
+        <li>
+        <a href="tagbayes.html">bayes </a> (1)
+    </li>
+        <li>
+        <a href="tagautoencoders.html">autoencoders </a> (1)
+    </li>
+        <li>
+        <a href="tagvariational.html">variational </a> (1)
+    </li>
+        <li>
+        <a href="tageager.html">eager </a> (1)
+    </li>
+        <li>
+        <a href="tagimputazione.html">imputazione </a> (1)
+    </li>
+        <li>
+        <a href="tagCIFAR.html">CIFAR </a> (1)
+    </li>
+        <li>
+        <a href="tagword embedding.html">word embedding </a> (1)
+    </li>
+        <li>
+        <a href="tagMNIST.html">MNIST </a> (1)
+    </li>
+        <li>
+        <a href="tagimmagini.html">immagini </a> (1)
+    </li>
+        <li>
+        <a href="tagclassificazione.html">classificazione </a> (1)
+    </li>
+        <li>
+        <a href="tagkpi.html">kpi </a> (1)
+    </li>
+        <li>
+        <a href="tagreprogramming.html">reprogramming </a> (1)
+    </li>
+        <li>
+        <a href="tagadversarial.html">adversarial </a> (1)
+    </li>
+        <li>
+        <a href="tagbrowser.html">browser </a> (1)
+    </li>
+        <li>
+        <a href="tagjavascript.html">javascript </a> (1)
+    </li>
+        <li>
+        <a href="tagreti ricorsive.html">reti ricorsive </a> (1)
+    </li>
+        <li>
+        <a href="tagreti ricorrenti.html">reti ricorrenti </a> (1)
+    </li>
+        <li>
+        <a href="tagftth.html">ftth </a> (1)
+    </li>
+        <li>
+        <a href="tagadversarial example.html">adversarial example </a> (1)
+    </li>
+        <li>
+        <a href="tagmanagement.html">management </a> (1)
+    </li>
+        <li>
+        <a href="tagrobotica.html">robotica </a> (1)
+    </li>
+        <li>
+        <a href="tagocr.html">ocr </a> (1)
+    </li>
+        <li>
+        <a href="tagfocus.html">focus </a> (1)
+    </li>
+        <li>
+        <a href="tagiphone.html">iphone </a> (1)
+    </li>
+        <li>
+        <a href="tagpython.html">python </a> (1)
+    </li>
+        <li>
+        <a href="tagface id.html">face id </a> (1)
+    </li>
+        <li>
+        <a href="tagmomento.html">momento </a> (1)
+    </li>
+        <li>
+        <a href="tagadam.html">adam </a> (1)
+    </li>
+        <li>
+        <a href="tagneuroscienza.html">neuroscienza </a> (1)
+    </li>
+        <li>
+        <a href="tagonde cerebrali.html">onde cerebrali </a> (1)
+    </li>
+        <li>
+        <a href="tagtorchvision.html">torchvision </a> (1)
+    </li>
+        <li>
+        <a href="taglatin.html">latin </a> (1)
+    </li>
+        <li>
+        <a href="tagpretrained.html">pretrained </a> (1)
+    </li>
+        <li>
+        <a href="tagrete convolutiva.html">rete convolutiva </a> (1)
+    </li>
+        <li>
+        <a href="tagautograd.html">autograd </a> (1)
+    </li>
+        <li>
+        <a href="tagswish.html">swish </a> (1)
+    </li>
+        <li>
+        <a href="tagattivazione.html">attivazione </a> (1)
+    </li>
+        <li>
+        <a href="tagcheckpoint.html">checkpoint </a> (1)
+    </li>
+        <li>
+        <a href="tagtensori.html">tensori </a> (1)
+    </li>
+        <li>
+        <a href="tagvariabili.html">variabili </a> (1)
+    </li>
+        <li>
+        <a href="taglineare.html">lineare </a> (1)
+    </li>
+        <li>
+        <a href="tagregressione.html">regressione </a> (1)
+    </li>
+        <li>
+        <a href="tagconvolutional networks.html">convolutional networks </a> (1)
+    </li>
+        <li>
+        <a href="tagVatican.html">Vatican </a> (1)
+    </li>
+        <li>
+        <a href="tagproject.html">project </a> (1)
+    </li>
+        <li>
+        <a href="tagkernel.html">kernel </a> (1)
+    </li>
+        <li>
+        <a href="tagICLR.html">ICLR </a> (1)
+    </li>
+        <li>
+        <a href="tagipotesi.html">ipotesi </a> (1)
+    </li>
+        <li>
+        <a href="tagsparsità.html">sparsità </a> (1)
+    </li>
+        <li>
+        <a href="tagfunzionale.html">funzionale </a> (1)
+    </li>
+        <li>
+        <a href="tagfunctional.html">functional </a> (1)
+    </li>
+        <li>
+        <a href="tagadversarial attack.html">adversarial attack </a> (1)
+    </li>
+        <li>
+        <a href="tagkmeans.html">kmeans </a> (1)
+    </li>
+        <li>
+        <a href="taganalysis.html">analysis </a> (1)
+    </li>
+        <li>
+        <a href="tagclustering.html">clustering </a> (1)
+    </li>
+        <li>
+        <a href="tagGoogle.html">Google </a> (1)
+    </li>
+        <li>
+        <a href="tagregression.html">regression </a> (1)
+    </li>
+        <li>
+        <a href="tagJAX.html">JAX </a> (1)
+    </li>
+        <li>
+        <a href="taggaussian process.html">gaussian process </a> (1)
+    </li>
+        <li>
+        <a href="tagensemble.html">ensemble </a> (1)
+    </li>
+        <li>
+        <a href="tagboosting.html">boosting </a> (1)
+    </li>
+        <li>
+        <a href="taggradient.html">gradient </a> (1)
+    </li>
+        <li>
+        <a href="tagsemi-supervised learning.html">semi-supervised learning </a> (1)
+    </li>
+        <li>
+        <a href="tagdocument classification.html">document classification </a> (1)
+    </li>
+        <li>
+        <a href="taggraphs.html">graphs </a> (1)
+    </li>
+        <li>
+        <a href="tagvariables.html">variables </a> (1)
+    </li>
+        <li>
+        <a href="taglinear.html">linear </a> (1)
+    </li>
+        <li>
+        <a href="tagk-NN.html">k-NN </a> (1)
+    </li>
+    </ul>
+</div>
+<div class="sidebar-content syndicate">
+    <h4>Syndicate</h4>
+    <a class="button" href="../blog.atom"><i class="fa fa-rss-square"></i> Atom 1.0</a>
+    <a class="button" href="../blog.rss"><i class="fa fa-rss-square"></i> RSS</a>
+</div>
+			</div>
+		</div>
+	
+                        <div class="modular-row footer ">
+    <div class="footer-items">
+        <div class="footer-module large">
+		<h4>About</h4>
+                            <p>Italian Association for Machine Learning (C.F. 97949550582)</p>
+            			<p>Write us: info@iaml.it</p>
+        </div>
+        <div class="footer-module"><h4>Address</h4>
+            <p>
+                                    <span><strong>Operational office</strong></span>
+                                    <span>IAML c/o Pi Campus, via Indonesia 23, 00144 Rome</span>
+                                    <span><strong>Legal office</strong></span>
+                                    <span>Via Cassia 964, 00189, Rome</span>
+                            </p>
+        </div>
+        <div class="footer-module"><h4>Quick Links</h4>
+         <ul class="quickmenu">
+                            <li><i class="fa fa-chevron-right"></i><a href="../home">Home</a></li>
+                            <li><i class="fa fa-chevron-right"></i><a href="https://iaml.it/documents">Documents (Italian)</a></li>
+                    </ul>
+    </div>
+   
+</div>
+<hr>
+<div class="footer-modules">
+    <div class="footer-copyright">
+        Copyright 2018 IAML.IT. All Rights Reserved.
+    </div>
+    <div class="footer-menu">
+    <ul class="othermenu">
+           <li><a href="https://learn.getgrav.org/">Powered by Grav</a></li>
+           <li><a href="https://github.com/getgrav/grav-theme-deliver">Theme (adapted) from Deliver</a></li>
+        </ul>
+    </div>
+</div>
+</div>                    </section>
+        
+    </div>
+    <div class="sb-slidebar sb-left sb-width-thin">
+        <div id="panel">
+        
+<ul class="navigation">
+                                                        <li class="">
+                    <a href="../index.html">
+                                                Home
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../activities">
+                                                Activities
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../supporters.html">
+                                                Supporters
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../member.html">
+                                                Become a member
+                    </a>
+                </li>
+                                                                <li class="active">
+                    <a href="../blog">
+                                                Blog
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../governance">
+                                                Governance
+                    </a>
+                </li>
+                                                                                                                                </ul>                   </div>
+    </div>
+        <script src="../user/plugins/simplesearch/js/simplesearch.js" type="text/javascript" ></script>
+
+    <script>
+    $(function () {
+        $(document).ready(function() {
+          $.slidebars({
+            hideControlClasses: true,
+            scrollLock: true
+          });
+        });
+    });
+    </script>
+    </body>
+</html>
+
+

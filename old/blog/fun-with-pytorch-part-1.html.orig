@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Fun with PyTorch - Part 1: Variables and Gradients | Italian Association for Machine Learning</title>
+    <meta content="GravCMS"  />
+<meta content="The Italian Association for Machine Learning (IAML) is a not-for-profit organization with the purpose of promoting knowledge of machine learning in all aspects of the Italian public life, from universities to enterprises and IT professionals."  />
+<meta property="og:title" content="Fun with PyTorch #1 (Variables and Gradients) | IAML.it"  />
+<meta property="og:image" content="https://iaml.it/blog/fun-with-pytorch-part-1/images/tensor_illustration.png"  />
+<meta property="og:url" content="https://iaml.it/blog/fun-with-pytorch-part-1/"  />
+<meta property="og:description" content="In this first tutorial, we are introducing the two main PyTorch elements: variables and gradients."  />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="icon" type="image/png" href="/user/themes/deliver/images/favicon.png" />
+
+	<!-- Global site tag (gtag.js) - Google Ads: 774709547 --> <script async src="https://www.googletagmanager.com/gtag/js?id=AW-774709547"></script> <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'AW-774709547'); </script> 
+	
+		
+                            		                                                <link href="/user/themes/deliver/css-compiled/nucleus.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css-compiled/template.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/custom.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/toc.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/font-awesome.min.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/facebook/css/facebook.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/facebook/assets/unitegallery/css/unite-gallery.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/facebook/assets/unitegallery/themes/default/ug-theme-default.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/markdown-notices/assets/notices.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/breadcrumbs/css/breadcrumbs.css" type="text/css" rel="stylesheet" />
+<link href="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/events/assets/events.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/form/assets/form-styles.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/mathjax/assets/css/mathjax.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/simplesearch/css/simplesearch.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/highlight/css/zenburn.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/login/css/login.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/slidebars.min.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/slideme.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/socialbuttons/vendor/rrssb/css/rrssb.css" type="text/css" rel="stylesheet" />
+
+
+                                                            <script src="/system/assets/jquery/jquery-2.x.min.js" type="text/javascript" ></script>
+<script src="/user/themes/deliver/js/modernizr.custom.71422.js" type="text/javascript" ></script>
+<script src="/user/plugins/facebook/assets/unitegallery/js/unitegallery.min.js" type="text/javascript" ></script>
+<script src="/user/plugins/facebook/assets/unitegallery/themes/default/ug-theme-default.js" type="text/javascript" ></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.js" type="text/javascript" ></script>
+<script src="/user/plugins/events/assets/events.js" type="text/javascript" ></script>
+<script src="/user/plugins/mathjax/assets/js/mathjax.js" type="text/javascript" ></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript" ></script>
+<script src="/user/plugins/highlight/js/highlight.pack.js" type="text/javascript" ></script>
+<script src="/user/themes/deliver/js/deliver.js" type="text/javascript" ></script>
+<script src="/user/themes/deliver/js/slidebars.min.js" type="text/javascript" ></script>
+<script src="/user/themes/deliver/js/jquery.slideme2.js" type="text/javascript" ></script>
+<script src="/user/plugins/socialbuttons/vendor/rrssb/js/rrssb.min.js" type="text/javascript" ></script>
+
+<script>
+window.addEventListener("load", function(){
+window.cookieconsent.initialise({
+"palette": {
+    "popup": {
+        "background": "#4d4d4d",
+        "text": "#fff"
+    },
+    "button": {
+        "background": "#f1d600",
+        "text": "#000",
+        "border": "#f1d600"
+    }
+},
+"position": "bottom",
+"theme": "block",
+"content": {
+    "message": "This website uses cookies to ensure you get the best experience on our website.",
+    "dismiss": "Got it!",
+    "link": "Learn more",
+    "href": "https://cookiesandyou.com"
+}
+})});
+hljs.initHighlightingOnLoad();
+
+</script>
+
+
+</head>
+<body id="top" class="header-lite fullwidth blogstyling">
+    <div id="sb-site">
+                <header id="header">
+                <div class="logo">
+                    <h3><a href="https://iaml.it"><img src="/user/pages/images/IAML_logo_viola.png" /></a></h3>
+                                            <ul class="social-icons">
+            <li>
+            <a href="https://twitter.com/iaml_it">
+                <i class="fa fa-twitter"></i>            </a>
+        </li>
+            <li>
+            <a href="https://www.linkedin.com/company/iaml/">
+                <i class="fa fa-linkedin"></i>            </a>
+        </li>
+            <li>
+            <a href="https://www.facebook.com/machinelearningitalia/">
+                <i class="fa fa-facebook"></i>            </a>
+        </li>
+            <li>
+            <a href="blog.rss">
+                <i class="fa fa-rss"></i>            </a>
+        </li>
+    </ul>  
+                                    </div>
+                <div id="navbar">
+                                                            
+<ul class="navigation">
+                                                        <li class="">
+                    <a href="/">
+                                                Home
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/activities">
+                                                Activities
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/supporters">
+                                                Supporters
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/member">
+                                                Become a member
+                    </a>
+                </li>
+                                                                <li class="active">
+                    <a href="/blog">
+                                                Blog
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/governance">
+                                                Governance
+                    </a>
+                </li>
+                                                                                                                                </ul>                                                   <form class="search-box">
+    <input type="search" placeholder="Search..." value="" data-search-input="/search/query" />
+    <script>
+    jQuery(document).ready(function($){
+        var input = $('[data-search-input]');
+
+        input.on('keypress', function(event) {
+            if (event.which == 13 && input.val().length > 3) {
+                event.preventDefault();
+                window.location.href = input.data('search-input') + ':' + input.val();
+            }
+        });
+    });
+    </script>
+    <i class="fa fa-search"></i>
+</form>                    <span class="panel-activation sb-toggle-left navbar-left menu-btn fa fa-bars"></span>
+                </div>
+        </header>
+        
+        
+                <section id="body" class="">
+                            
+				<div class="flush-top blog-header blog-header-image" style="background: #B4B093 url(/user/pages/05.blog/blue_header.jpg) no-repeat right;">
+            <h1>Fun with PyTorch - Part 1: Variables and Gradients</h1>
+        </div>
+            
+        
+<div id="breadcrumbs" itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
+                                            <a href="/" itemprop="url"><span itemprop="title">Home</span></a>
+                        <i class="fa fa-angle-right"></i>
+                                                <a href="/blog" itemprop="url"><span itemprop="title">Blog</span></a>
+                        <i class="fa fa-angle-right"></i>
+                                                <span itemprop="title">Fun with PyTorch - Part 1: Variables and Gradients</span>
+                        </div>
+		
+		<div class="blog-content-item g-grid pure-g-r">
+			<div id="item" class="g-block pure-u-2-3">
+			    <div class="list-item">
+
+    <div class="list-blog-header">
+                    <img src="/images/e/7/a/0/0/e7a00995064891fe7231d70ec8e7eb2b78eea20b-c2ujkgbviaaylf6.jpeg" />
+        
+                    <h4><a href="/blog/fun-with-pytorch-part-1">Fun with PyTorch - Part 1: Variables and Gradients</a></h4>
+        
+        <span class="list-blog-date">
+            <i class="fa fa-calendar"></i>
+            05, Mar
+        </span>
+                <span class="list-blog-author">
+            <i class="fa fa-user"></i>
+            Simone Scardapane / Gabriele Randelli
+        </span>
+                       <ul class="tags">
+            <i class="fa fa-tag"></i>
+                        <li><a href="/blog/tag:pytorch">pytorch</a></li>
+                        <li><a href="/blog/tag:regression">regression</a></li>
+                        <li><a href="/blog/tag:linear">linear</a></li>
+                        <li><a href="/blog/tag:variables">variables</a></li>
+                        <li><a href="/blog/tag:deep learning">deep learning</a></li>
+                    </ul>
+        
+    </div>
+
+	<div>
+	<br />
+	<!-- AddToAny BEGIN -->
+<div class="a2a_kit a2a_kit_size_32 a2a_default_style">
+<a class="a2a_dd" href="https://www.addtoany.com/share"></a>
+<a class="a2a_button_facebook"></a>
+<a class="a2a_button_twitter"></a>
+<a class="a2a_button_linkedin"></a>
+<a class="a2a_button_google_plus"></a>
+<a class="a2a_button_email"></a>
+</div>
+<script async src="https://static.addtoany.com/menu/page.js"></script>
+<!-- AddToAny END -->
+</div>
+	
+    <div class="list-blog-padding">
+
+            <p><p><a href="http://pytorch.org/">PyTorch</a> is a brand new framework for deep learning, mainly conceived by the <em>Facebook AI Research</em> (FAIR) group, which gained significant popularity in the ML community due to its ease of use and efficiency.<br />
+This is the first of a series of tutorials devoted to this framework, starting with the basic building blocks up to more advanced models and techniques to develop deep neural networks.
+In this first tutorial, we are introducing the two main PyTorch elements: variables and gradients.</p>
+<div class="notices blue">
+<h3>Read the entire series:</h3>
+<ul>
+<li>Fun with PyTorch - Part 1: Variables and Gradients (this one)</li>
+</ul>
+</div>
+<div class="notices yellow">
+<p>These tutorials are also available in italian language: <a href="https://iaml.it/blog/alle-prese-con-pytorch-parte-1/">Alle Prese con PyTorch</a>.</p>
+</div>
+<p></p>
+<h2>Install</h2>
+<p>PyTorch is currently released as beta version and available for Linux or OS X platforms only (latest version v0.4.0). From the latest version, it also supports Windows machines. If your machine isn't already packed with Python libraries, our hint is to install a package manager, such as <a href="https://www.anaconda.com/download/">Anaconda</a>, to ease the next steps. </p>
+<h3>Linux / Windows</h3>
+<p>Assuming both Python and Anaconda have been installed, just type: </p>
+<blockquote>
+<p>conda install pytorch -c pytorch</p>
+</blockquote>
+<p>This version supports GPU through CUDA. </p>
+<h3>OSX</h3>
+<p>You can rely on the same command, but there will be no GPU support. If you want to enable CUDA support, please refer to the following link to build PyTorch <a href="https://github.com/pytorch/pytorch#from-source">from source</a>. </p>
+<h2>Tensors: PyTorch vs NumPy</h2>
+<p>A Tensor, that is, a multi-dimensional numeric array, is the main PyTorch element, like in NumPy and, more in general, in almost every scientific framework based on Python.
+Since PyTorch's method signature is very close to NumPy, let's start by comparing the two libraries (and how the two interact) with the definition of a new tensor:</p>
+<pre><code class="language-py"># NumPy
+import numpy as np
+x = np.zeros((2, 3))
+
+# PyTorch
+import torch
+y = torch.zeros(2, 3)</code></pre>
+<p>More or less the syntax is the same. With NumPy, the tensor's size is expressed as a vector, while in PyTorch every dimension is passed as a separate argument.<br />
+NumPy and PyTorch tensors can be even combined with an automatic cast:</p>
+<pre><code class="language-py">z = x + y</code></pre>
+<p>However, automatic casting always hides pitfalls, as shown below: </p>
+<pre><code class="language-py">print(y.type()) # &lt;class 'torch.FloatTensor'&gt;
+print(z.type()) # &lt;class 'torch.DoubleTensor'&gt;</code></pre>
+<p>As you can see,  the destination tensor <code>z</code> changed its data type with respect to the source <code>y</code>!
+NumPy tensors are by default initialized as <code>np.float64</code>, while PyTorch adopts a 32-bit <code>torch.FloatTensor</code> type, to be GPU-compliant.<br />
+When combining the two tensors, there's an automatic upcast to a 64bit type, which in turn leads to manifold runtime errors. There are two possible workarounds to avoid this: (1) downcasting the destination tensor with <code>z.float()</code> or (2) upcasting the source tensor with  <code>y.double()</code>. </p>
+<div class="notices blue">
+<p>Previous to version 0.4.0, <code>y.type()</code> was equivalent to <code>type(y)</code>.</p>
+</div>
+<p>We can convert a PyTorch tensor to its corresponding NumPy version by using <code>z.numpy()</code>, or build a PyTorch tensor from a NumPy one through <code>torch.from_numpy(x)</code>.
+Pay attention that both the operations are sharing the allocated memory. Any operation applied to one tensor will <strong>alter the other one as well</strong>, as illustrated below: </p>
+<pre><code class="language-py">xx = z.numpy()
+xx += 1.0
+print(z)
+# 1  1  1
+# 1  1  1
+# [torch.DoubleTensor of size 2x3]</code></pre>
+<p>Besides these remarks, almost every method signature is equivalent in the two libraries. In particular, we can index elements within a tensor through squared brackets, as well as implicitly combine matrices with different size through <em>broadcasting</em> (as reported in this picture):</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/fun-with-pytorch-part-1/images/tensor_illustration.png"alt="Broadcasting in PyTorch" />
+        </figure>
+<pre><code class="language-py">torch.Tensor([3, 2]) * torch.Tensor([[0, 1], [4, 2]])
+# 0  2
+# 12  4
+# [torch.FloatTensor of size 2x2]</code></pre>
+<p>Retrieving tensors' sizing is almost the same, besides the return type: </p>
+<pre><code class="language-py">print(x.shape)   # (3, 2)
+print(y.size())  # torch.Size([3, 2])</code></pre>
+<p>Last, but not least, a minor difference is how we address a specific dimension of a tensor: </p>
+<pre><code class="language-py">x.mean(axis=0)
+y.mean(dim=0)</code></pre>
+<h2>Variables, gradients and functions</h2>
+<p>Let's jump into fancy stuff: how to automatically compute tensors' gradients (aka derivatives), given a set of functions.</p>
+<p>We will leverage on <strong>autograd</strong>, a core PyTorch package for automatic differentiation. Previous to version 0.4.0, this was combined with a PyTorch element called <strong>variables</strong>.</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/fun-with-pytorch-part-1/images/Variable.png"alt="Variables in PyTorch" />
+        </figure>
+<p>A variable is a small tensor's wrapper consisting of three major elements: </p>
+<ul>
+<li><code>v.data</code> references to the raw tensor;</li>
+<li><code>v.grad</code> accumulates the gradient computed on demand through the backward pass with respect to this variable;</li>
+<li><code>v.grad_fn</code> is used by PyTorch to link the root element of the computational graph containing the applied operations.</li>
+</ul>
+<p>Every single operation applied to the variable is tracked by PyTorch through the autograd tape within an acyclic graph:</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/fun-with-pytorch-part-1/images/dynamic_graph.gif"alt="Construction of the computational graph in PyTorch" />
+        </figure>
+<p>This allows to compute gradients over tensors by automatically feed-forwarding all the required information within the acyclic graph through the aforementioned tape.<br />
+Let's make an example: </p>
+<pre><code class="language-py">from torch.autograd import Variable
+v = Variable(torch.ones(1, 2), requires_grad=True)</code></pre>
+<p>Note the <code>require_grad</code> flag to set the automatic gradient update with respect to the variable <code>v</code>.</p>
+<div class="notices blue">
+<p>In the 0.4.0 release, variables and tensors were merged. A tensor on which you want to track operations can be defined directly as <code>v = torch.ones(1, 2, requires_grad=True)</code>. For retro-compatibility with most of the code online, we are using the older style for now.</p>
+</div>
+<p>Let's play with the tensor, by performing the sum of squared elements: </p>
+<pre><code class="language-py">v_fn = torch.sum(v ** 2)
+print(v_fn.data)    # 2 [torch.FloatTensor of size 1]
+print(v_fn.grad_fn) # &lt;SumBackward0 object at 0x7fa959f21550&gt;</code></pre>
+<p>With respect to other deep learning frameworks (e.g. TensorFlow without the brand new <a href="https://iaml.it/blog/tensorflow-eager">eager execution</a>), PyTorch builds up the graph dynamically, which leads to a very fast response. Furthermore, the <code>grad_fn</code> property contains an object reference to the operation originating the <code>v_fn</code> variable within the graph (in this case the sum function).</p>
+<p>In order to compute the function gradient of <code>v_fn</code> over <code>v</code>, we type: </p>
+<pre><code class="language-py">torch.autograd.grad(v_fn, v) # Gradient of v_fn over v
+# (Variable containing:
+# 2  2 [torch.FloatTensor of size 1x2],)</code></pre>
+<p>A more interesting approach to handle variables is reported through the following example with two variables: </p>
+<pre><code class="language-py">v1 = Variable(torch.Tensor([1, 2]), requires_grad=True)
+v2 = Variable(torch.Tensor([3]), requires_grad=True)
+v_fn = torch.sum(v1 * v2)</code></pre>
+<p>Instead of explicitly invoking the gradient computation for each variable, we can automatically compute the gradient with respect to the combination of all the involved variables where the <code>requires_grad</code> flag has been ticked: </p>
+<pre><code class="language-py">v_fn.backward()
+print(v1.grad) # Variable containing: 3 3 [torch.FloatTensor of size 2x1]
+print(v2.grad) # Variable containing: 3 [torch.FloatTensor of size 1]</code></pre>
+<p>In this case the backward function is not returning any value, since the gradients are stored in the <code>grad</code> property of each variable. PyTorch also exposes <a href="http://pytorch.org/docs/master/autograd.html">more complex and advanced methods to auto-compute gradients</a>, which are beyond the scope of this tutorial. </p>
+<h2>Example: Linear Regression</h2>
+<p>Let's apply everything so far described with a linear regression example. </p>
+<blockquote>
+<blockquote>
+<blockquote>
+<p>It is worth underlining that this is an example focused on re-applying the techniques introduced. Indeed, PyTorch offers much more advanced methodologies to accomplish the same task, introduced in the following tutorials.</p>
+</blockquote>
+</blockquote>
+</blockquote>
+<p>In this example we will consider a simple one-dimensional synthetic problem (with some added noise): </p>
+<pre><code class="language-py">X = np.random.rand(30, 1)*2.0
+w = np.random.rand(2, 1)
+y = X*w[0] + w[1] + np.random.randn(30, 1) * 0.05</code></pre>
+<figure role="group">
+        <img src="https://iaml.it/blog/fun-with-pytorch-part-1/images/regressione_lineare_1.png"alt="Dataset for linear regression" />
+        </figure>
+<p>In order to detect the line's coefficient, we define a linear model:</p>
+<pre><code class="language-py">W = Variable(torch.rand(1, 1), requires_grad=True)
+b = Variable(torch.rand(1), requires_grad=True)
+
+def linear(x):
+  return torch.matmul(x, W) + b</code></pre>
+<blockquote>
+<p>Using torch.matmul is redundant in this case, but we want the function to be as general as possible to be re-used for more complex models. </p>
+</blockquote>
+<p>Below we report how to train the model: </p>
+<pre><code class="language-py">Xt = Variable(torch.from_numpy(X)).float()
+yt = Variable(torch.from_numpy(y)).float()
+
+for epoch in range(2500):
+
+  # Compute predictions
+  y_pred = linear(Xt)
+
+  # Compute cost function
+  loss = torch.mean((y_pred - yt) ** 2)
+
+  # Run back-propagation
+  loss.backward()
+
+  # Update variables
+  W.data = W.data - 0.005*W.grad.data
+  b.data = b.data - 0.005*b.grad.data
+
+  # Reset gradients
+  W.grad.data.zero_()
+  b.grad.data.zero_()</code></pre>
+<p>Few remarks about the code: </p>
+<ol>
+<li>We need to cast the dataset from NumPy to PyTorch (32bit) using <code>float()</code>.</li>
+<li>The cost function is a mean squared error.</li>
+<li>After the back-propagation step we update the weights with a gradient descent, and we explicitly use <code>W.data</code> instead of <code>W</code>, in order not to override the original variables </li>
+<li>At the end of every iteration, gradients are reset.</li>
+</ol>
+<p>Finally, to validate our regression problem, we plot the final model: </p>
+<figure role="group">
+        <img src="https://iaml.it/blog/fun-with-pytorch-part-1/images/regressione_lineare_2.png"alt="Linear regression" />
+        </figure>
+<p>In the next tutorial we will deal with more advanced models and their optimization through native PyTorch functions and classes. </p>
+<div class="notices blue">
+<h3>Read the entire series:</h3>
+<ul>
+<li>Fun with PyTorch - Part 1: Variables and Gradients (this one)</li>
+</ul>
+</div>
+<hr />
+<p>If you liked this post and you would like to keep in touch with our activities, you can <a href="/member">become a member of the Italian Association for Machine Learning</a>, or follow us on <a href="https://www.facebook.com/machinelearningitalia/">Facebook</a> or <a href="https://www.linkedin.com/company/18312943/">LinkedIn</a>.</p></p>
+            
+    
+        <p class="prev-next">
+                            <a class="button" href="/blog/optimizing-sklearn-pipelines"><i class="fa fa-chevron-left"></i> Previous Post</a>
+            
+                            <a class="button" href="/blog/alle-prese-con-pytorch-parte-1">Next Post <i class="fa fa-chevron-right"></i></a>
+                    </p>
+    
+    </div>
+</div>
+			</div>
+			<div id="sidebar" class="g-block size-1-3 pure-u-1-3">
+				<div class="sidebar-content">
+    <h4>Search the blog</h4>
+    <input type="text" placeholder="Search..." value="" data-searchsidebar-input="/search/query" />
+<script>
+jQuery(document).ready(function($){
+    var input = $('[data-searchsidebar-input]');
+
+    input.on('keypress', function(event) {
+        if (event.which == 13 && input.val().length > 3) {
+            event.preventDefault();
+            window.location.href = input.data('searchsidebar-input') + ':' + input.val();
+        }
+    });
+});
+</script>
+</div>
+<!--
+<div class="sidebar-content">
+	<h4>Some Text Widget</h4>
+	<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna.</p>
+</div>
+!-->
+<div class="sidebar-content">
+    <h4>Categories</h4>
+    
+
+<ul class="archives">
+        <li>
+        <a href="/blog/category:Tutorials">Tutorials </a> (16)
+    </li>
+        <li>
+        <a href="/blog/category:Discussions">Discussions </a> (12)
+    </li>
+        <li>
+        <a href="/blog/category:Announcements">Announcements </a> (4)
+    </li>
+        <li>
+        <a href="/blog/category:Tutorials%20%28English%29">Tutorials (English) </a> (4)
+    </li>
+        <li>
+        <a href="/blog/category:Articles%27%20summaries">Articles' summaries </a> (3)
+    </li>
+        <li>
+        <a href="/blog/category:Discussions%20%28English%29">Discussions (English) </a> (2)
+    </li>
+        <li>
+        <a href="/blog/category:Focus-on">Focus-on </a> (1)
+    </li>
+        <li>
+        <a href="/blog/category:Reviews">Reviews </a> (1)
+    </li>
+        <li>
+        <a href="/blog/category:Discussion">Discussion </a> (1)
+    </li>
+    </ul>
+</div>
+<div class="sidebar-content">
+    <h4>Archives</h4>
+	<ul class="archives">
+    <li>
+    	<a href="/blog/archives_month:apr_2020">
+        <span class="archive_date">April 2020</span>
+                <span>(1)</span>
+                </a>
+    </li>
+</ul>
+</div>
+<div class="sidebar-content">
+    <h4>Popular Tags</h4>
+    
+
+<ul class="archives">
+        <li>
+        <a href="/blog/tag:deep%20learning">deep learning </a> (11)
+    </li>
+        <li>
+        <a href="/blog/tag:pytorch">pytorch </a> (9)
+    </li>
+        <li>
+        <a href="/blog/tag:reti%20neurali">reti neurali </a> (5)
+    </li>
+        <li>
+        <a href="/blog/tag:google">google </a> (4)
+    </li>
+        <li>
+        <a href="/blog/tag:jit">jit </a> (4)
+    </li>
+        <li>
+        <a href="/blog/tag:tensorflow">tensorflow </a> (4)
+    </li>
+        <li>
+        <a href="/blog/tag:ottimizzazione">ottimizzazione </a> (4)
+    </li>
+        <li>
+        <a href="/blog/tag:rete%20neurale">rete neurale </a> (3)
+    </li>
+        <li>
+        <a href="/blog/tag:time%20series">time series </a> (3)
+    </li>
+        <li>
+        <a href="/blog/tag:keras">keras </a> (3)
+    </li>
+        <li>
+        <a href="/blog/tag:reti%20convolutive">reti convolutive </a> (3)
+    </li>
+        <li>
+        <a href="/blog/tag:pipeline">pipeline </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:sklearn">sklearn </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:autodiff">autodiff </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:automatic%20differentation">automatic differentation </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:reverse-mode">reverse-mode </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:derivate">derivate </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:differenziazione">differenziazione </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:model%20selection">model selection </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:cross%20validation">cross validation </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:c%2B%2B">c++ </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:numpy">numpy </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:vmap">vmap </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:caffe">caffe </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:compiler">compiler </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:jax">jax </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:codemotion">codemotion </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:bias">bias </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:discrimination">discrimination </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:fairness">fairness </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:iaml">iaml </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:database">database </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:iperparametri">iperparametri </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:autograph">autograph </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:head">head </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:multi-task">multi-task </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:learning">learning </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:novit%C3%A0">novità </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:dev%20summit">dev summit </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:custom%20estimator">custom estimator </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:hyperopt">hyperopt </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:goodfellow">goodfellow </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:nlp">nlp </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:dati%20mancanti">dati mancanti </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:transformer">transformer </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:attenzione">attenzione </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:robocop">robocop </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:yolo">yolo </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:object%20detection">object detection </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:bayes">bayes </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:autoencoders">autoencoders </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:variational">variational </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:eager">eager </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:imputazione">imputazione </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:CIFAR">CIFAR </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:word%20embedding">word embedding </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:MNIST">MNIST </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:immagini">immagini </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:classificazione">classificazione </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:kpi">kpi </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:reprogramming">reprogramming </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:adversarial">adversarial </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:browser">browser </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:javascript">javascript </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:reti%20ricorsive">reti ricorsive </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:reti%20ricorrenti">reti ricorrenti </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:ftth">ftth </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:adversarial%20example">adversarial example </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:management">management </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:robotica">robotica </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:ocr">ocr </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:focus">focus </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:iphone">iphone </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:python">python </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:face%20id">face id </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:momento">momento </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:adam">adam </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:neuroscienza">neuroscienza </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:onde%20cerebrali">onde cerebrali </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:torchvision">torchvision </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:latin">latin </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:pretrained">pretrained </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:rete%20convolutiva">rete convolutiva </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:autograd">autograd </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:swish">swish </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:attivazione">attivazione </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:checkpoint">checkpoint </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:tensori">tensori </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:variabili">variabili </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:lineare">lineare </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:regressione">regressione </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:convolutional%20networks">convolutional networks </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:Vatican">Vatican </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:project">project </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:kernel">kernel </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:ICLR">ICLR </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:ipotesi">ipotesi </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:sparsit%C3%A0">sparsità </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:funzionale">funzionale </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:functional">functional </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:adversarial%20attack">adversarial attack </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:kmeans">kmeans </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:analysis">analysis </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:clustering">clustering </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:Google">Google </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:regression">regression </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:JAX">JAX </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:gaussian%20process">gaussian process </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:ensemble">ensemble </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:boosting">boosting </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:gradient">gradient </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:semi-supervised%20learning">semi-supervised learning </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:document%20classification">document classification </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:graphs">graphs </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:variables">variables </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:linear">linear </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:k-NN">k-NN </a> (1)
+    </li>
+    </ul>
+</div>
+<div class="sidebar-content syndicate">
+    <h4>Syndicate</h4>
+    <a class="button" href="/blog.atom"><i class="fa fa-rss-square"></i> Atom 1.0</a>
+    <a class="button" href="/blog.rss"><i class="fa fa-rss-square"></i> RSS</a>
+</div>
+			</div>
+		</div>
+	
+                        <div class="modular-row footer ">
+    <div class="footer-items">
+        <div class="footer-module large">
+		<h4>About</h4>
+                            <p>Italian Association for Machine Learning (C.F. 97949550582)</p>
+            			<p>Write us: info@iaml.it</p>
+        </div>
+        <div class="footer-module"><h4>Address</h4>
+            <p>
+                                    <span><strong>Operational office</strong></span>
+                                    <span>IAML c/o Pi Campus, via Indonesia 23, 00144 Rome</span>
+                                    <span><strong>Legal office</strong></span>
+                                    <span>Via Cassia 964, 00189, Rome</span>
+                            </p>
+        </div>
+        <div class="footer-module"><h4>Quick Links</h4>
+         <ul class="quickmenu">
+                            <li><i class="fa fa-chevron-right"></i><a href="https://iaml.it/home">Home</a></li>
+                            <li><i class="fa fa-chevron-right"></i><a href="https://iaml.it/documents">Documents (Italian)</a></li>
+                    </ul>
+    </div>
+   
+</div>
+<hr>
+<div class="footer-modules">
+    <div class="footer-copyright">
+        Copyright 2018 IAML.IT. All Rights Reserved.
+    </div>
+    <div class="footer-menu">
+    <ul class="othermenu">
+           <li><a href="https://learn.getgrav.org/">Powered by Grav</a></li>
+           <li><a href="https://github.com/getgrav/grav-theme-deliver">Theme (adapted) from Deliver</a></li>
+        </ul>
+    </div>
+</div>
+</div>                    </section>
+        
+    </div>
+    <div class="sb-slidebar sb-left sb-width-thin">
+        <div id="panel">
+        
+<ul class="navigation">
+                                                        <li class="">
+                    <a href="/">
+                                                Home
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/activities">
+                                                Activities
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/supporters">
+                                                Supporters
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/member">
+                                                Become a member
+                    </a>
+                </li>
+                                                                <li class="active">
+                    <a href="/blog">
+                                                Blog
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/governance">
+                                                Governance
+                    </a>
+                </li>
+                                                                                                                                </ul>                   </div>
+    </div>
+        <script src="/user/plugins/simplesearch/js/simplesearch.js" type="text/javascript" ></script>
+
+    <script>
+    $(function () {
+        $(document).ready(function() {
+          $.slidebars({
+            hideControlClasses: true,
+            scrollLock: true
+          });
+        });
+    });
+    </script>
+    </body>
+</html>

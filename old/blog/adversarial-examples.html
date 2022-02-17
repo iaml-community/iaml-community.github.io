@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Breve guida agli adversarial examples nel machine learning | Italian Association for Machine Learning</title>
+    <meta content="GravCMS"  />
+<meta content="The Italian Association for Machine Learning (IAML) is a not-for-profit organization with the purpose of promoting knowledge of machine learning in all aspects of the Italian public life, from universities to enterprises and IT professionals."  />
+<meta property="og:title" content="Breve guida agli adversarial examples nel machine learning | IAML.it"  />
+<meta property="og:image" content="https://iaml.it/blog/adversarial-examples/images/uap-fig-1.png"  />
+<meta property="og:url" content="https://iaml.it/blog/adversarial-examples/"  />
+<meta property="og:description" content="Gli adversarial attacks permettono di generare esempi in grado di confondere qualsiasi predittore, indipendentemente dalla sua accuratezza iniziale. In questo post vediamo cosa sono queste tecniche (con particolare attenzione ai classificatori di immagini), una selezione di lavori sul tema, e come generare esempi di questo tipo in poche righe di codice."  />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="icon" type="image/png" href="../user/themes/deliver/images/favicon.png" />
+
+	<!-- Global site tag (gtag.js) - Google Ads: 774709547 --> <script async src="https://www.googletagmanager.com/gtag/js?id=AW-774709547"></script> <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'AW-774709547'); </script> 
+	
+		
+                            		                                                <link href="../user/themes/deliver/css-compiled/nucleus.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css-compiled/template.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css/custom.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css/toc.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css/font-awesome.min.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/facebook/css/facebook.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/facebook/assets/unitegallery/css/unite-gallery.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/facebook/assets/unitegallery/themes/default/ug-theme-default.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/markdown-notices/assets/notices.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/breadcrumbs/css/breadcrumbs.css" type="text/css" rel="stylesheet" />
+<link href="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/events/assets/events.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/form/assets/form-styles.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/mathjax/assets/css/mathjax.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/simplesearch/css/simplesearch.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/highlight/css/zenburn.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/login/css/login.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css/slidebars.min.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css/slideme.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/socialbuttons/vendor/rrssb/css/rrssb.css" type="text/css" rel="stylesheet" />
+
+
+                                                            <script src="../system/assets/jquery/jquery-2.x.min.js" type="text/javascript" ></script>
+<script src="../user/themes/deliver/js/modernizr.custom.71422.js" type="text/javascript" ></script>
+<script src="../user/plugins/facebook/assets/unitegallery/js/unitegallery.min.js" type="text/javascript" ></script>
+<script src="../user/plugins/facebook/assets/unitegallery/themes/default/ug-theme-default.js" type="text/javascript" ></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.js" type="text/javascript" ></script>
+<script src="../user/plugins/events/assets/events.js" type="text/javascript" ></script>
+<script src="../user/plugins/mathjax/assets/js/mathjax.js" type="text/javascript" ></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript" ></script>
+<script src="../user/plugins/highlight/js/highlight.pack.js" type="text/javascript" ></script>
+<script src="../user/themes/deliver/js/deliver.js" type="text/javascript" ></script>
+<script src="../user/themes/deliver/js/slidebars.min.js" type="text/javascript" ></script>
+<script src="../user/themes/deliver/js/jquery.slideme2.js" type="text/javascript" ></script>
+<script src="../user/plugins/socialbuttons/vendor/rrssb/js/rrssb.min.js" type="text/javascript" ></script>
+
+<script>
+window.addEventListener("load", function(){
+window.cookieconsent.initialise({
+"palette": {
+    "popup": {
+        "background": "#4d4d4d",
+        "text": "#fff"
+    },
+    "button": {
+        "background": "#f1d600",
+        "text": "#000",
+        "border": "#f1d600"
+    }
+},
+"position": "bottom",
+"theme": "block",
+"content": {
+    "message": "This website uses cookies to ensure you get the best experience on our website.",
+    "dismiss": "Got it!",
+    "link": "Learn more",
+    "href": "https://cookiesandyou.com"
+}
+})});
+hljs.initHighlightingOnLoad();
+
+</script>
+
+
+</head>
+<body id="top" class="header-lite fullwidth blogstyling">
+    <div id="sb-site">
+                <header id="header">
+                <div class="logo">
+                    <h3><a href="../index.html"><img src="../user/pages/images/IAML_logo_viola.png" /></a></h3>
+                                            <ul class="social-icons">
+            <li>
+            <a href="https://twitter.com/iaml_it">
+                <i class="fa fa-twitter"></i>            </a>
+        </li>
+            <li>
+            <a href="https://www.linkedin.com/company/iaml/">
+                <i class="fa fa-linkedin"></i>            </a>
+        </li>
+            <li>
+            <a href="https://www.facebook.com/machinelearningitalia/">
+                <i class="fa fa-facebook"></i>            </a>
+        </li>
+            <li>
+            <a href="blog.rss">
+                <i class="fa fa-rss"></i>            </a>
+        </li>
+    </ul>  
+                                    </div>
+                <div id="navbar">
+                                                            
+<ul class="navigation">
+                                                        <li class="">
+                    <a href="../index.html">
+                                                Home
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../activities">
+                                                Activities
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../supporters.html">
+                                                Supporters
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../member.html">
+                                                Become a member
+                    </a>
+                </li>
+                                                                <li class="active">
+                    <a href="../blog">
+                                                Blog
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../governance.html">
+                                                Governance
+                    </a>
+                </li>
+                                                                                                                                </ul>                                                   <form class="search-box">
+    <input type="search" placeholder="Search..." value="" data-search-input="/search/query" />
+    <script>
+    jQuery(document).ready(function($){
+        var input = $('[data-search-input]');
+
+        input.on('keypress', function(event) {
+            if (event.which == 13 && input.val().length > 3) {
+                event.preventDefault();
+                window.location.href = input.data('search-input') + ':' + input.val();
+            }
+        });
+    });
+    </script>
+    <i class="fa fa-search"></i>
+</form>                    <span class="panel-activation sb-toggle-left navbar-left menu-btn fa fa-bars"></span>
+                </div>
+        </header>
+        
+        
+                <section id="body" class="">
+                            
+				<div class="flush-top blog-header blog-header-image" style="background: #B4B093 url(/user/pages/05.blog/blue_header.jpg) no-repeat right;">
+            <h1>Breve guida agli adversarial examples nel machine learning</h1>
+        </div>
+            
+        
+<div id="breadcrumbs" itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
+                                            <a href="../index.html" itemprop="url"><span itemprop="title">Home</span></a>
+                        <i class="fa fa-angle-right"></i>
+                                                <a href="../blog" itemprop="url"><span itemprop="title">Blog</span></a>
+                        <i class="fa fa-angle-right"></i>
+                                                <span itemprop="title">Breve guida agli adversarial examples nel machine learning</span>
+                        </div>
+		
+		<div class="blog-content-item g-grid pure-g-r">
+			<div id="item" class="g-block pure-u-2-3">
+			    <div class="list-item">
+
+    <div class="list-blog-header">
+                    
+        
+                    <h4><a href="adversarial-examples.html">Breve guida agli adversarial examples nel machine learning</a></h4>
+        
+        <span class="list-blog-date">
+            <i class="fa fa-calendar"></i>
+            13, Feb
+        </span>
+                <span class="list-blog-author">
+            <i class="fa fa-user"></i>
+            Simone Scardapane
+        </span>
+                       <ul class="tags">
+            <i class="fa fa-tag"></i>
+                        <li><a href="tagadversarial example.html">adversarial example</a></li>
+                        <li><a href="tagadversarial attack.html">adversarial attack</a></li>
+                        <li><a href="tagdeep learning.html">deep learning</a></li>
+                    </ul>
+        
+    </div>
+
+	<div>
+	<br />
+	<!-- AddToAny BEGIN -->
+<div class="a2a_kit a2a_kit_size_32 a2a_default_style">
+<a class="a2a_dd" href="https://www.addtoany.com/share"></a>
+<a class="a2a_button_facebook"></a>
+<a class="a2a_button_twitter"></a>
+<a class="a2a_button_linkedin"></a>
+<a class="a2a_button_google_plus"></a>
+<a class="a2a_button_email"></a>
+</div>
+<script async src="https://static.addtoany.com/menu/page.js"></script>
+<!-- AddToAny END -->
+</div>
+	
+    <div class="list-blog-padding">
+
+            <p><p>Molti li hanno già chiamati <em>le illusioni ottiche</em> delle reti neurali. In realtà, gli adversarial examples (che potremmo tradurre come "esempi antagonistici") sono un problema esistente per qualsiasi tecnica di machine learning: tramite <strong>modifiche impercettibili all'occhio umano</strong>, è possibile generare esempi in grado di <strong>confondere qualsiasi classificatore</strong>, indipendentemente dalla sua accuratezza in fase di training e con altissima probabilità. In pochissimi anni, questi attacchi sono risultati essere <strong>molto più semplici da applicare</strong> di quanto creduto inizialmente, e difendersi sembra di conseguenza tanto più complesso, con una vera e propria <strong>corsa agli armamenti</strong> tra ricercatori che inventano nuovi attacchi ed altri che provano ad evitarli. In questo post vediamo cosa sono gli adversarial example (con particolare attenzione ai classificatori di immagini), una selezione di lavori sul tema, e come generare esempi di questo tipo in poche righe di codice.</p>
+<h2>Come ingannare una rete neurale</h2>
+<p>Partiamo dall'inizio: corre l'anno 2013, e le reti neurali hanno ormai raggiunto un'accuratezza nel riconoscere oggetti <a href="http://people.idsia.ch/~juergen/computer-vision-contests-won-by-gpu-cnns.html">prossima a quella umana</a>, prestazioni che negli anni a seguire non faranno che aumentare e che si estenderanno a numerosi altri campi, dando vita al fenomeno del deep learning così come lo conosciamo oggi. Ma come <a href="https://iaml.it/blog/mito-accuratezza">abbiamo già discusso in passato</a> l'accuratezza non è tutto, ed in molti cominciano a chiedersi quanto robusti siano questi modelli: quanto realmente "<em>capiscono</em>" (se ci passate il termine) le reti neurali di quanto vedono?</p>
+<p>Nel tentativo di rispondere (anche) a questa domanda, in un articolo caricato su arXiv a fine 2013 <a href="#szegedy2013">[1]</a> alcuni ricercatori descrivono due aspetti interessanti di queste nuove reti neurali "profonde". Il primo di questi aspetti riguarda il modo in cui le reti memorizzano l'informazione, ma è il secondo ad attirare da subito l'attenzione della comunità scientifica: data un'immagine qualunque, anche classificata correttamente, è possibile <strong>aggiungerle del rumore impercettibile all'occhio umano</strong> e dare vita ad una seconda immagine in grado di confondere quasi sempre la rete neurale. L'anno dopo, questo fenomeno viene popolarizzato da Andrej Karpathy sul suo blog (<a href="https://karpathy.github.io/2015/03/30/breaking-convnets/">Breaking Linear Classifiers on ImageNet</a>):</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/adversarial-examples/./images/szegedy.png"alt="Fooling neural networks" />
+        </figure>
+<p>Il modo in cui ottenere questi "adversarial examples" (AE nel seguito) descritto dai ricercatori è anche piuttosto semplice ed elegante. Supponiamo che <span class="mathjax mathjax--inline">$x$</span> sia l'immagine (classificata correttamente), ed <span class="mathjax mathjax--inline">$f(x)$</span> la classe predetta dalla rete neurale. Vogliamo trovare una distorsione <span class="mathjax mathjax--inline">$r$</span> tale per cui la predizione <span class="mathjax mathjax--inline">$f(x+r)$</span> diventi <span class="mathjax mathjax--inline">$l$</span>, dove ovviamente <span class="mathjax mathjax--inline">$l \neq f(x)$</span>. Questo è banale se scegliamo <span class="mathjax mathjax--inline">$r$</span> sufficientemente grande, ma è possibile invece trovare una distorsione impercettibile? Per farlo, possiamo provare trovando la distorsione più piccola tra tutte quelle possibili tramite un problema di ottimizzazione:</p>
+<p class="mathjax mathjax--block">$$
+\begin{align}
+\underset{r}{\text{min}} & \,\, \lVert r \rVert_2 \,,\\
+\text{tale che} & \,\, \begin{cases} \,\, f(x+r) = l & \\
+ \,\, x+r \text{ rimanga un'immagine valida} & \end{cases} \,.
+\end{align}$$</p>
+<p>Per risolvere esattamente questo problema abbiamo bisogno di tecniche di ottimizzazione leggermente più sofisticate di quelle classiche (a causa dei vincoli imposti): in particolare, i ricercatori adottano una variante di L-BFGS, un algoritmo piuttosto oneroso che limita molto le dimensioni dei problemi a cui questo attacco può essere applicato. </p>
+<blockquote>
+<blockquote>
+<blockquote>
+<p>Per i curiosi, la sigla L-BFGS sta per "Limited-memory  Broyden–Fletcher–Goldfarb–Shanno", dove gli ultimi quattro nomi sono gli autori dell'algoritmo originale BFGS. La versione usata nell'articolo, "Box-constrained L-BFGS", permette di gestire anche vincoli sul range delle variabili. Trovate <a href="https://en.wikipedia.org/wiki/Limited-memory_BFGS">una spiegazione piuttosto approfondita</a> su Wikipedia.</p>
+</blockquote>
+</blockquote>
+</blockquote>
+<p>Nonostante la relativa complessità del metodo, la tecnica riesce su problemi di medie dimensioni, generando distorsioni effettivamente impercettibili e dando vita al primo <strong>adversarial attack</strong> nella storia del deep learning, che in seguito prenderà il nome dalla tecnica di ottimizzazione usata: L-BFGS. La conclusione è chiara: le reti neurali sembrano a prima vista molto meno robuste di quanto si poteva pensare (si inizia ad usare il termine "brittle"). Questo risultato va di pari passo con un risultato complementare ottenuto pochi mesi dopo da OpenAI, che mostra come immagini totalmente irriconoscibili siano invece <a href="http://www.evolvingai.org/fooling">classificate con grande confidenza dalla rete neurale</a>:</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/adversarial-examples/images/imagenet_16_images_horizontal_0.png"alt="OpenAI fooling neural networks" />
+        </figure>
+<p>Ad attirare ulteriormente l'attenzione della communità scientifica concorrono altri due fenomeni:</p>
+<ul>
+<li>La popolarità del deep learning è dovuta soprattutto a librerie software molto semplici da usare, come <a href="https://www.tensorflow.org/">TensorFlow</a>, <a href="http://pytorch.org/">PyTorch</a>, o (nell'ormai lontano 2013) <a href="http://deeplearning.net/software/theano/">Theano</a>. <strong>Proprio questi strumenti rendono altrettanto facile generare attacchi</strong>: è sufficiente ottimizzare una rete neurale non rispetto ai suoi pesi, ma rispetto all'immagine di input, e le due operazioni sono concettualmente uguali a livello del software. Questo vuol dire che l'implementazione, una volta allenata la rete, è minima (si veda in particolare la prossima sezione).</li>
+<li>A peggiorare le cose, le distorsioni trovate - oltre ad essere indistinguibili all'occhio umano se comparate con l'immagine originaria - vengono trovate <em>quasi</em> sempre (come nell'immagine di cui sopra).</li>
+</ul>
+<p>Una volta osservati i primi AE, le domande erano molte: quanto è generale il problema? Possiamo generare AE anche senza la conoscenza del modello della rete neurale? <strong>Ed in questo caso, possiamo difendercene?</strong> Per cominciare, il passo immediatamente successivo è stato quello di trovare metodi più semplici per generarli che non richiedessero la complessità di L-BFGS. Non troppo a sorpresa, c'è voluto pochissimo.</p>
+<h2>Da L-BFGS al fast gradient sign method</h2>
+<p>Il secondo tassello essenziale nella teoria degli AE arriva esattamente un anno dopo, in un secondo articolo <a href="#goodfellow2014">[2]</a> pubblicato da due degli autori originali insieme a Jonathon Shlens. Nel tentativo di dare una spiegazione a questo fenomeno (spiegazione su cui torniamo subito sotto), scoprono anche una tecnica incredibilmente semplice per generarli. In poche parole, al posto di risolvere in maniera ottimale il problema di ottimizzazione di prima gli autori ottengono degli AE aggiungendo all'immagine del rumore che dipende solo dal gradiente della rete neurale e da un parametro scelto dall'utente:</p>
+<p class="mathjax mathjax--block">\[
+\widetilde{x} = x + \varepsilon \cdot \text{sign}\left(\nabla_x c(f(x),y) \right) \,.\]</p>
+<p>Nell'equazione di prima, <span class="mathjax mathjax--inline">$\varepsilon$</span> determina quanto rumore viene aggiunto, e <span class="mathjax mathjax--inline">$c(f(x),y)$</span> è la funzione costo usata (es., cross-entropia). A differenza di L-BFGS, non dobbiamo ottimizzare nulla: una volta scelto <span class="mathjax mathjax--inline">$\varepsilon$</span> possiamo generare centinaia di immagini con (in pratica) una sola riga di codice. Stranamente, questa tecnica permette di raggiungere <strong>errori fino al 90%</strong> sui principali dataset di image classification! Per la sua semplicità, questo attacco è stato soprannominato Fast Gradient Sign Method (FGSM). Vale la pena fare una piccola pausa per apprezzare quanto semplice è questo metodo: vediamo quindi come implementarlo in pratica, prima di continuare la nostra panoramica sugli AE.</p>
+<h2>Adversarial examples in pratica (Python)</h2>
+<blockquote>
+<blockquote>
+<blockquote>
+<p>Questa sezione describe l'implementazione di FGSM in Python. Se siete interessati solo alla teoria degli AE, saltate pure oltre fino alla prossima sezione.</p>
+</blockquote>
+</blockquote>
+</blockquote>
+<p>Ci sono tantissime librerie per sperimentare attacchi di questo tipo, tra cui <a href="https://github.com/tensorflow/cleverhans">cleverhans</a> (rilasciata dagli autori degli articoli citati prima) e <a href="https://github.com/bethgelab/foolbox">foolbox</a>. Possiamo installare la seconda direttamente con pip:</p>
+<blockquote>
+<p>pip install foolbox</p>
+</blockquote>
+<p>Sul tutorial è disponibile un esempio già funzionante che riprendiamo qui. Per eseguirlo possiamo caricare un modello pre-allenato da <a href="https://keras.io/">Keras</a>:</p>
+<pre><code class="language-py">import keras
+import numpy as np
+from keras.applications.resnet50 import ResNet50
+keras.backend.set_learning_phase(0)
+kmodel = ResNet50(weights='imagenet')</code></pre>
+<p>Per chi non l'avesse mai incontrata, la ResNet-50 è un modello <a href="https://arxiv.org/abs/1512.03385">estremamente competitivo di image recognition</a>. Per eseguire un attacco, dobbiamo prima trasformare il modello di Keras in un modello di foolbox con un wrapper (ne esistono di appositi per tutte le principali librerie):</p>
+<pre><code class="language-py">import foolbox
+preprocessing = (np.array([104, 116, 123]), 1)
+fmodel = foolbox.models.KerasModel(kmodel, bounds=(0, 255), preprocessing=preprocessing)</code></pre>
+<p>Carichiamo un'immagine (nemmeno a dirlo - un gattino!):</p>
+<pre><code class="language-py">image, label = foolbox.utils.imagenet_example()</code></pre>
+<figure role="group">
+        <img src="https://iaml.it/blog/adversarial-examples/images/example.png"alt="Example image" />
+        </figure>
+<p>Possiamo verificare che l'immagine sia correttamente classificata dalla rete in questa fase:</p>
+<pre><code class="language-py">np.argmax(fmodel.predictions(image[:, :, ::-1])) # Ritorna 282 (tiger cat)</code></pre>
+<p>La rete neurale ritorna 282 come indice di classe, che nella tassonomia di ImageNet <a href="https://gist.github.com/yrevar/942d3a0ac09ec9e5eb3a">corrisponde effettivamente ad un <em>tiger cat</em></a>. Generiamo un attacco modificando l'immagine con il FGSM:</p>
+<pre><code class="language-py">attack = foolbox.attacks.FGSM(fmodel)
+adversarial = attack(image[:, :, ::-1], label)</code></pre>
+<figure role="group">
+        <img src="https://iaml.it/blog/adversarial-examples/images/example_distorted.png"alt="Example image" />
+        </figure>
+<p>Riproviamo la classificazione con la nuova immagine:</p>
+<pre><code class="language-py">np.argmax(fmodel.predictions(adversarial[:, :, ::-1])) # Ritorna 287 (lynx, catamount)</code></pre>
+<p>Il gatto è misteriosamente diventato una lince! (O un puma, che non è meno preoccupante per chi legge la predizione.) Questo genere di attacco richiede peraltro un tempo infinitesimo su una qualsiasi macchina di buone prestazioni. Per curiosità, possiamo anche analizzare <a href="https://github.com/bethgelab/foolbox/blob/master/foolbox/attacks/gradientsign.py#L8-L35">il codice del toolbox</a> per vedere l'implementazione dell'attacco (leggermente semplificata nella versione che riportiamo qui):</p>
+<pre><code class="language-py">perturbed = image + gradient_sign * np.sign(a.gradient())</code></pre>
+<p>Il tutto si può esprimere facilmente in una sola riga, grazie all'uso di <code>a.gradient()</code>, che permette di calcolare <span class="mathjax mathjax--inline">$\nabla_x c(f(x),y)$</span> automaticamente a partire da qualsiasi modello. </p>
+<h2>Oltre gli attacchi white-box</h2>
+<p>L-BFGS e FGSM, come dicevamo prima, sono solo la punta dell'iceberg, e di attacchi ne esistono ormai un'infinità. Ad esempio, con il saliency map attack <a href="#papernot2016">[3]</a> potete generare rapidamente adversarial examples in base ad una classe scelta da voi come nel caso di L-BFGS, ma in maniera molto più efficiente.</p>
+<p>Inoltre, finora abbiamo visto solo attacchi che supponevano che il modello della rete neurale fosse disponibile, il che sembra limitare di molto la loro pericolosità effettiva. Come vediamo ora, però, questo non è strettamente necessario: <strong>è possibile avere attacchi completamente <em>black-box</em></strong>, ovvero che non richiedono nessuna informazione sulla struttura interna del modello che stiamo attaccando. Esplorarli ci porta nel terreno più recente della ricerca sugli AE.</p>
+<h3>Attacchi black-box e perturbazioni universali</h3>
+<p>L-BFGS e FGSM, nella loro stranezza, sono poco più di una curiosità accademica: dover aver accesso al modello della rete neurale preclude, ad esempio, la possibilità di attaccare modelli in cloud o (ancora peggio) modelli già in produzione negli oggetti che ci circondano. Due anni esatti dopo la pubblicazione del primo articolo sugli AE, però, ecco arrivare una scoperta ben peggiore <a href="#papernot2017">[3]</a>: non solo è possibile attaccare qualsiasi modello di machine learning (e quindi non solo reti neurali), ma gli attacchi sono <em>trasferibili</em>. Se siamo in possesso di un buon numero di predizioni di un modello, <strong>possiamo allenare un altro modello ad imitazione del primo</strong>, ed usare quello per generare gli AE. Gli autori del nuovo articolo testano con successo questo nuovo attacco contro modelli in cloud di vari provider, ottenendo performance elevatissime.</p>
+<p>A questo punto, l'unico limite alla sofisticazione degli attacchi diventa la fantasia dei ricercatori. Le "perturbazioni universali" <a href="#moosavidezsfooli2017">[4]</a>, ad esempio, permettono di generare attacchi validi per quasi ogni classificatore <em>simultaneamente</em>:</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/adversarial-examples/images/uap-fig-1.png"alt="Universal adversarial perturbations" />
+        </figure>
+<p>Ancora più strane, le "perturbazioni ad un pixel" permettono di attaccare un modello modificando un <em>singolo pixel</em> dell'immagine :</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/adversarial-examples/images/pixel.png"alt="One-pixel attack" />
+        </figure>
+<p>E come se non bastasse, ecco infine le "adversarial patch", dei bottoni che permettono di ingannare quasi tutti i classificatori <strong>anche nel mondo reale</strong>:</p>
+<center>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/i1sp4X57TL4" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+</center>
+<blockquote>
+<blockquote>
+<blockquote>
+<p>Ovviamente il problema non si limita alle immagini. Possiamo <a href="https://nlp.stanford.edu/courses/cs224n/2015/reports/29.pdf">creare AE per sistemi di NLP</a> o anche (seppur in maniera preliminare) per i più <a href="https://nicholas.carlini.com/code/audio_adversarial_examples/">avanzati sistemi di text-to-speech</a>, facendogli trascrivere qualsiasi cosa desideriamo.</p>
+</blockquote>
+</blockquote>
+</blockquote>
+<p>Ma perché questi AE funzionano così bene? E come possiamo difendercene?</p>
+<h2>Teoria e difesa dagli adversarial examples</h2>
+<p>Il motivo del perché gli AE esistono ha (ovviamente) attirato molta attenzione e non si può dire sia stato ancora risolto in maniera soddisfacente. Una delle spiegazioni più note è stata introdotta in <a href="#goodfellow2014">[2]</a> e si fonda (contro-intuitivamente) sulla <em>linearità</em> delle reti neurali in pratica. Per spiegare questa linea di pensiero, supponiamo che il modello <span class="mathjax mathjax--inline">$f(x)$</span> sia effettivamente lineare: in questo caso, il cambiamento dato dalla perturbazione si può esprimere immediatamente come:</p>
+<p class="mathjax mathjax--block">\[
+w^T\widetilde{x} = w^T x + w^T r \,.\]</p>
+<p>Un semplice ragionamento mostra inoltre come la perturbazione ottimale con norma <span class="mathjax mathjax--inline">$\lVert r \rVert_2 = \varepsilon$</span> è proprio <span class="mathjax mathjax--inline">$r = \varepsilon \cdot \text{sign}(w)$</span> (vi ricorda qualcosa?). Se <span class="mathjax mathjax--inline">$w$</span> ha <span class="mathjax mathjax--inline">$n$</span> elementi e ciascuno di essi in media vale <span class="mathjax mathjax--inline">$m$</span>, la perturbazione complessiva media è data da <span class="mathjax mathjax--inline">$\varepsilon m n$</span>. Quindi, anche mantendendo <span class="mathjax mathjax--inline">$\varepsilon$</span> molto piccolo, su problemi sufficientemente complessi (dove <span class="mathjax mathjax--inline">$n$</span> è molto grande) <strong>la perturbazione complessiva può diventare enorme</strong>. La giustificazione data da <a href="#goodfellow2014">[2]</a> per gli AE è che le reti neurali esibiscono questo comportamento lineare in pratica, ed anzi è qualcosa di voluto: modificare di poco l'input varia (proporzionalmente) di poco la predizione. Da questa assunzione nasce il FGSM.</p>
+<p>Detto questo, <strong>come difendersi dagli AE</strong>? La verità è che attualmente stiamo assistendo ad una corsa agli armamenti nel quale <strong>gli attaccanti sono in vantaggio</strong>: per ogni difesa trovata, nuovi modi di aggirarla e nuovi attacchi vengono inventati ogni mese. Vediamo una rapidssima selezione di difese possibili:</p>
+<ol>
+<li>
+<p>L'idea più semplice è di aggiungere AE in fase di training (<strong>data augmentation</strong>). Questo rende il modello parzialmente più robusto, ma richiede una conoscenza di tutti i possibili attacchi a cui il sistema sarà soggetto, può aumentare la complessità dell'allenamento, ed in alcuni casi fallisce completamente.</p>
+</li>
+<li>
+<p><a href="#papernot2016b">[6]</a> introduce la tecnica di <strong>defensive distillation</strong>, una procedura a due fasi che cerca di evitare che la rete neurale si adatti in maniera troppo stringente ai propri dati allenandola due volte tramite un processo chiamato distillation. Questo metodo sembra resistente ad alcuni tipi di attacco (tra cui L-BFGS e FGSM), ma molto meno ad altri.</p>
+</li>
+<li>Una delle difese più note al momento, introdotta in <a href="#metzen2017">[7]</a>, allena un secondo modello sulle rappresentazioni interne della rete neurale a predire se l'esempio processato in quel momento è adversarial oppure no. Anche questa difesa potrebbe fallire (ad esempio nel caso di universal perturbations), ma sembra essere più robusta di altre.</li>
+</ol>
+<p>E questa è (ovviamente) solo una lista parziale di alcuni lavori particolarmente influenti, che conclude la nostra breve panoramica sull'affascinante problema degli AE. </p>
+<h2>E quindi?</h2>
+<p>La realtà è che gli AE rappresentano un problema critico per qualsiasi modello (sia esso una rete neurale o meno) le cui predizioni sono direttamente esposte al pubblico; un problema che deve essere assolutamente tenuto in conto nella fase di progettazione e controllato in quella di deployment, nella stessa maniera in cui di qualsiasi sistema informatico viene sempre valutata la sicurezza. Non farlo (e non tenersi costantemente aggiornati sui nuovi sviluppi del campo) apre falle enormi nella progettazione di sistemi di machine learning, falle che rischiano di portare ad ingenti danni, sia monetari che sociali. </p>
+<p>E questo apre una riflessione più generale: per quanto intelligenti sembrino questi sistemi, nel mondo reale <strong>persone che vogliano sfruttare il vostro sistema</strong> e siano dotate di sufficiente ingegno <strong>possono quasi sicuramente riuscirci</strong>. Nel campo più generale del data mining, questo problema è stato parallelamente studiato come <strong>adversarial machine learning</strong>: per chi fosse interessato, rimandiamo al <a href="https://sec-ml.pluribus-one.it/#about">bellissimo blog</a> del <a href="http://pralab.diee.unica.it/">PRA Lab</a> di Cagliari, dove trovate una timeline molto dettagliata dei principali lavori nel campo.</p>
+<p>Per concludere, come scrive <a href="https://www.technologyreview.com/s/608618/hackers-are-the-real-obstacle-for-self-driving-vehicles/">questo articolo</a> del MIT Technology Review, "gli hacker sono il vero ostacolo per le macchine che si guidano da sole" e non solo: come <a href="https://medium.com/self-driving-cars/adversarial-traffic-signs-fd16b7171906">ci ricorda anche David Silver</a>, cartelli stradali che cercano di ingannarvi sono dietro l'angolo!</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/adversarial-examples/images/1_4GcPQlKRT1mGTwaI18axxQ.png"alt="Adversarial traffic sign" />
+        </figure>
+<h2>Riferimenti</h2>
+<p><a id="szegedy2013">[1]</a> Szegedy, C., Zaremba, W., Sutskever, I., Bruna, J., Erhan, D., Goodfellow, I. and Fergus, R., 2013. <strong><a href="https://arxiv.org/abs/1312.6199">Intriguing properties of neural networks</a></strong>. <em>arXiv preprint arXiv:1312.6199</em>. <br />
+<a id="goodfellow2014">[2]</a> Goodfellow, I.J., Shlens, J. and Szegedy, C., 2014. <strong><a href="https://arxiv.org/abs/1412.6572">Explaining and harnessing adversarial examples</a></strong>. <em>arXiv preprint arXiv:1412.6572</em>. <br />
+<a id="papernot2016">[3]</a> Papernot, N., McDaniel, P., Jha, S., Fredrikson, M., Celik, Z.B. and Swami, A., 2016. <strong><a href="http://ieeexplore.ieee.org/abstract/document/7467366/">The limitations of deep learning in adversarial settings</a></strong>. <em>In 2016 IEEE European Symposium on Security and Privacy (EuroS&amp;P)</em>, (pp. 372-387). IEEE. <br />
+<a id="papernot2017">[3]</a> Papernot, N., McDaniel, P., Goodfellow, I., Jha, S., Celik, Z.B. and Swami, A., 2017. <strong><a href="https://dl.acm.org/citation.cfm" id="3053009">Practical black-box attacks against machine learning</a></strong>. In <em>Proceedings of the 2017 ACM on Asia Conference on Computer and Communications Security</em> (pp. 506-519). ACM. <br />
+<a id="moosavidezsfooli2017">[4]</a> Moosavi-Dezfooli, S.M., Fawzi, A., Fawzi, O. and Frossard, P., 2017. <strong><a href="https://arxiv.org/abs/1610.08401">Universal adversarial perturbations</a></strong>. In <em>IEEE Conference on Computer Vision and Pattern Recognition (CVPR)</em>. IEEE. <br />
+<a id="su2017">[5]</a> Su, J., Vargas, D.V. and Kouichi, S., 2017. <strong><a href="https://arxiv.org/abs/1710.08864">One pixel attack for fooling deep neural networks</a></strong>. <em>arXiv preprint arXiv:1710.08864</em>. <br />
+<a id="papernot2016b">[6]</a> Papernot, N., McDaniel, P., Wu, X., Jha, S. and Swami, A., 2016. <strong><a href="http://ieeexplore.ieee.org/abstract/document/7546524/">Distillation as a defense to adversarial perturbations against deep neural networks</a></strong>. In <em>2016 IEEE Symposium on Security and Privacy (SP)</em> (pp. 582-597). IEEE. <br />
+<a id="metzen2017">[7]</a> Metzen, J.H., Genewein, T., Fischer, V. and Bischoff, B., 2017. <strong><a href="https://arxiv.org/abs/1702.04267">On detecting adversarial perturbations</a></strong>. <em>arXiv preprint arXiv:1702.04267</em>. <br /></p>
+<hr />
+<p>Se questo articolo ti è piaciuto e vuoi tenerti aggiornato sulle nostre attività, ricordati che l'<a href="../member.html">iscrizione all'Italian Association for Machine Learning</a> è completamente gratuita e permette di ricevere la nostra newsletter mensile con una selezione di eventi, articoli e notizie di interesse. Puoi seguirci anche su <a href="https://www.facebook.com/machinelearningitalia/">Facebook</a> o su <a href="https://www.linkedin.com/company/18312943/">LinkedIn</a>.</p></p>
+            
+    
+        <p class="prev-next">
+                            <a class="button" href="ottimizzare-pipeline-sklearn.html"><i class="fa fa-chevron-left"></i> Previous Post</a>
+            
+                            <a class="button" href="optimizing-sklearn-pipelines.html">Next Post <i class="fa fa-chevron-right"></i></a>
+                    </p>
+    
+    </div>
+</div>
+			</div>
+			<div id="sidebar" class="g-block size-1-3 pure-u-1-3">
+				<div class="sidebar-content">
+    <h4>Search the blog</h4>
+    <input type="text" placeholder="Search..." value="" data-searchsidebar-input="/search/query" />
+<script>
+jQuery(document).ready(function($){
+    var input = $('[data-searchsidebar-input]');
+
+    input.on('keypress', function(event) {
+        if (event.which == 13 && input.val().length > 3) {
+            event.preventDefault();
+            window.location.href = input.data('searchsidebar-input') + ':' + input.val();
+        }
+    });
+});
+</script>
+</div>
+<!--
+<div class="sidebar-content">
+	<h4>Some Text Widget</h4>
+	<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna.</p>
+</div>
+!-->
+<div class="sidebar-content">
+    <h4>Categories</h4>
+    
+
+<ul class="archives">
+        <li>
+        <a href="categoryTutorials.html">Tutorials </a> (16)
+    </li>
+        <li>
+        <a href="categoryDiscussions.html">Discussions </a> (12)
+    </li>
+        <li>
+        <a href="categoryAnnouncements.html">Announcements </a> (4)
+    </li>
+        <li>
+        <a href="categoryTutorials (English).html">Tutorials (English) </a> (4)
+    </li>
+        <li>
+        <a href="categoryArticles' summaries.html">Articles' summaries </a> (3)
+    </li>
+        <li>
+        <a href="categoryDiscussions (English).html">Discussions (English) </a> (2)
+    </li>
+        <li>
+        <a href="categoryFocus-on.html">Focus-on </a> (1)
+    </li>
+        <li>
+        <a href="categoryReviews.html">Reviews </a> (1)
+    </li>
+        <li>
+        <a href="categoryDiscussion.html">Discussion </a> (1)
+    </li>
+    </ul>
+</div>
+<div class="sidebar-content">
+    <h4>Archives</h4>
+	<ul class="archives">
+    <li>
+    	<a href="archives_monthapr_2020.html">
+        <span class="archive_date">April 2020</span>
+                <span>(1)</span>
+                </a>
+    </li>
+</ul>
+</div>
+<div class="sidebar-content">
+    <h4>Popular Tags</h4>
+    
+
+<ul class="archives">
+        <li>
+        <a href="tagdeep learning.html">deep learning </a> (11)
+    </li>
+        <li>
+        <a href="tagpytorch.html">pytorch </a> (9)
+    </li>
+        <li>
+        <a href="tagreti neurali.html">reti neurali </a> (5)
+    </li>
+        <li>
+        <a href="taggoogle.html">google </a> (4)
+    </li>
+        <li>
+        <a href="tagjit.html">jit </a> (4)
+    </li>
+        <li>
+        <a href="tagtensorflow.html">tensorflow </a> (4)
+    </li>
+        <li>
+        <a href="tagottimizzazione.html">ottimizzazione </a> (4)
+    </li>
+        <li>
+        <a href="tagrete neurale.html">rete neurale </a> (3)
+    </li>
+        <li>
+        <a href="tagtime series.html">time series </a> (3)
+    </li>
+        <li>
+        <a href="tagkeras.html">keras </a> (3)
+    </li>
+        <li>
+        <a href="tagreti convolutive.html">reti convolutive </a> (3)
+    </li>
+        <li>
+        <a href="tagpipeline.html">pipeline </a> (2)
+    </li>
+        <li>
+        <a href="tagsklearn.html">sklearn </a> (2)
+    </li>
+        <li>
+        <a href="tagautodiff.html">autodiff </a> (2)
+    </li>
+        <li>
+        <a href="tagautomatic differentation.html">automatic differentation </a> (2)
+    </li>
+        <li>
+        <a href="tagreverse-mode.html">reverse-mode </a> (2)
+    </li>
+        <li>
+        <a href="tagderivate.html">derivate </a> (2)
+    </li>
+        <li>
+        <a href="tagdifferenziazione.html">differenziazione </a> (2)
+    </li>
+        <li>
+        <a href="tagmodel selection.html">model selection </a> (2)
+    </li>
+        <li>
+        <a href="tagcross validation.html">cross validation </a> (2)
+    </li>
+        <li>
+        <a href="tagc++.html">c++ </a> (2)
+    </li>
+        <li>
+        <a href="tagnumpy.html">numpy </a> (2)
+    </li>
+        <li>
+        <a href="tagvmap.html">vmap </a> (2)
+    </li>
+        <li>
+        <a href="tagcaffe.html">caffe </a> (2)
+    </li>
+        <li>
+        <a href="tagcompiler.html">compiler </a> (2)
+    </li>
+        <li>
+        <a href="tagjax.html">jax </a> (2)
+    </li>
+        <li>
+        <a href="tagcodemotion.html">codemotion </a> (1)
+    </li>
+        <li>
+        <a href="tagbias.html">bias </a> (1)
+    </li>
+        <li>
+        <a href="tagdiscrimination.html">discrimination </a> (1)
+    </li>
+        <li>
+        <a href="tagfairness.html">fairness </a> (1)
+    </li>
+        <li>
+        <a href="tagiaml.html">iaml </a> (1)
+    </li>
+        <li>
+        <a href="tagdatabase.html">database </a> (1)
+    </li>
+        <li>
+        <a href="tagiperparametri.html">iperparametri </a> (1)
+    </li>
+        <li>
+        <a href="tagautograph.html">autograph </a> (1)
+    </li>
+        <li>
+        <a href="taghead.html">head </a> (1)
+    </li>
+        <li>
+        <a href="tagmulti-task.html">multi-task </a> (1)
+    </li>
+        <li>
+        <a href="taglearning.html">learning </a> (1)
+    </li>
+        <li>
+        <a href="tagnovità.html">novità </a> (1)
+    </li>
+        <li>
+        <a href="tagdev summit.html">dev summit </a> (1)
+    </li>
+        <li>
+        <a href="tagcustom estimator.html">custom estimator </a> (1)
+    </li>
+        <li>
+        <a href="taghyperopt.html">hyperopt </a> (1)
+    </li>
+        <li>
+        <a href="taggoodfellow.html">goodfellow </a> (1)
+    </li>
+        <li>
+        <a href="tagnlp.html">nlp </a> (1)
+    </li>
+        <li>
+        <a href="tagdati mancanti.html">dati mancanti </a> (1)
+    </li>
+        <li>
+        <a href="tagtransformer.html">transformer </a> (1)
+    </li>
+        <li>
+        <a href="tagattenzione.html">attenzione </a> (1)
+    </li>
+        <li>
+        <a href="tagrobocop.html">robocop </a> (1)
+    </li>
+        <li>
+        <a href="tagyolo.html">yolo </a> (1)
+    </li>
+        <li>
+        <a href="tagobject detection.html">object detection </a> (1)
+    </li>
+        <li>
+        <a href="tagbayes.html">bayes </a> (1)
+    </li>
+        <li>
+        <a href="tagautoencoders.html">autoencoders </a> (1)
+    </li>
+        <li>
+        <a href="tagvariational.html">variational </a> (1)
+    </li>
+        <li>
+        <a href="tageager.html">eager </a> (1)
+    </li>
+        <li>
+        <a href="tagimputazione.html">imputazione </a> (1)
+    </li>
+        <li>
+        <a href="tagCIFAR.html">CIFAR </a> (1)
+    </li>
+        <li>
+        <a href="tagword embedding.html">word embedding </a> (1)
+    </li>
+        <li>
+        <a href="tagMNIST.html">MNIST </a> (1)
+    </li>
+        <li>
+        <a href="tagimmagini.html">immagini </a> (1)
+    </li>
+        <li>
+        <a href="tagclassificazione.html">classificazione </a> (1)
+    </li>
+        <li>
+        <a href="tagkpi.html">kpi </a> (1)
+    </li>
+        <li>
+        <a href="tagreprogramming.html">reprogramming </a> (1)
+    </li>
+        <li>
+        <a href="tagadversarial.html">adversarial </a> (1)
+    </li>
+        <li>
+        <a href="tagbrowser.html">browser </a> (1)
+    </li>
+        <li>
+        <a href="tagjavascript.html">javascript </a> (1)
+    </li>
+        <li>
+        <a href="tagreti ricorsive.html">reti ricorsive </a> (1)
+    </li>
+        <li>
+        <a href="tagreti ricorrenti.html">reti ricorrenti </a> (1)
+    </li>
+        <li>
+        <a href="tagftth.html">ftth </a> (1)
+    </li>
+        <li>
+        <a href="tagadversarial example.html">adversarial example </a> (1)
+    </li>
+        <li>
+        <a href="tagmanagement.html">management </a> (1)
+    </li>
+        <li>
+        <a href="tagrobotica.html">robotica </a> (1)
+    </li>
+        <li>
+        <a href="tagocr.html">ocr </a> (1)
+    </li>
+        <li>
+        <a href="tagfocus.html">focus </a> (1)
+    </li>
+        <li>
+        <a href="tagiphone.html">iphone </a> (1)
+    </li>
+        <li>
+        <a href="tagpython.html">python </a> (1)
+    </li>
+        <li>
+        <a href="tagface id.html">face id </a> (1)
+    </li>
+        <li>
+        <a href="tagmomento.html">momento </a> (1)
+    </li>
+        <li>
+        <a href="tagadam.html">adam </a> (1)
+    </li>
+        <li>
+        <a href="tagneuroscienza.html">neuroscienza </a> (1)
+    </li>
+        <li>
+        <a href="tagonde cerebrali.html">onde cerebrali </a> (1)
+    </li>
+        <li>
+        <a href="tagtorchvision.html">torchvision </a> (1)
+    </li>
+        <li>
+        <a href="taglatin.html">latin </a> (1)
+    </li>
+        <li>
+        <a href="tagpretrained.html">pretrained </a> (1)
+    </li>
+        <li>
+        <a href="tagrete convolutiva.html">rete convolutiva </a> (1)
+    </li>
+        <li>
+        <a href="tagautograd.html">autograd </a> (1)
+    </li>
+        <li>
+        <a href="tagswish.html">swish </a> (1)
+    </li>
+        <li>
+        <a href="tagattivazione.html">attivazione </a> (1)
+    </li>
+        <li>
+        <a href="tagcheckpoint.html">checkpoint </a> (1)
+    </li>
+        <li>
+        <a href="tagtensori.html">tensori </a> (1)
+    </li>
+        <li>
+        <a href="tagvariabili.html">variabili </a> (1)
+    </li>
+        <li>
+        <a href="taglineare.html">lineare </a> (1)
+    </li>
+        <li>
+        <a href="tagregressione.html">regressione </a> (1)
+    </li>
+        <li>
+        <a href="tagconvolutional networks.html">convolutional networks </a> (1)
+    </li>
+        <li>
+        <a href="tagVatican.html">Vatican </a> (1)
+    </li>
+        <li>
+        <a href="tagproject.html">project </a> (1)
+    </li>
+        <li>
+        <a href="tagkernel.html">kernel </a> (1)
+    </li>
+        <li>
+        <a href="tagICLR.html">ICLR </a> (1)
+    </li>
+        <li>
+        <a href="tagipotesi.html">ipotesi </a> (1)
+    </li>
+        <li>
+        <a href="tagsparsità.html">sparsità </a> (1)
+    </li>
+        <li>
+        <a href="tagfunzionale.html">funzionale </a> (1)
+    </li>
+        <li>
+        <a href="tagfunctional.html">functional </a> (1)
+    </li>
+        <li>
+        <a href="tagadversarial attack.html">adversarial attack </a> (1)
+    </li>
+        <li>
+        <a href="tagkmeans.html">kmeans </a> (1)
+    </li>
+        <li>
+        <a href="taganalysis.html">analysis </a> (1)
+    </li>
+        <li>
+        <a href="tagclustering.html">clustering </a> (1)
+    </li>
+        <li>
+        <a href="tagGoogle.html">Google </a> (1)
+    </li>
+        <li>
+        <a href="tagregression.html">regression </a> (1)
+    </li>
+        <li>
+        <a href="tagJAX.html">JAX </a> (1)
+    </li>
+        <li>
+        <a href="taggaussian process.html">gaussian process </a> (1)
+    </li>
+        <li>
+        <a href="tagensemble.html">ensemble </a> (1)
+    </li>
+        <li>
+        <a href="tagboosting.html">boosting </a> (1)
+    </li>
+        <li>
+        <a href="taggradient.html">gradient </a> (1)
+    </li>
+        <li>
+        <a href="tagsemi-supervised learning.html">semi-supervised learning </a> (1)
+    </li>
+        <li>
+        <a href="tagdocument classification.html">document classification </a> (1)
+    </li>
+        <li>
+        <a href="taggraphs.html">graphs </a> (1)
+    </li>
+        <li>
+        <a href="tagvariables.html">variables </a> (1)
+    </li>
+        <li>
+        <a href="taglinear.html">linear </a> (1)
+    </li>
+        <li>
+        <a href="tagk-NN.html">k-NN </a> (1)
+    </li>
+    </ul>
+</div>
+<div class="sidebar-content syndicate">
+    <h4>Syndicate</h4>
+    <a class="button" href="../blog.atom"><i class="fa fa-rss-square"></i> Atom 1.0</a>
+    <a class="button" href="../blog.rss"><i class="fa fa-rss-square"></i> RSS</a>
+</div>
+			</div>
+		</div>
+	
+                        <div class="modular-row footer ">
+    <div class="footer-items">
+        <div class="footer-module large">
+		<h4>About</h4>
+                            <p>Italian Association for Machine Learning (C.F. 97949550582)</p>
+            			<p>Write us: info@iaml.it</p>
+        </div>
+        <div class="footer-module"><h4>Address</h4>
+            <p>
+                                    <span><strong>Operational office</strong></span>
+                                    <span>IAML c/o Pi Campus, via Indonesia 23, 00144 Rome</span>
+                                    <span><strong>Legal office</strong></span>
+                                    <span>Via Cassia 964, 00189, Rome</span>
+                            </p>
+        </div>
+        <div class="footer-module"><h4>Quick Links</h4>
+         <ul class="quickmenu">
+                            <li><i class="fa fa-chevron-right"></i><a href="../home">Home</a></li>
+                            <li><i class="fa fa-chevron-right"></i><a href="https://iaml.it/documents">Documents (Italian)</a></li>
+                    </ul>
+    </div>
+   
+</div>
+<hr>
+<div class="footer-modules">
+    <div class="footer-copyright">
+        Copyright 2018 IAML.IT. All Rights Reserved.
+    </div>
+    <div class="footer-menu">
+    <ul class="othermenu">
+           <li><a href="https://learn.getgrav.org/">Powered by Grav</a></li>
+           <li><a href="https://github.com/getgrav/grav-theme-deliver">Theme (adapted) from Deliver</a></li>
+        </ul>
+    </div>
+</div>
+</div>                    </section>
+        
+    </div>
+    <div class="sb-slidebar sb-left sb-width-thin">
+        <div id="panel">
+        
+<ul class="navigation">
+                                                        <li class="">
+                    <a href="../index.html">
+                                                Home
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../activities">
+                                                Activities
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../supporters.html">
+                                                Supporters
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../member.html">
+                                                Become a member
+                    </a>
+                </li>
+                                                                <li class="active">
+                    <a href="../blog">
+                                                Blog
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../governance.html">
+                                                Governance
+                    </a>
+                </li>
+                                                                                                                                </ul>                   </div>
+    </div>
+        <script src="../user/plugins/simplesearch/js/simplesearch.js" type="text/javascript" ></script>
+
+    <script>
+    $(function () {
+        $(document).ready(function() {
+          $.slidebars({
+            hideControlClasses: true,
+            scrollLock: true
+          });
+        });
+    });
+    </script>
+    </body>
+</html>
+
+

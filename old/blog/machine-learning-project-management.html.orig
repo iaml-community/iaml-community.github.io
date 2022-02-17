@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Machine Learning per il Project Management – un esempio di applicazione sulla costruzione di reti FTTH | Italian Association for Machine Learning</title>
+    <meta content="GravCMS"  />
+<meta content="The Italian Association for Machine Learning (IAML) is a not-for-profit organization with the purpose of promoting knowledge of machine learning in all aspects of the Italian public life, from universities to enterprises and IT professionals."  />
+<meta property="og:title" content="Machine Learning per il Project Management | IAML.it"  />
+<meta property="og:image" content="https://iaml.it/blog/machine-learning-project-management/5.jpg"  />
+<meta property="og:url" content="https://iaml.it/blog/machine-learning-project-management/"  />
+<meta property="og:description" content="In questo breve articolo, mostriamo con un caso pratico alcune delle possibilità che offrono gli algoritmi di Machine Learning per il controllo di progetti complessi."  />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="icon" type="image/png" href="/user/themes/deliver/images/favicon.png" />
+
+	<!-- Global site tag (gtag.js) - Google Ads: 774709547 --> <script async src="https://www.googletagmanager.com/gtag/js?id=AW-774709547"></script> <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'AW-774709547'); </script> 
+	
+		
+                            		                                                <link href="/user/themes/deliver/css-compiled/nucleus.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css-compiled/template.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/custom.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/toc.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/font-awesome.min.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/facebook/css/facebook.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/facebook/assets/unitegallery/css/unite-gallery.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/facebook/assets/unitegallery/themes/default/ug-theme-default.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/markdown-notices/assets/notices.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/breadcrumbs/css/breadcrumbs.css" type="text/css" rel="stylesheet" />
+<link href="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/events/assets/events.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/form/assets/form-styles.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/mathjax/assets/css/mathjax.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/simplesearch/css/simplesearch.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/highlight/css/zenburn.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/login/css/login.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/slidebars.min.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/slideme.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/socialbuttons/vendor/rrssb/css/rrssb.css" type="text/css" rel="stylesheet" />
+
+
+                                                            <script src="/system/assets/jquery/jquery-2.x.min.js" type="text/javascript" ></script>
+<script src="/user/themes/deliver/js/modernizr.custom.71422.js" type="text/javascript" ></script>
+<script src="/user/plugins/facebook/assets/unitegallery/js/unitegallery.min.js" type="text/javascript" ></script>
+<script src="/user/plugins/facebook/assets/unitegallery/themes/default/ug-theme-default.js" type="text/javascript" ></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.js" type="text/javascript" ></script>
+<script src="/user/plugins/events/assets/events.js" type="text/javascript" ></script>
+<script src="/user/plugins/mathjax/assets/js/mathjax.js" type="text/javascript" ></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript" ></script>
+<script src="/user/plugins/highlight/js/highlight.pack.js" type="text/javascript" ></script>
+<script src="/user/themes/deliver/js/deliver.js" type="text/javascript" ></script>
+<script src="/user/themes/deliver/js/slidebars.min.js" type="text/javascript" ></script>
+<script src="/user/themes/deliver/js/jquery.slideme2.js" type="text/javascript" ></script>
+<script src="/user/plugins/socialbuttons/vendor/rrssb/js/rrssb.min.js" type="text/javascript" ></script>
+
+<script>
+window.addEventListener("load", function(){
+window.cookieconsent.initialise({
+"palette": {
+    "popup": {
+        "background": "#4d4d4d",
+        "text": "#fff"
+    },
+    "button": {
+        "background": "#f1d600",
+        "text": "#000",
+        "border": "#f1d600"
+    }
+},
+"position": "bottom",
+"theme": "block",
+"content": {
+    "message": "This website uses cookies to ensure you get the best experience on our website.",
+    "dismiss": "Got it!",
+    "link": "Learn more",
+    "href": "https://cookiesandyou.com"
+}
+})});
+hljs.initHighlightingOnLoad();
+
+</script>
+
+
+</head>
+<body id="top" class="header-lite fullwidth blogstyling">
+    <div id="sb-site">
+                <header id="header">
+                <div class="logo">
+                    <h3><a href="https://iaml.it"><img src="/user/pages/images/IAML_logo_viola.png" /></a></h3>
+                                            <ul class="social-icons">
+            <li>
+            <a href="https://twitter.com/iaml_it">
+                <i class="fa fa-twitter"></i>            </a>
+        </li>
+            <li>
+            <a href="https://www.linkedin.com/company/iaml/">
+                <i class="fa fa-linkedin"></i>            </a>
+        </li>
+            <li>
+            <a href="https://www.facebook.com/machinelearningitalia/">
+                <i class="fa fa-facebook"></i>            </a>
+        </li>
+            <li>
+            <a href="blog.rss">
+                <i class="fa fa-rss"></i>            </a>
+        </li>
+    </ul>  
+                                    </div>
+                <div id="navbar">
+                                                            
+<ul class="navigation">
+                                                        <li class="">
+                    <a href="/">
+                                                Home
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/activities">
+                                                Activities
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/supporters">
+                                                Supporters
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/member">
+                                                Become a member
+                    </a>
+                </li>
+                                                                <li class="active">
+                    <a href="/blog">
+                                                Blog
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/governance">
+                                                Governance
+                    </a>
+                </li>
+                                                                                                                                </ul>                                                   <form class="search-box">
+    <input type="search" placeholder="Search..." value="" data-search-input="/search/query" />
+    <script>
+    jQuery(document).ready(function($){
+        var input = $('[data-search-input]');
+
+        input.on('keypress', function(event) {
+            if (event.which == 13 && input.val().length > 3) {
+                event.preventDefault();
+                window.location.href = input.data('search-input') + ':' + input.val();
+            }
+        });
+    });
+    </script>
+    <i class="fa fa-search"></i>
+</form>                    <span class="panel-activation sb-toggle-left navbar-left menu-btn fa fa-bars"></span>
+                </div>
+        </header>
+        
+        
+                <section id="body" class="">
+                            
+				<div class="flush-top blog-header blog-header-image" style="background: #B4B093 url(/user/pages/05.blog/blue_header.jpg) no-repeat right;">
+            <h1>Machine Learning per il Project Management – un esempio di applicazione sulla costruzione di reti FTTH</h1>
+        </div>
+            
+        
+<div id="breadcrumbs" itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
+                                            <a href="/" itemprop="url"><span itemprop="title">Home</span></a>
+                        <i class="fa fa-angle-right"></i>
+                                                <a href="/blog" itemprop="url"><span itemprop="title">Blog</span></a>
+                        <i class="fa fa-angle-right"></i>
+                                                <span itemprop="title">Machine Learning per il Project Management – un esempio di applicazione sulla costruzione di reti FTTH</span>
+                        </div>
+		
+		<div class="blog-content-item g-grid pure-g-r">
+			<div id="item" class="g-block pure-u-2-3">
+			    <div class="list-item">
+
+    <div class="list-blog-header">
+                    <img src="/images/4/e/6/7/b/4e67bcdb110040f37261e06eb9a5299537dd1c5d-5.jpeg" />
+        
+                    <h4><a href="/blog/machine-learning-project-management">Machine Learning per il Project Management – un esempio di applicazione sulla costruzione di reti FTTH</a></h4>
+        
+        <span class="list-blog-date">
+            <i class="fa fa-calendar"></i>
+            03, Aug
+        </span>
+                <span class="list-blog-author">
+            <i class="fa fa-user"></i>
+            Davide Mazza
+        </span>
+                       <ul class="tags">
+            <i class="fa fa-tag"></i>
+                        <li><a href="/blog/tag:project">project</a></li>
+                        <li><a href="/blog/tag:management">management</a></li>
+                        <li><a href="/blog/tag:kpi">kpi</a></li>
+                        <li><a href="/blog/tag:ftth">ftth</a></li>
+                    </ul>
+        
+    </div>
+
+	<div>
+	<br />
+	<!-- AddToAny BEGIN -->
+<div class="a2a_kit a2a_kit_size_32 a2a_default_style">
+<a class="a2a_dd" href="https://www.addtoany.com/share"></a>
+<a class="a2a_button_facebook"></a>
+<a class="a2a_button_twitter"></a>
+<a class="a2a_button_linkedin"></a>
+<a class="a2a_button_google_plus"></a>
+<a class="a2a_button_email"></a>
+</div>
+<script async src="https://static.addtoany.com/menu/page.js"></script>
+<!-- AddToAny END -->
+</div>
+	
+    <div class="list-blog-padding">
+
+            <p><p>In questo breve articolo, mostriamo con un caso pratico alcune delle possibilità che offrono gli algoritmi di Machine Learning per il controllo di progetti complessi. </p>
+<p>La teoria classica del <strong>Project Management</strong> prevede che all’inizio di ogni progetto sia definita una <em>project charter</em>, all’interno della quale sono stabiliti i KPI (di solito variabili continue) che misureranno il grado di successo del progetto. Questi KPI possono essere i tempi di consegna del progetto, oppure valori di tipo economico (es., il ROI del progetto), finanziario (l’NPV) o ancora di tipo più commerciale (es., il tasso di fidelizzazione di clienti di un nuovo prodotto). Tipicamente, questi KPI devono essere monitorati nel corso del progetto, ma non sempre è possibile misurarli in modo immediato, o peggio ancora dare una previsione accurata del valore a completamento del progetto.  Mostriamo in questo articolo le grandi potenzialità che offre il Machine Learning nel gestire questi valori: idealmente, vorremmo che grazie al Machine Learning i Project Manager si concentrassero sull’analisi delle azioni di miglioramento, piuttosto che sul calcolo dei KPI stessi.</p>
+<p>Gli esempi sono basati sulla libreria <a href="https://scikit-learn.org/">scikit-learn</a> di Python, ma sono facilmente replicabili con altri linguaggi che implementino gli stessi algoritmi.</p>
+<h2>Una soluzione basata sul Machine Learning Supervisionato</h2>
+<p>Chiamiamo <span class="mathjax mathjax--inline">$y$</span> un KPI di un progetto, e definiamo <span class="mathjax mathjax--inline">$f(\mathbf{X}_N)$</span> la funzione che lega il KPI ad un vettore di <span class="mathjax mathjax--inline">$N$</span> parametri:</p>
+<p class="mathjax mathjax--block">\[
+y = f(\mathbf{X}_N) \,.\]</p>
+<p>I parametri possono essere sia variabili di tipo continuo che discreto, inoltre potrebbero essere variabili nel tempo. </p>
+<p>Tipicamente, la funzione  <span class="mathjax mathjax--inline">$f(\mathbf{X}_N)$</span>  non è nota, inoltre a noi potrebbe interessare il valore a fine progetto di <span class="mathjax mathjax--inline">$y$</span>, quindi per calcolarlo dovremmo avere anche i valori finali di <span class="mathjax mathjax--inline">$\mathbf{X}_N$</span>; il numero di parametri <span class="mathjax mathjax--inline">$N$</span> può essere molto grande, pertanto il problema è poco controllabile.  </p>
+<p>Una possibile soluzione è individuare un subset molto ristretto <span class="mathjax mathjax--inline">$n$</span> di parametri, che chiamiamo <span class="mathjax mathjax--inline">$\mathbf{X}_n$</span>,  con <span class="mathjax mathjax--inline">$n \ll N$</span>, che siano facilmente misurabili e per i quali sia abbastanza semplice prevedere il valore finale nel corso del progetto. Una volta individuati tali parametri potremmo addestrare un algoritmo di Machine Learning a prevedere <span class="mathjax mathjax--inline">$y$</span> a partire da <span class="mathjax mathjax--inline">$\mathbf{X}_n$</span> invece che da <span class="mathjax mathjax--inline">$\mathbf{X}_N$</span>. Pertanto con il Machine Learning individuiamo una funzione <span class="mathjax mathjax--inline">$\hat{f}(\mathbf{X}_n)$</span> tale che:</p>
+<p class="mathjax mathjax--block">\[
+y = f(\mathbf{X}_N) \approx \hat{f}(\mathbf{X}_n) \,.\]</p>
+<p>In questo modo avremmo sempre a disposizione il valore attuale di <span class="mathjax mathjax--inline">$y$</span>, inoltre, essendo i parametri scelti facilmente prevedibili, potremmo utilizzarli per prevedere anche il valore finale del KPI <span class="mathjax mathjax--inline">$y$</span>.</p>
+<h2>Scelta dei parametri</h2>
+<p>Chiaramente, affinchè l’algoritmo funzioni, è necessario individuare bene gli <span class="mathjax mathjax--inline">$n$</span> parametri. Abbiamo 3 possibilità:</p>
+<ol>
+<li>Abbiamo una conoscenza abbastanza profonda del progetto, e quindi sappiamo bene quali sono questi <span class="mathjax mathjax--inline">$n$</span> parametri che influenzano maggiormente il valore finale del KPI;</li>
+<li>Abbiamo in mente un insieme di parametri, ma non abbiamo ben chiaro quanto siano significativi sull’influenza del valore finale del KPI. In questo secondo caso, procediamo a selezionare un sottoinsieme di parametri con l’aiuto degli algoritmi di Machine Learning, che ci danno un’analisi "a posteriori" dell’impatto dei parametri sul valore finale del KPI.</li>
+<li>Non conosciamo questi parametri. In questo caso dovremo utilizzare altre tecniche di Machine Learning non supervisionato oppure di calcolo delle correlazioni. Questo caso non è analizzato in questo articolo.</li>
+</ol>
+<p>Una volta individuati i parametri possiamo procedere all’addestramento dell’algoritmo. Possiamo scegliere uno dei tanti algoritmi di regressione per la previsione di variabili continue a partire da un gruppo di parametri di ingresso. Per fare l’addestramento dell’algoritmo, possiamo utilizzare lo storico di altri progetti, oppure le fasi di "progettazione" del progetto stesso. Prima di vedere un esempio concreto, rivediamo tutti i passi.</p>
+<ol>
+<li>Individuare il KPI di progetto da monitorare;</li>
+<li>Individuare un subset di parametri da cui il KPI dipende in maniera consistente. Tali parametri devono essere di semplice misura e deve essere facile prevedere il valore finale;</li>
+<li>Addestrare un algoritmo di Machine Learning a calcolare il valore del KPI a partire dai parametri.</li>
+</ol>
+<h2>Esempio di applicazione: NPV di una rete di telecomunicazioni FTTH</h2>
+<p>Un progetto di costruzione di una rete in fibra ottica FTTH (<em>Fiber to the Home</em>) è un progetto complesso che prevede di stendere fibra ottica in un’intera città ed entrare in ogni edificio con la fibra per predisporre una possibile attivazione di un cliente. Da un punto di vista finanziario, un progetto del genere è caratterizzato da una forte investimento iniziale per la predisposizione della rete, che genera un ritorno economico "spalmato" su diversi anni mano a mano che i clienti chiedono l’attivazione di una linea.</p>
+<p>Un metodo per valutare finanziariamente progetti del genere è il calcolo dell’NPV (<strong>Net Present Value</strong>). L’NPV prevede di stimare il flusso di cassa su ciascun anno e poi sommare i risultati "attualizzati" di flusso di cassa di ciascun anno. Col termine "attualizzato" si intende che il risultato di ciascun anno viene "scontato" (attualizzato) in funzione del costo annuale del capitale prima di essere sommato al risultato degli altri anni (flussi di cassa più lontani nel tempo sono quindi "scontati di più"). Un NPV negativo indica presumibilmente un progetto non sostenibile. Al link in fondo è disponibile una descrizione più dettagliata del concetto di NPV.</p>
+<p>Per una rete FTTH, l’NPV dipende sostanzialmente da 4 fattori:</p>
+<ul>
+<li>l’investimento iniziale per costruire la rete ("investimento capex"), calcolato in funzione dell’investimento medio per unità immobiliare connessa (predisposta all’attivazione);</li>
+<li>il "take up rate annuale", ovvero la percentuale annuale di unità immobiliari connesse (predisposte) che diventano un cliente attivo e pagante;</li>
+<li>il ricavo medio per utente attivo, di solito chiamato  ARPU (<em>average revenue per user</em>);</li>
+<li>il costo medio annuale operativo ("costi opex").</li>
+</ul>
+<p>Generalmente, ciascuno di questi quattro elementi diventa un KPI di progetto. In questo articolo mostriamo un esempio per il calcolo del primo KPI, ovvero l’investimento medio per unità immobiliare connessa (predisposta), applicando i principi descritti nei primi paragrafi. Ma potremmo ugualmente ripetere l’esercizio per calcolare i ricavi e i costi operativi ed arrivare a costruire un NPV basato sul Machine Learning. </p>
+<h3>Investimento medio per unità immobiliare</h3>
+<p>L’investimento medio per unità immobiliare di costruzione della rete FTTH (€/u.i.) è un parametro molto complesso, che dipende da tantissimi fattori. Per fare un esempio, un capitolato d’appalto per un lavoro del genere potrebbe contenere fino a 100 voci, a cui aggiungere i vari costi accessori (tasse occupazione suolo pubblico, servizi di progettazione e direzione lavori, ecc.). In fase di progetto viene fatto un calcolo dell’investimento atteso, ma essendo un lavoro complesso che si dipana su una città intera, è spesso soggetto a "varianti" esecutive, quindi è piuttosto complicato monitorare il valore effettivo in corso d’opera e fare una predizione esatta del valore finale. </p>
+<p>Procediamo quindi ad individuare un subset molto ristretto di parametri che pilotano abbastanza bene il valore finale di investimento medio: parametri facilmente misurabili e prevedibili. Ad esempio, potremmo scegliere 3 parametri:</p>
+<ol>
+<li>densità dell’area, ovvero il rapporto tra le unità immobiliari e la lunghezza delle strade presenti nell’area di lavoro, che ci dà un’idea della "densità" abitativa;</li>
+<li>percentuale di strade senza infrastrutture pre-esisenti idonee alla posa della fibra, su cui si dovrà scavare;</li>
+<li>quanti nuovi pozzetti devo posare ogni metro di scavo.</li>
+</ol>
+<p>Per semplicità, in questo esempio ci fermiamo a 3 parametri. Questi parametri sono abbastanza semplici da misurare in campo, soprattutto se la rete è tracciata su un sistema GIS (come avviene di solito).  È anche piuttosto semplice calcolare il valore di atterraggio finale: il parametro 1 non cambia nel tempo, mentre i parametri 2 e 3 possono cambiare a seguito di varianti progettuali ma sono facilmente tracciabili e prevedibili.</p>
+<p>Per legare questi 3 parametri al KPI investimento medio per unità immobiliare, utilizziamo un algoritmo di regressione molto potente già implementato nella libreria di machine learning, ovvero il <em>Gradient Boosting Regressor</em>. Qui la spiegazione dell’algoritmo di Gradient Boosting presentata su questo stesso blog: <a href="https://iaml.it/blog/gradient-boosting">https://iaml.it/blog/gradient-boosting</a>.</p>
+<h2>Implementazione</h2>
+<p>Innanzitutto, implementiamo una funzione che legga il nostro elenco di valori di training. Ipotizziamo che questi siano contenuti in un csv (questi numeri non sono tratti da casi reali ma sono una buona approssimazione). Ogni riga contiene il valore di unitario di investimento €/u.i. di un progetto (una città o un quartiere) e i corrispettivi parametri; questi dati possono derivare dallo "storico" di reti completate su altre città, oppure essere i valori derivanti del progetto preliminare sui vari quartieri della città:</p>
+<table>
+<thead>
+<tr>
+<th>unitario</th>
+<th>Densità (param   1)</th>
+<th>% scavo      (param 2)</th>
+<th>metri scavo/pozzetti (param 3)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>337,91</td>
+<td>7,81</td>
+<td>0,75</td>
+<td>22,56</td>
+</tr>
+<tr>
+<td>360,45</td>
+<td>8,21</td>
+<td>0,76</td>
+<td>22,66</td>
+</tr>
+<tr>
+<td>341,25</td>
+<td>7,81</td>
+<td>0,75</td>
+<td>20,59</td>
+</tr>
+<tr>
+<td>323,01</td>
+<td>7,42</td>
+<td>0,76</td>
+<td>25,22</td>
+</tr>
+<tr>
+<td>139,59</td>
+<td>5,91</td>
+<td>0,30</td>
+<td>19,05</td>
+</tr>
+<tr>
+<td>176,26</td>
+<td>7,28</td>
+<td>0,31</td>
+<td>19,40</td>
+</tr>
+<tr>
+<td>168,87</td>
+<td>7,23</td>
+<td>0,30</td>
+<td>20,41</td>
+</tr>
+<tr>
+<td>210,44</td>
+<td>5,38</td>
+<td>0,66</td>
+<td>23,03</td>
+</tr>
+<tr>
+<td>398,22</td>
+<td>8,43</td>
+<td>0,81</td>
+<td>16,71</td>
+</tr>
+<tr>
+<td>296,81</td>
+<td>7,39</td>
+<td>0,67</td>
+<td>20,60</td>
+</tr>
+<tr>
+<td>379,38</td>
+<td>8,09</td>
+<td>0,79</td>
+<td>14,48</td>
+</tr>
+<tr>
+<td>346,88</td>
+<td>7,38</td>
+<td>0,83</td>
+<td>21,34</td>
+</tr>
+<tr>
+<td>434,69</td>
+<td>9,58</td>
+<td>0,78</td>
+<td>17,75</td>
+</tr>
+<tr>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+</tr>
+<tr>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-python">import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn import ensemble
+from sklearn.metrics import mean_absolute_error
+import numpy
+
+df = pd.read_csv("articolo2.csv", sep=";", encoding="latin1")
+# Estrai i valori di Y
+y = df['unitario'].to_numpy()
+# Rimuovi Y 
+del df['unitario']
+# Crea i parametri di test 
+X = df.to_numpy()</code></pre>
+<p>Definiamo poi la classe Gradient Boosting. Questa classe dipende ad alcuni iperparametri; in questo esempio passiamo dei valori predefiniti, è possibile ottimizzare i valori attraverso vari metodi, ad esempio col metodo "Grid Search" (vedi link in fondo)</p>
+<pre><code class="language-python">model = ensemble.GradientBoostingRegressor(
+    n_estimators=5000,
+    learning_rate=0.005,
+    max_depth=4,
+    loss='lad',
+    random_state=0,
+)</code></pre>
+<p>A questo punto eseguiamo l’addestramento e utilizziamo un sottoinsieme dei valori di traning (10%) per eseguire il test di performance dell’algoritmo (ovvero quanto è bravo a calcolare il valore del KPI a partire da X su dati sconosciuti). La partizione del set di addestramento si ottiene con il parametro <code>test_size</code> della funzione <code>train_test_split</code>.</p>
+<pre><code class="language-python">X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1,
+                                                    random_state=55, shuffle=True)
+model.fit(X_train, y_train)
+prediction = model.predict(X_test)
+error = mean_absolute_error(y_test, prediction)
+print("Test Set Mean Absolute Error: %.4f" % error)</code></pre>
+<p>In questo esempio, calcoliamo l’errore assoluto medio (Mean Absolute Error) della predizione sul set di test, che risulta pari a 11 €/u.i., ovvero +/- 3,5% del valore medio di Y.  </p>
+<p>Se siamo soddisfatti del risultato, abbiamo costruito uno stimatore che ci permette di calcolare il nostro KPI sulla base di un ristretto numero di parametri facilmente misurabili e predicibili. Se il valore non ci soddisfa, dobbiamo approfondire l’analisi. Per esempio, se il nostro stimatore soffre di underfitting, può darsi che dovremo aumentare il numero di parametri (al costo di complicare però il modello). Se soffre di overfitting, può darsi sia meglio diminuire il numero di parametri e semplificare il modello. La classe <code>GradienBoosting</code> è in grado di dirci la percentuale di importanza di ciascun parametro sul valore della predizione. Nel caso in oggetto tutti e 3 i parametri hanno un impatto significativo.</p>
+<pre><code class="language-python">importance = model.feature_importances_
+feauture_indexes_by_importance = importance.argsort()
+feature_labels = numpy.array(['m/u.i. (param 1) ',
+                              '% scavo (param 2) ',
+                              'scavo / pozzetti (param 3)'])
+for index in feauture_indexes_by_importance:
+    print("{} - {:.2f}%".format(feature_labels[index], (importance[index] * 100.0)))</code></pre>
+<blockquote>
+<blockquote>
+<p>scavo / pozzetti (param 3) - 18.47%</p>
+<p>% scavo (param 2)  - 36.58%</p>
+<p>densità (param 1)  - 44.95%</p>
+</blockquote>
+</blockquote>
+<p>Per la ricerca del set di parametri necessari per la predizione, potremmo quindi procedere a selezionare inizialmente un gruppo un po' ampio di parametri "candidati" e fare delle prove sul set di addestramento, andando a verificare l’impatto di ciascun parametro e scegliendo quindi il subset che ha più impatto sul risultato della predizione. Può essere utile ripetere l’esperimento N volte, andando a modificare la suddivisione tra set di addestramento e set di test (questo si può ottenere semplicemente modificando il parametro <code>random_state</code> del metodo <code>train_test_split</code>). Idealmente, se i parametri sono sufficientemente generici, dovrebbero avere un impatto sulla predizione abbastanza indipendente dalla suddivisione scelta per training e test.</p>
+<h2>Conclusione</h2>
+<p>Chiunque si sia trovato a gestire progetti complessi, conosce la difficoltà nel monitorare e prevedere i diversi KPI di successo del progetto. Il Machine Learning ci offre un grande aiuto per dare solidità ai numeri che ci si trova ogni giorno a gestire; spesso i Project Manager si trovano a dover spendere molto tempo nel calcolare questi parametri, il Machine Learning ci dà la possibilità di concentrarci sull’analisi dei dati e sul definire le azioni di miglioramento, lasciando alla "macchina" il compito di "calcolo" dei numeri. </p>
+<p><strong>Davide Mazza</strong> – Ingegnere Telecomunicazioni, MBA graduate; mi occupo da 10 anni di gestione di progetti di costruzione di reti in fibra ottica di nuova generazione in tutta Italia (FTTx), prima in Vodafone e poi in Open Fiber.</p>
+<h2>Copyright</h2>
+<p>Immagine di copertina: <a href="https://www.shutterstock.com/it/g/skypicsstudio">https://www.shutterstock.com/it/g/skypicsstudio</a>.</p>
+<h2>Per saperne di più:</h2>
+<ul>
+<li><a href="https://scikit-learn.org/stable/auto_examples/ensemble/plot_gradient_boosting_regression.html">Documentazione scikit-learn sul Gradient Boosting</a></li>
+<li><a href="https://iaml.it/blog/gradient-boosting">L’algoritmo di Gradient Boosting</a></li>
+<li><a href="https://educationalresearchtechniques.com/2019/01/14/gradient-boosting-regression-in-python/">Grid Search per ottimizzare gli Iperparametri</a></li>
+<li><a href="https://www.investopedia.com/terms/n/npv.asp">Definizione di NPV</a></li>
+<li><a href="https://it.wikipedia.org/wiki/FTTx">Schema delle reti fisse in fibra ottica</a></li>
+</ul>
+<hr />
+<div class="notices blue">
+<p>Se questo articolo ti è piaciuto e vuoi tenerti aggiornato sulle nostre attività, ricordati che l'<a href="/member">iscrizione all'Italian Association for Machine Learning</a> è gratuita! Puoi seguirci su <a href="https://www.facebook.com/machinelearningitalia/">Facebook</a>, <a href="https://www.linkedin.com/company/iaml/">LinkedIn</a>, e <a href="https://twitter.com/iaml_it">Twitter</a>.</p>
+</div></p>
+            
+    
+        <p class="prev-next">
+                            <a class="button" href="/blog/serie-storiche-3-dynamic-time-warping"><i class="fa fa-chevron-left"></i> Previous Post</a>
+            
+                            <a class="button" href="/blog/dal-knn-al-transformer">Next Post <i class="fa fa-chevron-right"></i></a>
+                    </p>
+    
+    </div>
+</div>
+			</div>
+			<div id="sidebar" class="g-block size-1-3 pure-u-1-3">
+				<div class="sidebar-content">
+    <h4>Search the blog</h4>
+    <input type="text" placeholder="Search..." value="" data-searchsidebar-input="/search/query" />
+<script>
+jQuery(document).ready(function($){
+    var input = $('[data-searchsidebar-input]');
+
+    input.on('keypress', function(event) {
+        if (event.which == 13 && input.val().length > 3) {
+            event.preventDefault();
+            window.location.href = input.data('searchsidebar-input') + ':' + input.val();
+        }
+    });
+});
+</script>
+</div>
+<!--
+<div class="sidebar-content">
+	<h4>Some Text Widget</h4>
+	<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna.</p>
+</div>
+!-->
+<div class="sidebar-content">
+    <h4>Categories</h4>
+    
+
+<ul class="archives">
+        <li>
+        <a href="/blog/category:Tutorials">Tutorials </a> (16)
+    </li>
+        <li>
+        <a href="/blog/category:Discussions">Discussions </a> (12)
+    </li>
+        <li>
+        <a href="/blog/category:Announcements">Announcements </a> (4)
+    </li>
+        <li>
+        <a href="/blog/category:Tutorials%20%28English%29">Tutorials (English) </a> (4)
+    </li>
+        <li>
+        <a href="/blog/category:Articles%27%20summaries">Articles' summaries </a> (3)
+    </li>
+        <li>
+        <a href="/blog/category:Discussions%20%28English%29">Discussions (English) </a> (2)
+    </li>
+        <li>
+        <a href="/blog/category:Focus-on">Focus-on </a> (1)
+    </li>
+        <li>
+        <a href="/blog/category:Reviews">Reviews </a> (1)
+    </li>
+        <li>
+        <a href="/blog/category:Discussion">Discussion </a> (1)
+    </li>
+    </ul>
+</div>
+<div class="sidebar-content">
+    <h4>Archives</h4>
+	<ul class="archives">
+    <li>
+    	<a href="/blog/archives_month:jan_1970">
+        <span class="archive_date">January 1970</span>
+                <span>(1)</span>
+                </a>
+    </li>
+</ul>
+</div>
+<div class="sidebar-content">
+    <h4>Popular Tags</h4>
+    
+
+<ul class="archives">
+        <li>
+        <a href="/blog/tag:deep%20learning">deep learning </a> (11)
+    </li>
+        <li>
+        <a href="/blog/tag:pytorch">pytorch </a> (9)
+    </li>
+        <li>
+        <a href="/blog/tag:reti%20neurali">reti neurali </a> (5)
+    </li>
+        <li>
+        <a href="/blog/tag:google">google </a> (4)
+    </li>
+        <li>
+        <a href="/blog/tag:jit">jit </a> (4)
+    </li>
+        <li>
+        <a href="/blog/tag:tensorflow">tensorflow </a> (4)
+    </li>
+        <li>
+        <a href="/blog/tag:ottimizzazione">ottimizzazione </a> (4)
+    </li>
+        <li>
+        <a href="/blog/tag:rete%20neurale">rete neurale </a> (3)
+    </li>
+        <li>
+        <a href="/blog/tag:time%20series">time series </a> (3)
+    </li>
+        <li>
+        <a href="/blog/tag:keras">keras </a> (3)
+    </li>
+        <li>
+        <a href="/blog/tag:reti%20convolutive">reti convolutive </a> (3)
+    </li>
+        <li>
+        <a href="/blog/tag:pipeline">pipeline </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:sklearn">sklearn </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:autodiff">autodiff </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:automatic%20differentation">automatic differentation </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:reverse-mode">reverse-mode </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:derivate">derivate </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:differenziazione">differenziazione </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:model%20selection">model selection </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:cross%20validation">cross validation </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:c%2B%2B">c++ </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:numpy">numpy </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:vmap">vmap </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:caffe">caffe </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:compiler">compiler </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:jax">jax </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:codemotion">codemotion </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:bias">bias </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:discrimination">discrimination </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:fairness">fairness </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:iaml">iaml </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:database">database </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:iperparametri">iperparametri </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:autograph">autograph </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:head">head </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:multi-task">multi-task </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:learning">learning </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:novit%C3%A0">novità </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:dev%20summit">dev summit </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:custom%20estimator">custom estimator </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:hyperopt">hyperopt </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:goodfellow">goodfellow </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:nlp">nlp </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:dati%20mancanti">dati mancanti </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:transformer">transformer </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:attenzione">attenzione </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:robocop">robocop </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:yolo">yolo </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:object%20detection">object detection </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:bayes">bayes </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:autoencoders">autoencoders </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:variational">variational </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:eager">eager </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:imputazione">imputazione </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:CIFAR">CIFAR </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:word%20embedding">word embedding </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:MNIST">MNIST </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:immagini">immagini </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:classificazione">classificazione </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:kpi">kpi </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:reprogramming">reprogramming </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:adversarial">adversarial </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:browser">browser </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:javascript">javascript </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:reti%20ricorsive">reti ricorsive </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:reti%20ricorrenti">reti ricorrenti </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:ftth">ftth </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:adversarial%20example">adversarial example </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:management">management </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:robotica">robotica </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:ocr">ocr </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:focus">focus </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:iphone">iphone </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:python">python </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:face%20id">face id </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:momento">momento </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:adam">adam </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:neuroscienza">neuroscienza </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:onde%20cerebrali">onde cerebrali </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:torchvision">torchvision </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:latin">latin </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:pretrained">pretrained </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:rete%20convolutiva">rete convolutiva </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:autograd">autograd </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:swish">swish </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:attivazione">attivazione </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:checkpoint">checkpoint </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:tensori">tensori </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:variabili">variabili </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:lineare">lineare </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:regressione">regressione </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:convolutional%20networks">convolutional networks </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:Vatican">Vatican </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:project">project </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:kernel">kernel </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:ICLR">ICLR </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:ipotesi">ipotesi </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:sparsit%C3%A0">sparsità </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:funzionale">funzionale </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:functional">functional </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:adversarial%20attack">adversarial attack </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:kmeans">kmeans </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:analysis">analysis </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:clustering">clustering </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:Google">Google </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:regression">regression </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:JAX">JAX </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:gaussian%20process">gaussian process </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:ensemble">ensemble </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:boosting">boosting </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:gradient">gradient </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:semi-supervised%20learning">semi-supervised learning </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:document%20classification">document classification </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:graphs">graphs </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:variables">variables </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:linear">linear </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:k-NN">k-NN </a> (1)
+    </li>
+    </ul>
+</div>
+<div class="sidebar-content syndicate">
+    <h4>Syndicate</h4>
+    <a class="button" href="/blog.atom"><i class="fa fa-rss-square"></i> Atom 1.0</a>
+    <a class="button" href="/blog.rss"><i class="fa fa-rss-square"></i> RSS</a>
+</div>
+			</div>
+		</div>
+	
+                        <div class="modular-row footer ">
+    <div class="footer-items">
+        <div class="footer-module large">
+		<h4>About</h4>
+                            <p>Italian Association for Machine Learning (C.F. 97949550582)</p>
+            			<p>Write us: info@iaml.it</p>
+        </div>
+        <div class="footer-module"><h4>Address</h4>
+            <p>
+                                    <span><strong>Operational office</strong></span>
+                                    <span>IAML c/o Pi Campus, via Indonesia 23, 00144 Rome</span>
+                                    <span><strong>Legal office</strong></span>
+                                    <span>Via Cassia 964, 00189, Rome</span>
+                            </p>
+        </div>
+        <div class="footer-module"><h4>Quick Links</h4>
+         <ul class="quickmenu">
+                            <li><i class="fa fa-chevron-right"></i><a href="https://iaml.it/home">Home</a></li>
+                            <li><i class="fa fa-chevron-right"></i><a href="https://iaml.it/documents">Documents (Italian)</a></li>
+                    </ul>
+    </div>
+   
+</div>
+<hr>
+<div class="footer-modules">
+    <div class="footer-copyright">
+        Copyright 2018 IAML.IT. All Rights Reserved.
+    </div>
+    <div class="footer-menu">
+    <ul class="othermenu">
+           <li><a href="https://learn.getgrav.org/">Powered by Grav</a></li>
+           <li><a href="https://github.com/getgrav/grav-theme-deliver">Theme (adapted) from Deliver</a></li>
+        </ul>
+    </div>
+</div>
+</div>                    </section>
+        
+    </div>
+    <div class="sb-slidebar sb-left sb-width-thin">
+        <div id="panel">
+        
+<ul class="navigation">
+                                                        <li class="">
+                    <a href="/">
+                                                Home
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/activities">
+                                                Activities
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/supporters">
+                                                Supporters
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/member">
+                                                Become a member
+                    </a>
+                </li>
+                                                                <li class="active">
+                    <a href="/blog">
+                                                Blog
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/governance">
+                                                Governance
+                    </a>
+                </li>
+                                                                                                                                </ul>                   </div>
+    </div>
+        <script src="/user/plugins/simplesearch/js/simplesearch.js" type="text/javascript" ></script>
+
+    <script>
+    $(function () {
+        $(document).ready(function() {
+          $.slidebars({
+            hideControlClasses: true,
+            scrollLock: true
+          });
+        });
+    });
+    </script>
+    </body>
+</html>

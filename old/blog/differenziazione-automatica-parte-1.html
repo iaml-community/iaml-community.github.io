@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>La magia della differenziazione automatica - Parte 1 | Italian Association for Machine Learning</title>
+    <meta content="GravCMS"  />
+<meta content="The Italian Association for Machine Learning (IAML) is a not-for-profit organization with the purpose of promoting knowledge of machine learning in all aspects of the Italian public life, from universities to enterprises and IT professionals."  />
+<meta property="og:title" content="La magia della differenziazione automatica - Parte 1 | IAML.it"  />
+<meta property="og:image" content="https://iaml.it/blog/differenziazione-automatica-parte-1/computational_graph.png"  />
+<meta property="og:url" content="https://iaml.it/blog/differenziazione-automatica-parte-1/"  />
+<meta property="og:description" content="In questo tutorial spieghiamo come viene implementato l&#039;autodiff con un esempio concreto, oltre a fare chiarezza su alcuni aspetti terminologici. Nella seconda parte del tutorial vedremo una implementazione in puro Python di un meccanismo di autodiff simile a quello reso celebre da PyTorch."  />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="icon" type="image/png" href="../user/themes/deliver/images/favicon.png" />
+
+	<!-- Global site tag (gtag.js) - Google Ads: 774709547 --> <script async src="https://www.googletagmanager.com/gtag/js?id=AW-774709547"></script> <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'AW-774709547'); </script> 
+	
+		
+                            		                                                <link href="../user/themes/deliver/css-compiled/nucleus.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css-compiled/template.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css/custom.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css/toc.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css/font-awesome.min.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/facebook/css/facebook.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/facebook/assets/unitegallery/css/unite-gallery.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/facebook/assets/unitegallery/themes/default/ug-theme-default.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/markdown-notices/assets/notices.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/breadcrumbs/css/breadcrumbs.css" type="text/css" rel="stylesheet" />
+<link href="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/events/assets/events.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/form/assets/form-styles.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/mathjax/assets/css/mathjax.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/simplesearch/css/simplesearch.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/highlight/css/zenburn.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/login/css/login.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css/slidebars.min.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css/slideme.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/socialbuttons/vendor/rrssb/css/rrssb.css" type="text/css" rel="stylesheet" />
+
+
+                                                            <script src="../system/assets/jquery/jquery-2.x.min.js" type="text/javascript" ></script>
+<script src="../user/themes/deliver/js/modernizr.custom.71422.js" type="text/javascript" ></script>
+<script src="../user/plugins/facebook/assets/unitegallery/js/unitegallery.min.js" type="text/javascript" ></script>
+<script src="../user/plugins/facebook/assets/unitegallery/themes/default/ug-theme-default.js" type="text/javascript" ></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.js" type="text/javascript" ></script>
+<script src="../user/plugins/events/assets/events.js" type="text/javascript" ></script>
+<script src="../user/plugins/mathjax/assets/js/mathjax.js" type="text/javascript" ></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript" ></script>
+<script src="../user/plugins/highlight/js/highlight.pack.js" type="text/javascript" ></script>
+<script src="../user/themes/deliver/js/deliver.js" type="text/javascript" ></script>
+<script src="../user/themes/deliver/js/slidebars.min.js" type="text/javascript" ></script>
+<script src="../user/themes/deliver/js/jquery.slideme2.js" type="text/javascript" ></script>
+<script src="../user/plugins/socialbuttons/vendor/rrssb/js/rrssb.min.js" type="text/javascript" ></script>
+
+<script>
+window.addEventListener("load", function(){
+window.cookieconsent.initialise({
+"palette": {
+    "popup": {
+        "background": "#4d4d4d",
+        "text": "#fff"
+    },
+    "button": {
+        "background": "#f1d600",
+        "text": "#000",
+        "border": "#f1d600"
+    }
+},
+"position": "bottom",
+"theme": "block",
+"content": {
+    "message": "This website uses cookies to ensure you get the best experience on our website.",
+    "dismiss": "Got it!",
+    "link": "Learn more",
+    "href": "https://cookiesandyou.com"
+}
+})});
+hljs.initHighlightingOnLoad();
+
+</script>
+
+
+</head>
+<body id="top" class="header-lite fullwidth blogstyling">
+    <div id="sb-site">
+                <header id="header">
+                <div class="logo">
+                    <h3><a href="../index.html"><img src="../user/pages/images/IAML_logo_viola.png" /></a></h3>
+                                            <ul class="social-icons">
+            <li>
+            <a href="https://twitter.com/iaml_it">
+                <i class="fa fa-twitter"></i>            </a>
+        </li>
+            <li>
+            <a href="https://www.linkedin.com/company/iaml/">
+                <i class="fa fa-linkedin"></i>            </a>
+        </li>
+            <li>
+            <a href="https://www.facebook.com/machinelearningitalia/">
+                <i class="fa fa-facebook"></i>            </a>
+        </li>
+            <li>
+            <a href="blog.rss">
+                <i class="fa fa-rss"></i>            </a>
+        </li>
+    </ul>  
+                                    </div>
+                <div id="navbar">
+                                                            
+<ul class="navigation">
+                                                        <li class="">
+                    <a href="../index.html">
+                                                Home
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../activities">
+                                                Activities
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../supporters.html">
+                                                Supporters
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../member.html">
+                                                Become a member
+                    </a>
+                </li>
+                                                                <li class="active">
+                    <a href="../blog">
+                                                Blog
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../governance.html">
+                                                Governance
+                    </a>
+                </li>
+                                                                                                                                </ul>                                                   <form class="search-box">
+    <input type="search" placeholder="Search..." value="" data-search-input="/search/query" />
+    <script>
+    jQuery(document).ready(function($){
+        var input = $('[data-search-input]');
+
+        input.on('keypress', function(event) {
+            if (event.which == 13 && input.val().length > 3) {
+                event.preventDefault();
+                window.location.href = input.data('search-input') + ':' + input.val();
+            }
+        });
+    });
+    </script>
+    <i class="fa fa-search"></i>
+</form>                    <span class="panel-activation sb-toggle-left navbar-left menu-btn fa fa-bars"></span>
+                </div>
+        </header>
+        
+        
+                <section id="body" class="">
+                            
+				<div class="flush-top blog-header blog-header-image" style="background: #B4B093 url(/user/pages/05.blog/blue_header.jpg) no-repeat right;">
+            <h1>La magia della differenziazione automatica - Parte 1</h1>
+        </div>
+            
+        
+<div id="breadcrumbs" itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
+                                            <a href="../index.html" itemprop="url"><span itemprop="title">Home</span></a>
+                        <i class="fa fa-angle-right"></i>
+                                                <a href="../blog" itemprop="url"><span itemprop="title">Blog</span></a>
+                        <i class="fa fa-angle-right"></i>
+                                                <span itemprop="title">La magia della differenziazione automatica - Parte 1</span>
+                        </div>
+		
+		<div class="blog-content-item g-grid pure-g-r">
+			<div id="item" class="g-block pure-u-2-3">
+			    <div class="list-item">
+
+    <div class="list-blog-header">
+                    <img src="../images/4/0/c/8/a/40c8a3b4bad17110eb858d05d10cdbce480ba5b0-computationalgraph.png" />
+        
+                    <h4><a href="differenziazione-automatica-parte-1.html">La magia della differenziazione automatica - Parte 1</a></h4>
+        
+        <span class="list-blog-date">
+            <i class="fa fa-calendar"></i>
+            18, Feb
+        </span>
+                <span class="list-blog-author">
+            <i class="fa fa-user"></i>
+            Simone Scardapane
+        </span>
+                       <ul class="tags">
+            <i class="fa fa-tag"></i>
+                        <li><a href="tagdifferenziazione.html">differenziazione</a></li>
+                        <li><a href="tagdeep learning.html">deep learning</a></li>
+                        <li><a href="tagderivate.html">derivate</a></li>
+                        <li><a href="tagreverse-mode.html">reverse-mode</a></li>
+                        <li><a href="tagautomatic differentation.html">automatic differentation</a></li>
+                        <li><a href="tagautodiff.html">autodiff</a></li>
+                    </ul>
+        
+    </div>
+
+	<div>
+	<br />
+	<!-- AddToAny BEGIN -->
+<div class="a2a_kit a2a_kit_size_32 a2a_default_style">
+<a class="a2a_dd" href="https://www.addtoany.com/share"></a>
+<a class="a2a_button_facebook"></a>
+<a class="a2a_button_twitter"></a>
+<a class="a2a_button_linkedin"></a>
+<a class="a2a_button_google_plus"></a>
+<a class="a2a_button_email"></a>
+</div>
+<script async src="https://static.addtoany.com/menu/page.js"></script>
+<!-- AddToAny END -->
+</div>
+	
+    <div class="list-blog-padding">
+
+            <p><p>Il calcolo automatico delle derivate è in assoluto "il cuore" di qualsiasi framework di deep learning. Esso permette di rendere completamente automatico (ed efficiente) uno dei meccanismi più complessi nell'uso di reti neurali, la <em>back-propagation</em>. Negli ultimi anni abbiamo visto la diffusione di strumenti di differenziazione automatica (<em>autodiff</em>) sempre più complessi e modulari, di pari passo con i progressi e successi del deep learning. Allo stesso tempo, nonostante la sua importanza, <strong>l'autodiff è un tema relativamente poco compreso</strong>. In questo tutorial spieghiamo come viene implementato con un piccolo esempio concreto, oltre a fare chiarezza su alcuni aspetti terminologici. Nella seconda parte del tutorial vedremo una implementazione in puro Python di un meccanismo di autodiff simile a quello reso celebre da <a href="http://pytorch.org">PyTorch</a>.</p>
+<p></p>
+<div class="notices yellow">
+<p>Questo tutorial è ispirato da un blog post molto interessante del 2016, <a href="https://rufflewind.com/2016-12-30/reverse-mode-automatic-differentiation">Reverse-mode automatic differentiation: a tutorial</a>, di cui manteniamo il modo relativamente informale di introdurre tutti i concetti. Per approfondire il tema, rimandiamo ai link in fondo all'articolo.</p>
+</div>
+<nav class="table-of-contents minitoc" role="navigation">
+                <span class="toctitle">Overview:</span>
+      
+                                                                
+  <ul>
+      
+        
+        
+              <li><a href="#partiamo-da-un-esempio" class="toclink" title="Partiamo da un esempio">Partiamo da un esempio</a></li>
+      
+        
+        
+              <li><a href="#un-primo-approccio..." class="toclink" title="Un primo approccio: differenziazione numerica">Un primo approccio: differenziazione numerica</a></li>
+      
+        
+        
+              <li><a href="#un-passo-avanti..." class="toclink" title="Un passo avanti: differenziazione simbolica">Un passo avanti: differenziazione simbolica</a></li>
+      
+        
+        
+              <li><a href="#dalla-differenziazione..." class="toclink" title="Dalla differenziazione simbolica al grafo computazionale">Dalla differenziazione simbolica al grafo computazionale</a></li>
+      
+                      <li><ul>
+          
+        
+              <li><a href="#forward-mode-automatic..." class="toclink" title="Forward-mode automatic differentiation">Forward-mode automatic differentiation</a></li>
+      
+        
+        
+              <li><a href="#reverse-mode-automatic..." class="toclink" title="Reverse-mode automatic differentiation">Reverse-mode automatic differentiation</a></li>
+      
+                      </ul></li>
+          
+        
+              <li><a href="#letture-di-approfondimento" class="toclink" title="Letture di approfondimento">Letture di approfondimento</a></li>
+      
+        
+        
+              <li><a href="#note" class="toclink" title="Note">Note</a></li>
+      
+    
+  </ul>
+</nav>
+
+
+<h2 id="partiamo-da-un-esempio" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#partiamo-da-un-esempio" title="Permanent link: Partiamo da un esempio" data-icon="#">Partiamo da un esempio</a></h2>
+<p>Per rendere il tutorial più concreto possibile, supponiamo di avere questa espressione:</p>
+<p class="mathjax mathjax--block">\[
+f(w_1, w_2) = w1 \cdot \cos \left( 3w_1 + w_2 \right) \,. \]</p>
+<p><span class="mathjax mathjax--inline">$w_1$</span> e <span class="mathjax mathjax--inline">$w_2$</span> rappresentano due input della nostra funzione (es., due pesi della nostra rete neurale), mentre <span class="mathjax mathjax--inline">$f$</span> potrebbe rappresentare l'output della rete o una qualche funzione costo. Vogliamo calcolare (in automatico!) le derivate parziali di questa funzione (il suo <em>gradiente</em>) ovvero, in notazione matematica,</p>
+<p class="mathjax mathjax--block">\[
+\frac{\partial f}{\partial w_1} \;\;\text{  e  }\;\; \frac{\partial f}{\partial w_2} \,. \]</p>
+<p>Una minima conoscenza di analisi ci dice che questa operazione sembra abbastanza meccanica: è sufficiente conoscere le derivate delle funzioni elementari coinvolte (ad es., la derivata del coseno), e come queste si compongono tra loro in presenza di somme e prodotti. Qualsiasi framework di deep learning rende questa operazione di una <strong>semplicità disarmante</strong>. Ad esempio, in TensorFlow con <a href="https://www.tensorflow.org/guide/eager">la eager execution</a> attiva potremmo scrivere:</p>
+<pre><code class="language-python">import tensorflow as tf
+import tensorflow.contrib.eager as tfe
+tf.enable_eager_execution()
+
+def f(w1, w2):
+    return w1 * tf.cos(3*w1 + w2)
+
+grad_f = tfe.gradients_function(f, ['w1', 'w2'])</code></pre>
+<p>Quello che si nasconde dietro questa operazione all'apparenza banale è ciò di cui parliamo nel resto del tutorial.</p>
+<h2 id="un-primo-approccio..." class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#un-primo-approccio..." title="Permanent link: Un primo approccio: differenziazione numerica" data-icon="#">Un primo approccio: differenziazione numerica</a></h2>
+<p>Cominciamo dalle cose più semplici. Ad esempio, potrebbe stupirvi sapere che possiamo calcolare le nostre derivative in un paio di righe di codice, senza nessuna conoscenza aggiuntiva, semplicemente applicando alla lettera la definizione di derivata parziale (concentriamoci per ora solo sul primo argomento della funzione):</p>
+<p class="mathjax mathjax--block">\[
+\frac{\partial f}{\partial w_1} = \lim_{\delta \rightarrow 0} \frac{f(w_1+\delta, w_2) - f(w_1, w_2)}{\delta} \,. \]</p>
+<p>Prendendo un <span class="mathjax mathjax--inline">$\delta$</span> molto piccolo otteniamo un'approssimazione di questa espressione <a href="https://en.wikipedia.org/wiki/Finite_difference">alle differenze finite</a>. Per esempio, per <span class="mathjax mathjax--inline">$w_1=2.0$</span>, <span class="mathjax mathjax--inline">$w_2=1.5$</span> e <span class="mathjax mathjax--inline">$\delta=10^{-4}$</span> potremmo calcolare (con la funzione definita sopra):</p>
+<pre><code class="language-python">dw1 = (f(2.0 + 1e-4, 1.5) - f(2.0, 1.5)) / 1e-4 # -5.2809715...,</code></pre>
+<p>ovvero una approssimazione corretta fino al secondo decimale.<sup id="fnref1:fn1"><a href="#fn:fn1" class="footnote-ref">1</a></sup> Ci accorgiamo subito che questo metodo non ci porta molto lontano: oltre a dover calcolare nuovamente <span class="mathjax mathjax--inline">$f$</span> per ogni derivata parziale, dobbiamo anche tenere d'occhio tutti gli eventuali errori numerici che (per espressioni più complesse) possono diventare rapidamente significativi. Ciò nonostante, è sempre utile tenere a mente questo metodo, se non altro come <em>check</em> della corretta implementazione dei propri moduli (es., dalla guida di PyTorch: https://pytorch.org/docs/stable/autograd.html#numerical-gradient-checking).</p>
+<h2 id="un-passo-avanti..." class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#un-passo-avanti..." title="Permanent link: Un passo avanti: differenziazione simbolica" data-icon="#">Un passo avanti: differenziazione simbolica</a></h2>
+<p>Ritorniamo alla nostra idea di partenza: esprimendo la nostra <span class="mathjax mathjax--inline">$f$</span> in qualche linguaggio simbolico, possiamo applicare meccanicamente le regole della derivazione ed ottenere una seconda espressione, sempre <em>simbolica</em>, che rappresenta la derivata parziale rispetto ad un argomento. Questa è una metodologia che dovrebbe suonare molto familiare a chi di mestiere lavora con strumenti come MATLAB, <a href="https://www.maplesoft.com/products/Maple/">Maple</a> o <a href="http://m.wolframalpha.com/">WolframAlpha</a>. Ad esempio, ecco uno screenshot di come potremmo ottenere la derivata parziale rispetto a <span class="mathjax mathjax--inline">$w_1$</span> nell'ultimo caso:</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/differenziazione-automatica-parte-1/images/wolfram.png">
+        </figure>
+<figcaption>Uno screenshot da <a href="http://m.wolframalpha.com/">WolframAlpha</a> che mostra il calcolo simbolico delle derivate parziali.</figcaption>
+<p>Ovvero:</p>
+<p class="mathjax mathjax--block">\[
+\frac{\partial f}{\partial w_1} = \cos(3w_1 + w_2) - 3w_1\sin(3w_1 + w_2) \,.\]</p>
+<p>[Il calcolo è abbastanza semplice da replicare conoscendo la derivata del coseno, del prodotto di due funzioni, e della loro composizione, su cui torneremo tra pochissimo.]</p>
+<p>Anche qui notiamo subito un dettaglio interessante: il valore su cui applichiamo il coseno ed il seno è lo stesso! In generale, ottenere un'espressione <em>efficiente</em> per via simbolica è un compito molto difficile, in quanto la grandezza dell'espressione della derivata può (nel caso peggiore) crescere <strong>esponenzialmente</strong> rispetto al numero di operazioni della funzione di partenza.</p>
+<p>A causa di questo, praticamente nessun software di deep learning implementa questa tecnica.</p>
+<div class="notices yellow">
+<p>A livello terminologico, molti confondono la <em>differenziazione simbolica</em> descritta qui con la procedura usata nei software di deep learning, che invece usa un altro insieme di tecniche che introdurremo tra poco. Questa confusione deriva in parte dall'uso parzialmente improprio del termine in <a href="https://news.ycombinator.com/item" id="10825232">Theano</a>.</p>
+</div>
+<p></p>
+<h2 id="dalla-differenziazione..." class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#dalla-differenziazione..." title="Permanent link: Dalla differenziazione simbolica al grafo computazionale" data-icon="#">Dalla differenziazione simbolica al grafo computazionale</a></h2>
+<p>Come fare per superare i limiti della differenziazione simbolica? L'idea di fondo è abbastanza sottile: dobbiamo vedere la formula da differenziare non come un'unica espressione simbolica, ma come una <em>serie di operazioni elementari</em>, in maniera equivalente ad una serie di istruzioni di codice in un qualsiasi linguaggio di programmazione. Applicando le regole delle derivate alle <em>singole operazioni elementari</em> di questo programma, possiamo ottenere un secondo programma (NON necessariamente un'espressione simbolica) che permette di calcolare numericamente le derivate. La spiegazione può sembrare confusionaria, ma diventerà tutto molto più chiaro con un esempio pratico.</p>
+<div class="notices yellow">
+<p>Una seconda nota terminologica: il termine 'automatic differentiation' (autodiff), nonostante il nome, si riferisce solamente alle tecniche descritte in questa e nella seguente sezione, e non alla differenziazione simbolica o numerica.</p>
+</div>
+<p>Cominciamo con il riformulare la nostra espressione di partenza come una serie di operazioni elementari, in cui identifichiamo esplicitamente tutti i risultati intermedi.</p>
+<p class="mathjax mathjax--block">\[
+\begin{cases}
+w_1 = & \ldots \\
+w_2 = & \ldots \\
+z_1 = & 3w_1 \\
+z_2 = & z_1 + w_2 \\
+z_3 = & \cos(z_2) \\
+z_4 = & w_1 z_3
+\end{cases}\]</p>
+<p>Così facendo, ci siamo avvicinati alla classica rappresentazione 'a grafo' a cui TensorFlow e simili ci hanno ampiamente abituato:</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/differenziazione-automatica-parte-1/images/computational_graph.png">
+        </figure>
+<figcaption>Grafo computazionale dell'espressione iniziale.</figcaption>
+<p>Il grafo esprime in maniera visiva (i) tutti i passi intermedi della nostra formula, e (ii) la <em>dipendenza</em> di ogni passo rispetto a quelli precedenti. Cosa farne? </p>
+<h3 id="forward-mode-automatic..." class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#forward-mode-automatic..." title="Permanent link: Forward-mode automatic differentiation" data-icon="#">Forward-mode automatic differentiation</a></h3>
+<p>L'idea fondamentale è che vogliamo associare ad ogni nodo del grafo un secondo valore, che rappresenti la derivata numerica di quel nodo rispetto ad uno degli input. Per comodità, nel seguito usiamo il nome <span class="mathjax mathjax--inline">$da$</span> per riferirci alla quantità <span class="mathjax mathjax--inline">$\frac{\partial a}{\partial w_1}$</span>, ovvero la derivata della funzione <span class="mathjax mathjax--inline">$a$</span> rispetto a <span class="mathjax mathjax--inline">$w_1$</span>. Ad esempio, <span class="mathjax mathjax--inline">$dz_2$</span> sarà la derivata di <span class="mathjax mathjax--inline">$z_2$</span> rispetto a <span class="mathjax mathjax--inline">$w_1$</span>, mentre <span class="mathjax mathjax--inline">$dz_4$</span> sarà il valore cercato.</p>
+<p>Proviamo a procedere per passi tenendo sempre bene a mente il grafo precedente:</p>
+<ol>
+<li>Supponiamo di aver eseguito solo la nostra prima istruzione nel listato, ovvero l'assegnazione di un valore a <span class="mathjax mathjax--inline">$w_1$</span>. Trivialmente abbiamo <span class="mathjax mathjax--inline">$dw_1 = 1$</span>.</li>
+<li>La seconda istruzione è l'assegnazione di <span class="mathjax mathjax--inline">$w_2$</span>. Poiché <span class="mathjax mathjax--inline">$w_1$</span> e <span class="mathjax mathjax--inline">$w_2$</span> sono indipendenti, abbiamo <span class="mathjax mathjax--inline">$dw_2 = 0$</span>.</li>
+<li>Nel terzo passo moltiplichiamo <span class="mathjax mathjax--inline">$w_1$</span> per <span class="mathjax mathjax--inline">$3$</span>: è immediato verificare che <span class="mathjax mathjax--inline">$dz_1 = 3$</span>.</li>
+<li>Nel quarto passo le cose si fanno interessanti: sommiamo a <span class="mathjax mathjax--inline">$z_1$</span> il valore di <span class="mathjax mathjax--inline">$w_2$</span>. La derivata rispetto a <span class="mathjax mathjax--inline">$w_1$</span> è quindi la somma delle derivate dei due nodi precedenti: <span class="mathjax mathjax--inline">$dz_2 = dz_1 + dw_2 = dz_1 + 0 = dz_1$</span>.</li>
+<li>Al quinto passo applichiamo il coseno a <span class="mathjax mathjax--inline">$z_2$</span>. Per la 'chain rule' della derivazione, abbiamo che <span class="mathjax mathjax--inline">$dz_3 = [\frac{\partial \cos(z_2)}{\partial z_2}]\cdot\frac{\partial z_2}{\partial w_1} = -\sin(z_2)dz_2$</span>.</li>
+<li>Il sesto passo è un prodotto di due termini. Usando la regola della derivata della moltiplicazione otteniamo: <span class="mathjax mathjax--inline">$dz_4 = z_3 + w_1dz_3$</span>.</li>
+</ol>
+<p>Al di là dei conti (che vi invitiamo a verificare), un aspetto dovrebbe essere apparente: ad ogni passo, i valori che andiamo a calcolare dipendono solo (a) dalla derivata elementare del singolo nodo (es., del coseno), e (b) <strong>dai valori calcolati nei nodi immediatamente precedenti sul grafo</strong>.</p>
+<p>Grazie a quest'ultima proprietà, possiamo esprimere l'intera operazione come un listato di istruzioni molto simile a quello di prima:</p>
+<p class="mathjax mathjax--block">\[
+\begin{cases}
+dw_1 = & 1.0 \\
+dw_2 = & 0.0 \\
+dz_1 = & 3.0 \\
+dz_2 = & dz_1 \\
+dz_3 = & -\sin(z_2)dz_2 \\
+dz_4 = & z_3 + w_1dz_3
+\end{cases} \]</p>
+<p>Possiamo interlacciare l'esecuzione di questa procedura con quella di partenza (es., calcolare <span class="mathjax mathjax--inline">$dz_3$</span> dopo <span class="mathjax mathjax--inline">$z_3$</span>). Una volta conclusa l'intera procedura, <span class="mathjax mathjax--inline">$dz_4$</span> conterrà il valore che stavamo cercando!</p>
+<p>Questo algoritmo per calcolare il gradiente viene detto <strong>forward-mode autodiff</strong>, ed i valori intermedi che abbiamo appena definito vengono detti <strong>dual numbers</strong>.<sup id="fnref1:fn2"><a href="#fn:fn2" class="footnote-ref">2</a></sup></p>
+<p>Le buone notizie:</p>
+<ul>
+<li>Questo approccio è <em>molto</em> più efficiente della differenziazione simbolica (la complessità computazionale della procedura di derivazione è linearmente, e non più esponenzialmente, legata alla complessità della funzione di partenza).</li>
+<li>Il secondo punto è più sottile: poiché ora lavoriamo con istruzioni di programmazione (e non più con espressioni simboliche), possiamo combinare le istruzioni di partenza con altri costrutti di programmazione: cicli for, strutture dati, ed altri. Ad esempio, pensiamo ad un'operazione che inserisca una variabile in un dizionario: l'istruzione 'duale' sarà quella che estrarrà l'elemento dal dizionario, in maniera completamente trasparente all'utente. Se questo punto non vi è chiaro, non vi preoccupate, perché lo esploreremo con maggiore dettaglio nella seconda parte del tutorial.</li>
+</ul>
+<p>Per riepilogare la differenza fra differenziazione automatica e simbolica, prendiamo in prestito una bella immagine da Wikipedia. Mentre la seconda lavora su un'espressione simbolica, la prima lavora sull'<em>implementazione</em> di questa espressione in un qualche linguaggio di programmazione:</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/differenziazione-automatica-parte-1/images/AutomaticDifferentiationNutshell.png">
+        </figure>
+<figcaption><a href="https://en.wikipedia.org/wiki/Automatic_differentiation#/media/File:AutomaticDifferentiationNutshell.png">Source: Wikipedia.</a></figcaption>
+<p>Abbiamo finito? Purtroppo no! Anche se la nostra procedura è ora notevolmente più efficiente, abbiamo comunque bisogno di due procedure <em>distinte</em> per ciascun input: per calcolare la derivata rispetto a <span class="mathjax mathjax--inline">$w_2$</span> dobbiamo calcolare un insieme distinto di valori duali (seppur con molte ridondanze), inizializzando <span class="mathjax mathjax--inline">$dw_2$</span> ad 1.0, e <span class="mathjax mathjax--inline">$dw_1$</span> a 0. Una  variante della forward-mode autodiff, che poi è quella usata da quasi tutti gli strumenti di deep learning, risponde a quest'ultima problematica.</p>
+<h3 id="reverse-mode-automatic..." class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#reverse-mode-automatic..." title="Permanent link: Reverse-mode automatic differentiation" data-icon="#">Reverse-mode automatic differentiation</a></h3>
+<p>Il trucco finale sfrutta tutte le idee della sezione precedente, ma percorre il grafo  "al contrario". Per farlo, dobbiamo introdurre un nuovo insieme di variabili intermedie, che questa volta descriveranno la derivata parziale di tutti i nodi del grafo rispetto all'output finale:</p>
+<p class="mathjax mathjax--block">\[
+ga = \frac{\partial a}{\partial z_4} \,.\]</p>
+<p>Per calcolare queste nuove variabili dobbiamo ovviamente aspettare di aver raggiunto il nodo <span class="mathjax mathjax--inline">$z_4$</span>: a questo punto possiamo seguire un ragionamento molto simile a quello di prima, ma percorrendo gli archi del grafo nella direzione opposta.</p>
+<ol>
+<li>Cominciando dalla fine, abbiamo ovviamente <span class="mathjax mathjax--inline">$gz_4 = 1.0$</span>.</li>
+<li>Tornando indietro di uno step sul grafo: <span class="mathjax mathjax--inline">$gz_3$</span> è la derivata di <span class="mathjax mathjax--inline">$w_1z_3$</span> rispetto a <span class="mathjax mathjax--inline">$z_3$</span>, ovvero <span class="mathjax mathjax--inline">$w_1$</span>.</li>
+<li>Arrivati a <span class="mathjax mathjax--inline">$z_2$</span>, le cose diventano interamente speculari a quanto visto prima: per la chain rule, <span class="mathjax mathjax--inline">$gz_2$</span> è <span class="mathjax mathjax--inline">$\frac{\partial z_2}{\partial z_4} = \frac{\partial z_2}{\partial z_3}\frac{\partial z_3}{\partial z_4} = -\sin(z_2) gz_3$</span>.</li>
+<li>Con ragionamenti simili a prima, otteniamo poi <span class="mathjax mathjax--inline">$gz_1 = gz_2$</span> e <span class="mathjax mathjax--inline">$gw_2 = gz_2$</span>.</li>
+<li>L'ultimo caso è il più interessante: percorrendo all'indietro il grafo, <span class="mathjax mathjax--inline">$w_1$</span> riceve contributi da due 'rami' separati, i cui contributi si andranno a sommare: <span class="mathjax mathjax--inline">$gw_1 = 3gz_1 + z_3gz_4$</span>.</li>
+</ol>
+<p>Valgono regole esattamente speculari a quelle del forward-mode: il calcolo di ogni variabile temporanea richiede la conoscenza delle variabili temporanee di tutti i nodi <em>successori</em> sul grafo, oltre alle loro derivate elementari. Elencando il tutto come un listato di istruzioni:</p>
+<p class="mathjax mathjax--block">\[
+\begin{cases}
+gz_4 = & 1.0 \\
+gz_3 = & w_1 \\
+gz_2 = & -\sin(z_2) gz_3 \\
+gz_1 = & gz_2 \\
+gw_2 = & gz_2 \\
+gw_1 = & 3gz_1 + z_3gz_4
+\end{cases}\]</p>
+<div class="notices yellow">
+<p>Se l'idea di "andare all'indietro" sul grafo vi ricorda qualcosa, probabilmente avete ragione: la reverse-mode autodiff nel campo delle reti neurali è in sostanza un sinonimo di back-propagation!</p>
+</div>
+<p>Nel reverse-mode possiamo calcolare tutte le derivate parziali degli input rispetto ad un singolo output con una sola iterazione, mentre abbiamo bisogno di più procedure per output separati: poiché in generale il numero di parametri di una rete neurale è molto grande, mentre abbiamo di solito un unico output (la funzione costo), questa modalità risulta infinitamente più efficiente, ed è lo standard in praticamente tutti i framework di deep learning! Ne vedremo un'implementazione concreta nella prossima parte del tutorial, in aggiunta ad alcuni dettagli pratici di grande interesse.</p>
+<h2 id="letture-di-approfondimento" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#letture-di-approfondimento" title="Permanent link: Letture di approfondimento" data-icon="#">Letture di approfondimento</a></h2>
+<p>Per una breve introduzione più formale al tema, consigliamo un blog post del 2013 di Alexey Radul, <a href="https://alexey.radul.name/ideas/2013/introduction-to-automatic-differentiation/">Introduction to Automatic Differentiation</a>. Un articolo scientifico estremamente chiaro e con molti più dettagli sulle tecniche (e sulla storia) dell'autodiff rimane <a href="http://www.jmlr.org/papers/volume18/17-468/17-468.pdf">Automatic Differentiation in Machine Learning: a Survey</a> di Baydin et al. </p>
+<p>Come discusso nell'articolo di Baydin et al., l'autodiff è in realtà un campo scientifico con numerosi decenni di storia, solo recentemente 'riscoperti' in parte dalla community del machine learning. Parte di questa storia e materiale si può ritrovare sul sito <a href="http://www.autodiff.org/">autodiff.org</a>. Per una visione più variegata del settore nel contesto del machine learning, rimandiamo ai panel dell'<a href="https://autodiff-workshop.github.io/">Autodiff Workshop</a> organizzato a <a href="https://nips.cc/Conferences/2017">NeurIPS 2017</a>.</p>
+<hr />
+<p>Se questo articolo ti è piaciuto e vuoi tenerti aggiornato sulle nostre attività, ricordati che l'<a href="../member.html">iscrizione all'Italian Association for Machine Learning</a> è gratuita! Puoi seguirci su <a href="https://www.facebook.com/machinelearningitalia/">Facebook</a>, <a href="https://www.linkedin.com/company/iaml/">LinkedIn</a>, e <a href="https://twitter.com/iaml_it">Twitter</a>.</p>
+<h2 id="note" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#note" title="Permanent link: Note" data-icon="#">Note</a></h2>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn:fn1">
+<p>Potremmo migliorare questa approssimazione con qualche tecnica alle differenze finite più avanzata, come il metodo delle <em>central differences</em>.&#160;<a href="#fnref1:fn1" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:fn2">
+<p>Il significato di questo termine richiede una definizione più formale del procedimento, per cui rimandiamo ad un <a href="https://alexey.radul.name/ideas/2013/introduction-to-automatic-differentiation/">articolo più approfondito</a> o alla Sezione 3.1.1 <a href="http://www.jmlr.org/papers/volume18/17-468/17-468.pdf">qui</a>.&#160;<a href="#fnref1:fn2" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+</ol>
+</div></p>
+            
+    
+        <p class="prev-next">
+                            <a class="button" href="introduzione-cluster-analysis.html"><i class="fa fa-chevron-left"></i> Previous Post</a>
+            
+                            <a class="button" href="variational-autoencoders-1.html">Next Post <i class="fa fa-chevron-right"></i></a>
+                    </p>
+    
+    </div>
+</div>
+			</div>
+			<div id="sidebar" class="g-block size-1-3 pure-u-1-3">
+				<div class="sidebar-content">
+    <h4>Search the blog</h4>
+    <input type="text" placeholder="Search..." value="" data-searchsidebar-input="/search/query" />
+<script>
+jQuery(document).ready(function($){
+    var input = $('[data-searchsidebar-input]');
+
+    input.on('keypress', function(event) {
+        if (event.which == 13 && input.val().length > 3) {
+            event.preventDefault();
+            window.location.href = input.data('searchsidebar-input') + ':' + input.val();
+        }
+    });
+});
+</script>
+</div>
+<!--
+<div class="sidebar-content">
+	<h4>Some Text Widget</h4>
+	<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna.</p>
+</div>
+!-->
+<div class="sidebar-content">
+    <h4>Categories</h4>
+    
+
+<ul class="archives">
+        <li>
+        <a href="categoryTutorials.html">Tutorials </a> (16)
+    </li>
+        <li>
+        <a href="categoryDiscussions.html">Discussions </a> (12)
+    </li>
+        <li>
+        <a href="categoryAnnouncements.html">Announcements </a> (4)
+    </li>
+        <li>
+        <a href="categoryTutorials (English).html">Tutorials (English) </a> (4)
+    </li>
+        <li>
+        <a href="categoryArticles' summaries.html">Articles' summaries </a> (3)
+    </li>
+        <li>
+        <a href="categoryDiscussions (English).html">Discussions (English) </a> (2)
+    </li>
+        <li>
+        <a href="categoryFocus-on.html">Focus-on </a> (1)
+    </li>
+        <li>
+        <a href="categoryReviews.html">Reviews </a> (1)
+    </li>
+        <li>
+        <a href="categoryDiscussion.html">Discussion </a> (1)
+    </li>
+    </ul>
+</div>
+<div class="sidebar-content">
+    <h4>Archives</h4>
+	<ul class="archives">
+    <li>
+    	<a href="archives_monthapr_2020.html">
+        <span class="archive_date">April 2020</span>
+                <span>(1)</span>
+                </a>
+    </li>
+</ul>
+</div>
+<div class="sidebar-content">
+    <h4>Popular Tags</h4>
+    
+
+<ul class="archives">
+        <li>
+        <a href="tagdeep learning.html">deep learning </a> (11)
+    </li>
+        <li>
+        <a href="tagpytorch.html">pytorch </a> (9)
+    </li>
+        <li>
+        <a href="tagreti neurali.html">reti neurali </a> (5)
+    </li>
+        <li>
+        <a href="taggoogle.html">google </a> (4)
+    </li>
+        <li>
+        <a href="tagjit.html">jit </a> (4)
+    </li>
+        <li>
+        <a href="tagtensorflow.html">tensorflow </a> (4)
+    </li>
+        <li>
+        <a href="tagottimizzazione.html">ottimizzazione </a> (4)
+    </li>
+        <li>
+        <a href="tagrete neurale.html">rete neurale </a> (3)
+    </li>
+        <li>
+        <a href="tagtime series.html">time series </a> (3)
+    </li>
+        <li>
+        <a href="tagkeras.html">keras </a> (3)
+    </li>
+        <li>
+        <a href="tagreti convolutive.html">reti convolutive </a> (3)
+    </li>
+        <li>
+        <a href="tagpipeline.html">pipeline </a> (2)
+    </li>
+        <li>
+        <a href="tagsklearn.html">sklearn </a> (2)
+    </li>
+        <li>
+        <a href="tagautodiff.html">autodiff </a> (2)
+    </li>
+        <li>
+        <a href="tagautomatic differentation.html">automatic differentation </a> (2)
+    </li>
+        <li>
+        <a href="tagreverse-mode.html">reverse-mode </a> (2)
+    </li>
+        <li>
+        <a href="tagderivate.html">derivate </a> (2)
+    </li>
+        <li>
+        <a href="tagdifferenziazione.html">differenziazione </a> (2)
+    </li>
+        <li>
+        <a href="tagmodel selection.html">model selection </a> (2)
+    </li>
+        <li>
+        <a href="tagcross validation.html">cross validation </a> (2)
+    </li>
+        <li>
+        <a href="tagc++.html">c++ </a> (2)
+    </li>
+        <li>
+        <a href="tagnumpy.html">numpy </a> (2)
+    </li>
+        <li>
+        <a href="tagvmap.html">vmap </a> (2)
+    </li>
+        <li>
+        <a href="tagcaffe.html">caffe </a> (2)
+    </li>
+        <li>
+        <a href="tagcompiler.html">compiler </a> (2)
+    </li>
+        <li>
+        <a href="tagjax.html">jax </a> (2)
+    </li>
+        <li>
+        <a href="tagcodemotion.html">codemotion </a> (1)
+    </li>
+        <li>
+        <a href="tagbias.html">bias </a> (1)
+    </li>
+        <li>
+        <a href="tagdiscrimination.html">discrimination </a> (1)
+    </li>
+        <li>
+        <a href="tagfairness.html">fairness </a> (1)
+    </li>
+        <li>
+        <a href="tagiaml.html">iaml </a> (1)
+    </li>
+        <li>
+        <a href="tagdatabase.html">database </a> (1)
+    </li>
+        <li>
+        <a href="tagiperparametri.html">iperparametri </a> (1)
+    </li>
+        <li>
+        <a href="tagautograph.html">autograph </a> (1)
+    </li>
+        <li>
+        <a href="taghead.html">head </a> (1)
+    </li>
+        <li>
+        <a href="tagmulti-task.html">multi-task </a> (1)
+    </li>
+        <li>
+        <a href="taglearning.html">learning </a> (1)
+    </li>
+        <li>
+        <a href="tagnovità.html">novità </a> (1)
+    </li>
+        <li>
+        <a href="tagdev summit.html">dev summit </a> (1)
+    </li>
+        <li>
+        <a href="tagcustom estimator.html">custom estimator </a> (1)
+    </li>
+        <li>
+        <a href="taghyperopt.html">hyperopt </a> (1)
+    </li>
+        <li>
+        <a href="taggoodfellow.html">goodfellow </a> (1)
+    </li>
+        <li>
+        <a href="tagnlp.html">nlp </a> (1)
+    </li>
+        <li>
+        <a href="tagdati mancanti.html">dati mancanti </a> (1)
+    </li>
+        <li>
+        <a href="tagtransformer.html">transformer </a> (1)
+    </li>
+        <li>
+        <a href="tagattenzione.html">attenzione </a> (1)
+    </li>
+        <li>
+        <a href="tagrobocop.html">robocop </a> (1)
+    </li>
+        <li>
+        <a href="tagyolo.html">yolo </a> (1)
+    </li>
+        <li>
+        <a href="tagobject detection.html">object detection </a> (1)
+    </li>
+        <li>
+        <a href="tagbayes.html">bayes </a> (1)
+    </li>
+        <li>
+        <a href="tagautoencoders.html">autoencoders </a> (1)
+    </li>
+        <li>
+        <a href="tagvariational.html">variational </a> (1)
+    </li>
+        <li>
+        <a href="tageager.html">eager </a> (1)
+    </li>
+        <li>
+        <a href="tagimputazione.html">imputazione </a> (1)
+    </li>
+        <li>
+        <a href="tagCIFAR.html">CIFAR </a> (1)
+    </li>
+        <li>
+        <a href="tagword embedding.html">word embedding </a> (1)
+    </li>
+        <li>
+        <a href="tagMNIST.html">MNIST </a> (1)
+    </li>
+        <li>
+        <a href="tagimmagini.html">immagini </a> (1)
+    </li>
+        <li>
+        <a href="tagclassificazione.html">classificazione </a> (1)
+    </li>
+        <li>
+        <a href="tagkpi.html">kpi </a> (1)
+    </li>
+        <li>
+        <a href="tagreprogramming.html">reprogramming </a> (1)
+    </li>
+        <li>
+        <a href="tagadversarial.html">adversarial </a> (1)
+    </li>
+        <li>
+        <a href="tagbrowser.html">browser </a> (1)
+    </li>
+        <li>
+        <a href="tagjavascript.html">javascript </a> (1)
+    </li>
+        <li>
+        <a href="tagreti ricorsive.html">reti ricorsive </a> (1)
+    </li>
+        <li>
+        <a href="tagreti ricorrenti.html">reti ricorrenti </a> (1)
+    </li>
+        <li>
+        <a href="tagftth.html">ftth </a> (1)
+    </li>
+        <li>
+        <a href="tagadversarial example.html">adversarial example </a> (1)
+    </li>
+        <li>
+        <a href="tagmanagement.html">management </a> (1)
+    </li>
+        <li>
+        <a href="tagrobotica.html">robotica </a> (1)
+    </li>
+        <li>
+        <a href="tagocr.html">ocr </a> (1)
+    </li>
+        <li>
+        <a href="tagfocus.html">focus </a> (1)
+    </li>
+        <li>
+        <a href="tagiphone.html">iphone </a> (1)
+    </li>
+        <li>
+        <a href="tagpython.html">python </a> (1)
+    </li>
+        <li>
+        <a href="tagface id.html">face id </a> (1)
+    </li>
+        <li>
+        <a href="tagmomento.html">momento </a> (1)
+    </li>
+        <li>
+        <a href="tagadam.html">adam </a> (1)
+    </li>
+        <li>
+        <a href="tagneuroscienza.html">neuroscienza </a> (1)
+    </li>
+        <li>
+        <a href="tagonde cerebrali.html">onde cerebrali </a> (1)
+    </li>
+        <li>
+        <a href="tagtorchvision.html">torchvision </a> (1)
+    </li>
+        <li>
+        <a href="taglatin.html">latin </a> (1)
+    </li>
+        <li>
+        <a href="tagpretrained.html">pretrained </a> (1)
+    </li>
+        <li>
+        <a href="tagrete convolutiva.html">rete convolutiva </a> (1)
+    </li>
+        <li>
+        <a href="tagautograd.html">autograd </a> (1)
+    </li>
+        <li>
+        <a href="tagswish.html">swish </a> (1)
+    </li>
+        <li>
+        <a href="tagattivazione.html">attivazione </a> (1)
+    </li>
+        <li>
+        <a href="tagcheckpoint.html">checkpoint </a> (1)
+    </li>
+        <li>
+        <a href="tagtensori.html">tensori </a> (1)
+    </li>
+        <li>
+        <a href="tagvariabili.html">variabili </a> (1)
+    </li>
+        <li>
+        <a href="taglineare.html">lineare </a> (1)
+    </li>
+        <li>
+        <a href="tagregressione.html">regressione </a> (1)
+    </li>
+        <li>
+        <a href="tagconvolutional networks.html">convolutional networks </a> (1)
+    </li>
+        <li>
+        <a href="tagVatican.html">Vatican </a> (1)
+    </li>
+        <li>
+        <a href="tagproject.html">project </a> (1)
+    </li>
+        <li>
+        <a href="tagkernel.html">kernel </a> (1)
+    </li>
+        <li>
+        <a href="tagICLR.html">ICLR </a> (1)
+    </li>
+        <li>
+        <a href="tagipotesi.html">ipotesi </a> (1)
+    </li>
+        <li>
+        <a href="tagsparsità.html">sparsità </a> (1)
+    </li>
+        <li>
+        <a href="tagfunzionale.html">funzionale </a> (1)
+    </li>
+        <li>
+        <a href="tagfunctional.html">functional </a> (1)
+    </li>
+        <li>
+        <a href="tagadversarial attack.html">adversarial attack </a> (1)
+    </li>
+        <li>
+        <a href="tagkmeans.html">kmeans </a> (1)
+    </li>
+        <li>
+        <a href="taganalysis.html">analysis </a> (1)
+    </li>
+        <li>
+        <a href="tagclustering.html">clustering </a> (1)
+    </li>
+        <li>
+        <a href="tagGoogle.html">Google </a> (1)
+    </li>
+        <li>
+        <a href="tagregression.html">regression </a> (1)
+    </li>
+        <li>
+        <a href="tagJAX.html">JAX </a> (1)
+    </li>
+        <li>
+        <a href="taggaussian process.html">gaussian process </a> (1)
+    </li>
+        <li>
+        <a href="tagensemble.html">ensemble </a> (1)
+    </li>
+        <li>
+        <a href="tagboosting.html">boosting </a> (1)
+    </li>
+        <li>
+        <a href="taggradient.html">gradient </a> (1)
+    </li>
+        <li>
+        <a href="tagsemi-supervised learning.html">semi-supervised learning </a> (1)
+    </li>
+        <li>
+        <a href="tagdocument classification.html">document classification </a> (1)
+    </li>
+        <li>
+        <a href="taggraphs.html">graphs </a> (1)
+    </li>
+        <li>
+        <a href="tagvariables.html">variables </a> (1)
+    </li>
+        <li>
+        <a href="taglinear.html">linear </a> (1)
+    </li>
+        <li>
+        <a href="tagk-NN.html">k-NN </a> (1)
+    </li>
+    </ul>
+</div>
+<div class="sidebar-content syndicate">
+    <h4>Syndicate</h4>
+    <a class="button" href="../blog.atom"><i class="fa fa-rss-square"></i> Atom 1.0</a>
+    <a class="button" href="../blog.rss"><i class="fa fa-rss-square"></i> RSS</a>
+</div>
+			</div>
+		</div>
+	
+                        <div class="modular-row footer ">
+    <div class="footer-items">
+        <div class="footer-module large">
+		<h4>About</h4>
+                            <p>Italian Association for Machine Learning (C.F. 97949550582)</p>
+            			<p>Write us: info@iaml.it</p>
+        </div>
+        <div class="footer-module"><h4>Address</h4>
+            <p>
+                                    <span><strong>Operational office</strong></span>
+                                    <span>IAML c/o Pi Campus, via Indonesia 23, 00144 Rome</span>
+                                    <span><strong>Legal office</strong></span>
+                                    <span>Via Cassia 964, 00189, Rome</span>
+                            </p>
+        </div>
+        <div class="footer-module"><h4>Quick Links</h4>
+         <ul class="quickmenu">
+                            <li><i class="fa fa-chevron-right"></i><a href="../home">Home</a></li>
+                            <li><i class="fa fa-chevron-right"></i><a href="https://iaml.it/documents">Documents (Italian)</a></li>
+                    </ul>
+    </div>
+   
+</div>
+<hr>
+<div class="footer-modules">
+    <div class="footer-copyright">
+        Copyright 2018 IAML.IT. All Rights Reserved.
+    </div>
+    <div class="footer-menu">
+    <ul class="othermenu">
+           <li><a href="https://learn.getgrav.org/">Powered by Grav</a></li>
+           <li><a href="https://github.com/getgrav/grav-theme-deliver">Theme (adapted) from Deliver</a></li>
+        </ul>
+    </div>
+</div>
+</div>                    </section>
+        
+    </div>
+    <div class="sb-slidebar sb-left sb-width-thin">
+        <div id="panel">
+        
+<ul class="navigation">
+                                                        <li class="">
+                    <a href="../index.html">
+                                                Home
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../activities">
+                                                Activities
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../supporters.html">
+                                                Supporters
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../member.html">
+                                                Become a member
+                    </a>
+                </li>
+                                                                <li class="active">
+                    <a href="../blog">
+                                                Blog
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../governance.html">
+                                                Governance
+                    </a>
+                </li>
+                                                                                                                                </ul>                   </div>
+    </div>
+        <script src="../user/plugins/simplesearch/js/simplesearch.js" type="text/javascript" ></script>
+
+    <script>
+    $(function () {
+        $(document).ready(function() {
+          $.slidebars({
+            hideControlClasses: true,
+            scrollLock: true
+          });
+        });
+    });
+    </script>
+    </body>
+</html>
+
+

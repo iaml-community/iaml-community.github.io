@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Alle prese con PyTorch - Parte 2: Reti neurali ed ottimizzatori | Italian Association for Machine Learning</title>
+    <meta content="GravCMS"  />
+<meta content="The Italian Association for Machine Learning (IAML) is a not-for-profit organization with the purpose of promoting knowledge of machine learning in all aspects of the Italian public life, from universities to enterprises and IT professionals."  />
+<meta property="og:title" content="Alle prese con PyTorch #2 (Reti neurali) | IAML.it"  />
+<meta property="og:image" content="https://iaml.it/blog/alle-prese-con-pytorch-parte-2/images/iris_loss_function.png"  />
+<meta property="og:url" content="https://iaml.it/blog/alle-prese-con-pytorch-parte-2/"  />
+<meta property="og:description" content="In questo secondo tutorial su PyTorch introduciamo alcuni elementi avanzati della libreria per costruire ed ottimizzare reti neurali."  />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="icon" type="image/png" href="/user/themes/deliver/images/favicon.png" />
+
+	<!-- Global site tag (gtag.js) - Google Ads: 774709547 --> <script async src="https://www.googletagmanager.com/gtag/js?id=AW-774709547"></script> <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'AW-774709547'); </script> 
+	
+		
+                            		                                                <link href="/user/themes/deliver/css-compiled/nucleus.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css-compiled/template.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/custom.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/toc.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/font-awesome.min.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/facebook/css/facebook.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/facebook/assets/unitegallery/css/unite-gallery.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/facebook/assets/unitegallery/themes/default/ug-theme-default.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/markdown-notices/assets/notices.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/breadcrumbs/css/breadcrumbs.css" type="text/css" rel="stylesheet" />
+<link href="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/events/assets/events.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/form/assets/form-styles.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/mathjax/assets/css/mathjax.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/simplesearch/css/simplesearch.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/highlight/css/zenburn.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/login/css/login.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/slidebars.min.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/slideme.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/socialbuttons/vendor/rrssb/css/rrssb.css" type="text/css" rel="stylesheet" />
+
+
+                                                            <script src="/system/assets/jquery/jquery-2.x.min.js" type="text/javascript" ></script>
+<script src="/user/themes/deliver/js/modernizr.custom.71422.js" type="text/javascript" ></script>
+<script src="/user/plugins/facebook/assets/unitegallery/js/unitegallery.min.js" type="text/javascript" ></script>
+<script src="/user/plugins/facebook/assets/unitegallery/themes/default/ug-theme-default.js" type="text/javascript" ></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.js" type="text/javascript" ></script>
+<script src="/user/plugins/events/assets/events.js" type="text/javascript" ></script>
+<script src="/user/plugins/mathjax/assets/js/mathjax.js" type="text/javascript" ></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript" ></script>
+<script src="/user/plugins/highlight/js/highlight.pack.js" type="text/javascript" ></script>
+<script src="/user/themes/deliver/js/deliver.js" type="text/javascript" ></script>
+<script src="/user/themes/deliver/js/slidebars.min.js" type="text/javascript" ></script>
+<script src="/user/themes/deliver/js/jquery.slideme2.js" type="text/javascript" ></script>
+<script src="/user/plugins/socialbuttons/vendor/rrssb/js/rrssb.min.js" type="text/javascript" ></script>
+
+<script>
+window.addEventListener("load", function(){
+window.cookieconsent.initialise({
+"palette": {
+    "popup": {
+        "background": "#4d4d4d",
+        "text": "#fff"
+    },
+    "button": {
+        "background": "#f1d600",
+        "text": "#000",
+        "border": "#f1d600"
+    }
+},
+"position": "bottom",
+"theme": "block",
+"content": {
+    "message": "This website uses cookies to ensure you get the best experience on our website.",
+    "dismiss": "Got it!",
+    "link": "Learn more",
+    "href": "https://cookiesandyou.com"
+}
+})});
+hljs.initHighlightingOnLoad();
+
+</script>
+
+
+</head>
+<body id="top" class="header-lite fullwidth blogstyling">
+    <div id="sb-site">
+                <header id="header">
+                <div class="logo">
+                    <h3><a href="https://iaml.it"><img src="/user/pages/images/IAML_logo_viola.png" /></a></h3>
+                                            <ul class="social-icons">
+            <li>
+            <a href="https://twitter.com/iaml_it">
+                <i class="fa fa-twitter"></i>            </a>
+        </li>
+            <li>
+            <a href="https://www.linkedin.com/company/iaml/">
+                <i class="fa fa-linkedin"></i>            </a>
+        </li>
+            <li>
+            <a href="https://www.facebook.com/machinelearningitalia/">
+                <i class="fa fa-facebook"></i>            </a>
+        </li>
+            <li>
+            <a href="blog.rss">
+                <i class="fa fa-rss"></i>            </a>
+        </li>
+    </ul>  
+                                    </div>
+                <div id="navbar">
+                                                            
+<ul class="navigation">
+                                                        <li class="">
+                    <a href="/">
+                                                Home
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/activities">
+                                                Activities
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/supporters">
+                                                Supporters
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/member">
+                                                Become a member
+                    </a>
+                </li>
+                                                                <li class="active">
+                    <a href="/blog">
+                                                Blog
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/governance">
+                                                Governance
+                    </a>
+                </li>
+                                                                                                                                </ul>                                                   <form class="search-box">
+    <input type="search" placeholder="Search..." value="" data-search-input="/search/query" />
+    <script>
+    jQuery(document).ready(function($){
+        var input = $('[data-search-input]');
+
+        input.on('keypress', function(event) {
+            if (event.which == 13 && input.val().length > 3) {
+                event.preventDefault();
+                window.location.href = input.data('search-input') + ':' + input.val();
+            }
+        });
+    });
+    </script>
+    <i class="fa fa-search"></i>
+</form>                    <span class="panel-activation sb-toggle-left navbar-left menu-btn fa fa-bars"></span>
+                </div>
+        </header>
+        
+        
+                <section id="body" class="">
+                            
+				<div class="flush-top blog-header blog-header-image" style="background: #B4B093 url(/user/pages/05.blog/blue_header.jpg) no-repeat right;">
+            <h1>Alle prese con PyTorch - Parte 2: Reti neurali ed ottimizzatori</h1>
+        </div>
+            
+        
+<div id="breadcrumbs" itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
+                                            <a href="/" itemprop="url"><span itemprop="title">Home</span></a>
+                        <i class="fa fa-angle-right"></i>
+                                                <a href="/blog" itemprop="url"><span itemprop="title">Blog</span></a>
+                        <i class="fa fa-angle-right"></i>
+                                                <span itemprop="title">Alle prese con PyTorch - Parte 2: Reti neurali ed ottimizzatori</span>
+                        </div>
+		
+		<div class="blog-content-item g-grid pure-g-r">
+			<div id="item" class="g-block pure-u-2-3">
+			    <div class="list-item">
+
+    <div class="list-blog-header">
+                    <img src="/images/1/b/6/5/1/1b6512e41498336d63232ea4c91b78e1103da083-c2ujkgbviaaylf6.jpeg" />
+        
+                    <h4><a href="/blog/alle-prese-con-pytorch-parte-2">Alle prese con PyTorch - Parte 2: Reti neurali ed ottimizzatori</a></h4>
+        
+        <span class="list-blog-date">
+            <i class="fa fa-calendar"></i>
+            05, Apr
+        </span>
+                <span class="list-blog-author">
+            <i class="fa fa-user"></i>
+            Simone Scardapane
+        </span>
+                       <ul class="tags">
+            <i class="fa fa-tag"></i>
+                        <li><a href="/blog/tag:pytorch">pytorch</a></li>
+                        <li><a href="/blog/tag:rete neurale">rete neurale</a></li>
+                        <li><a href="/blog/tag:checkpoint">checkpoint</a></li>
+                        <li><a href="/blog/tag:ottimizzazione">ottimizzazione</a></li>
+                        <li><a href="/blog/tag:deep learning">deep learning</a></li>
+                    </ul>
+        
+    </div>
+
+	<div>
+	<br />
+	<!-- AddToAny BEGIN -->
+<div class="a2a_kit a2a_kit_size_32 a2a_default_style">
+<a class="a2a_dd" href="https://www.addtoany.com/share"></a>
+<a class="a2a_button_facebook"></a>
+<a class="a2a_button_twitter"></a>
+<a class="a2a_button_linkedin"></a>
+<a class="a2a_button_google_plus"></a>
+<a class="a2a_button_email"></a>
+</div>
+<script async src="https://static.addtoany.com/menu/page.js"></script>
+<!-- AddToAny END -->
+</div>
+	
+    <div class="list-blog-padding">
+
+            <p><p><a href="http://pytorch.org/">PyTorch</a> è un framework di deep learning, sviluppato principalmente dal <em>Facebook AI Research</em> (FAIR) group, che ha guadagnato una enorme popolarità fra gli sviluppatori grazie alla combinazione di semplicità ed efficienza. Questi tutorial sono dedicati ad esplorare la libreria, partendo dai concetti più semplici fino alla definizione di modelli estremamente sofisticati. </p>
+<p>In questa seconda parte, introduciamo alcuni elementi avanzati della libreria per costruire ed ottimizzare reti neurali e gestire dati in maniera più efficiente.</p>
+<div class="notices blue">
+<h3>Leggi tutti gli articoli della serie:</h3>
+<ul>
+<li><a href="https://iaml.it/blog/alle-prese-con-pytorch-parte-1">Alle prese con PyTorch - Parte 1: Tensori e Gradienti</a></li>
+<li>Alle prese con PyTorch - Parte 2: Reti Neurali ed Ottimizzatori (questo)</li>
+<li><a href="https://iaml.it/blog/alle-prese-con-pytorch-parte-3">Alle prese con PyTorch - Parte 3: Implementare Nuovi Moduli</a></li>
+<li><a href="https://iaml.it/blog/alle-prese-con-pytorch-parte-4">Alle prese con PyTorch - Parte 4: Torchvision e Reti Convolutive</a></li>
+<li><a href="https://iaml.it/blog/alle-prese-con-pytorch-parte-5">Alle prese con PyTorch - Parte 5: JIT Compiler</a></li>
+</ul>
+</div>
+<div class="notices yellow">
+<p>Questi tutorial sono anche disponibili (parzialmente) in lingua inglese: <a href="https://iaml.it/blog/fun-with-pytorch-part-1/">Fun With PyTorch</a>.</p>
+</div>
+<p></p>
+<h2>Contenuto di questo tutorial</h2>
+<p>Nella <a href="https://iaml.it/blog/alle-prese-con-pytorch-parte-1">prima parte</a> abbiamo visto il meccanismo di differenziazione automatica di PyTorch, che è alla base del suo funzionamento. Oltre a questo, ovviamente, PyTorch mette a disposizione una serie di classi e funzioni per aiutare a definire modelli più complessi, ottimizzarli, e semplificare la gestione del dataset. </p>
+<p>In questo tutorial ne introduciamo la maggior parte, con l'obiettivo di costruire una rete neurale per classificare il <a href="https://archive.ics.uci.edu/ml/datasets/iris">buon vecchio dataset di Iris</a>. Per comodità, utilizzeremo la versione di scikit-learn del dataset, dividendola in due parti per training e test:</p>
+<pre><code class="language-py">from sklearn import datasets, model_selection
+data = datasets.load_iris()
+Xtrain, Xtest, ytrain, ytest = \
+    model_selection.train_test_split(data['data'], data['target']) </code></pre>
+<p>Importiamo subito buona parte dei moduli di PyTorch che ci serviranno in seguito (commenteremo ciascuno nel dettaglio più avanti):</p>
+<pre><code class="language-py">import torch
+from torch import nn, optim</code></pre>
+<p>Inoltre, trasformiamo tutte le nostre matrici in tensori di PyTorch seguendo quanto visto nella prima parte, trasformando inoltre gli input in tensori a 32-bit:</p>
+<pre><code class="language-py">Xtrain = torch.from_numpy(Xtrain).float()
+Xtest = torch.from_numpy(Xtest).float()
+ytrain = torch.from_numpy(ytrain)
+ytest = torch.from_numpy(ytest)</code></pre>
+<p>Il resto del tutorial è diviso in cinque parti: (i) creazione di una rete neurale; (ii) ottimizzazione; (iii) gestione dei dati con il modulo <code>data</code>; (iv) ottimizzazione su GPU invece che su CPU; (v) checkpointing del modello.</p>
+<h2>Passo 1: Creare la rete neurale</h2>
+<p>Come molti framework di deep learning, PyTorch mette a disposizione una serie di costrutti di base con cui costruire reti neurali di vario genere, all'interno del modulo <code>torch.nn</code>, fra cui trasformazioni lineari, numerose funzioni di attivazione, e diverse classi per costruire reti convolutive e ricorrenti (che vedremo nei prossimi tutorial).</p>
+<p>Per cominciare, vediamo ad esempio come creare un modello lineare e richiedere delle predizioni:</p>
+<pre><code class="language-py"># Inizializzazione del modello
+lin = nn.Linear(4, 3)
+
+# Predizione
+lin(Xtrain[0:1])</code></pre>
+<p>Niente di particolarmente complicato fin qui. Si noti come tutti i modelli di PyTorch sono direttamente invocabili come se fossero funzioni. Il modo più semplice per definire modelli non banali è estendere l'oggetto <code>torch.nn.Module</code>, che richiede di specificare (almeno) due funzioni al suo interno:</p>
+<pre><code class="language-py">class CustomModel(nn.Module):
+
+    def __init__(self):
+        # Codice per l'inizializzazione
+
+    def forward(self, x):
+        # Codice per la forward pass</code></pre>
+<p>Nella prima funzione possiamo inizializzare tutti i blocchi che ci serviranno in seguito (inclusi tutti i componenti già pronti di PyTorch), mentre nella funzione <code>forward</code> possiamo implementare la logica di predizione del modello. </p>
+<p>Vediamo un esempio più avanzato, una rete neurale con un singolo strato nascosto ed <a href="https://en.wikipedia.org/wiki/Dropout_(neural_networks)">un'operazione di dropout</a> fra lo strato nascosto e lo strato di uscita:</p>
+<pre><code class="language-py">class CustomModel(nn.Module):
+
+    def __init__(self):
+        super(CustomModel, self).__init__()
+
+        self.hidden = nn.Linear(4, 10)
+        self.relu = nn.ReLU()
+        self.drop = nn.Dropout(0.2)
+        self.out = nn.Linear(10, 3)
+
+    def forward(self, x):
+        x = self.relu(self.hidden(x))
+        return self.out(self.drop(x))</code></pre>
+<div class="notices yellow">
+<p>Se non avete mai lavorato con il dropout, non preoccupatevi! Si tratta di una tecnica di regolarizzazione piuttosto comune su modelli complessi, che rimuove casualmente alcuni elementi della rete neurale in fase di training per aumentarne la robustezza. Inserirla o meno in questo esempio non cambia quasi per nulla le performance del modello.</p>
+</div>
+<p>Facciamo qualche commento sul codice di prima:</p>
+<ol>
+<li>Una pratica molto comune è quella di inizializzare i vari componenti della rete associandoli a proprietà dell'oggetto stesso. A differenza di altre librerie di deep learning, in questa fase è già necessario dichiarare esplicitamente tutte le dimensioni, incluse quelle dell'input.</li>
+<li>Tutti gli oggetti che abbiamo dichiarato (es., <code>nn.Linear</code>) sono a loro volta estensioni di <code>torch.nn.Module</code>. Questo permette di annidare fra loro i componenti: potremmo usare il nostro <code>CustomModule</code> come singolo componente di una struttura ancora più complessa.</li>
+<li>Come già detto, tutti i moduli sono direttamente invocabili come se fossero funzioni. È invece sconsigliabile richiamare direttamente la funzione <code>forward</code> di ciascun modulo.</li>
+</ol>
+<p>Possiamo creare ed utilizzare la nostra nuova rete neurale come nell'esempio di prima:</p>
+<pre><code class="language-py">net = CustomModel()
+net(Xtrain[0:1])</code></pre>
+<p>Possiamo anche stampare un riepilogo dei vari componenti:</p>
+<pre><code class="language-py">print(net)
+# CustomModel(
+# (hidden): Linear(in_features=4, out_features=10, bias=True)
+# (relu): ReLU()
+# (drop): Dropout(p=0.2)
+# (out): Linear(in_features=10, out_features=3, bias=True)
+# )</code></pre>
+<p>Si noti come i nomi di ciascun componente corrispondano ai nomi delle proprietà a cui sono stati associati.</p>
+<h3>Modelli e parametri del modello</h3>
+<p>Un aspetto essenziale della classe <code>Module</code> è tenere traccia automaticamente di tutti i tensori "allenabili" del modello. Tra le altre cose, la funzione <code>parameters()</code> ritorna un generatore che permette di estrarre tutti i tensori che rappresentano parametri del modello:</p>
+<pre><code class="language-py">params = list(net.parameters())
+len(params) 
+# Prints: 4</code></pre>
+<p>In questo caso abbiamo quattro parametri: due matrici nel modulo <code>hidden</code>, ed altre due nel modulo <code>out</code>, mentre la funzione di attivazione ed il dropout non hanno nulla di adattabile. Per curiosità, possiamo ispezionare il bias dell'ultimo livello:</p>
+<pre><code class="language-py">print(params[-1])
+# Parameter containing:
+# -0.2020 -0.0427 0.2549 [torch.FloatTensor of size 3]</code></pre>
+<div class="notices yellow">
+<p>Si noti come il tensore è incapsulato in un oggetto <code>Parameter</code>. <code>Parameter</code> è semplicemente un wrapper che identifica un tensore da allenare: questo perché alcuni modelli più avanzati (come le reti ricorrenti) potrebbero definire variabili temporanee che non vanno adattate. Distinguere esplicitamente tra le due classi permette a PyTorch di implementare questa logica. </p>
+</div>
+<p>Una cosa semplice che possiamo fare con il risultato è, ad esempio, calcolare quanti parametri adattabili ha il nostro modello:</p>
+<pre><code class="language-py">print(sum([torch.numel(p) for p in params])) 
+# Prints: 83</code></pre>
+<p><code>named_parameters()</code> è simile a <code>parameters()</code>, ma permette di estrarre tutti i parametri ed il loro nome, come tuple di due elementi:</p>
+<pre><code class="language-py">named_params = [p for p in net.named_parameters()]
+print(named_params[-1])
+# (
+# 'out.bias', 
+# Parameter containing:
+# -0.2020 -0.0427 0.2549 [torch.FloatTensor of size 3]
+# )</code></pre>
+<h3>Alternative per la definizione dei modelli</h3>
+<p>Prima di proseguire, vediamo rapidamente alcune alternative da tenere a mente quando definiamo i nostri modelli. La prima è che, per funzioni semplici (come ad esempio la ReLU, che non possiede parametri da inizializzare o adattabili), PyTorch mette a disposizione un <a href="http://pytorch.org/docs/master/nn.html#torch-nn-functional">modulo funzionale</a> che permette di richiamare queste funzioni direttamente senza inizializzazione. Ad esempio, possiamo definire una regressione logistica inserendo una softmax sul modello lineare definito prima:</p>
+<pre><code class="language-py">import torch.nn.functional as F
+
+def logreg(x):
+  return F.softmax(lin(x), dim=1)</code></pre>
+<p>Non c'è in pratica nessuna differenza fra l'utilizzo di un <code>Module</code> o del suo equivalente in <code>torch.nn.functional</code>, e la scelta è tipicamente una questione di gusto personale o semplicità di implementazione. Alcune funzioni matematiche di base, come la sigmoide, hanno anche una implementazione <a href="https://pytorch.org/docs/stable/torch.html">direttamente nel modulo <code>torch</code></a>.</p>
+<p>Il secondo aspetto è che alcuni moduli (come ReLU) mettono a disposizione una versione <em>in-place</em> specificando un parametro aggiuntivo:</p>
+<pre><code class="language-py">relu_inplace = nn.ReLU(inplace=True)</code></pre>
+<p>La versione in-place lavora senza creare dati temporanei, ma sovrascrivendo lo spazio di memoria delle variabili originarie. Anche se questo può generare guadagni di memoria, l'utilizzo di funzioni in-place è in realtà <a href="http://pytorch.org/docs/master/notes/autograd.html#in-place-operations-on-variables">sconsigliato nella maggior parte dei casi</a> in quanto interferisce con il meccanismo di back-propagation. In molti casi, il loro utilizzo potrebbe generare un messaggio di errore.</p>
+<p>L'ultimo aspetto che menzioniamo è il modulo <code>Sequential</code>, che permette di definire modelli feedforward come quello di prima in maniera più immediata. Ad esempio, il nostro <code>CustomModule</code> è equivalente a questa definizione:</p>
+<pre><code class="language-py">net_sequential = nn.Sequential(
+        nn.Linear(4, 10),
+        nn.ReLU(),
+        nn.Dropout(0.5),
+        nn.Linear(10, 3)
+)</code></pre>
+<h3>Inizializzazione del modello</h3>
+<p>Un altro aspetto interessante è l'inizializzazione dei parametri del modello, che influenza di molto le performance, soprattutto di modelli più complessi. Usando moduli già esistenti come abbiamo fatto finora, ogni parametro viene inizializzato alla sua creazione. Ad esempio, ispezionando <a href="http://pytorch.org/docs/master/_modules/torch/nn/modules/linear.html#Linear">il codice del modulo Linear</a> si può vedere che i parametri vengono inizializzati all'interno di una funzione <code>reset_parameters()</code>, che utilizza un metodo noto come 'He initialization' (che dipende dal numero di input del modello).</p>
+<p>PyTorch ha anche un insieme piuttosto variegato di funzioni (all'interno di un altro <a href="http://pytorch.org/docs/master/nn.html#torch-nn-init">modulo dedicato</a>) che possono essere usate per inizializzare tensori.  Ad esempio, supponiamo di voler inizializzare i parametri dello strato nascosto con una tecnica più semplice (una distribuzione normale per la trasformazione lineare, ed una costante per il bias). Possiamo farlo sovrascrivendo i parametri dopo la creazione del modello:</p>
+<pre><code class="language-py">torch.nn.init.normal_(net.hidden.weight)
+torch.nn.init.constant_(net.hidden.bias, 0.1)</code></pre>
+<p>Per modelli particolarmente complessi, potremmo voler definire una procedura di inizializzazione da applicare a ciascuna classe in modo automatico. Per farlo, possiamo iterare sui moduli di cui è composto il modello definendo una logica condizionale:</p>
+<pre><code class="language-py">for m in net.modules():
+  if type(m) in ['Linear']:
+    torch.nn.init.normal_(m.weight.data)
+    torch.nn.init.constant_(m.bias.data, 0.1)</code></pre>
+<p>In questo esempio applichiamo l'inizializzazione scelta prima ad entrambi gli strati lineari, mentre lasciamo gli altri strati inalterati (anche perché, in questo caso, non hanno parametri adattabili).</p>
+<h2>Passo 2: Ottimizzare la rete neurale</h2>
+<p>Passiamo ora alla fase di ottimizzazione, che ricalca quasi completamente <a href="https://iaml.it/blog/alle-prese-con-pytorch-parte-1">quanto fatto nella prima parte del tutorial</a>. In questo caso, però, useremo due classi di PyTorch per calcolare la funzione costo ed ottimizzare il modello stesso:</p>
+<pre><code class="language-py">net = CustomModel()
+loss = nn.CrossEntropyLoss()
+opt = torch.optim.Adam(params=net.parameters(), lr=0.01)</code></pre>
+<p><code>CrossEntropyLoss</code> è una funzione costo indicata per la classificazione, che unisce un'operazione di softmax sulle uscite della rete neurale con il calcolo della cross-entropia. <a href="https://arxiv.org/abs/1412.6980">Adam</a> è invece un algoritmo di ottimizzazione piuttosto comune per la sua velocità di convergenza. All'interno di <code>nn</code> ed <code>optim</code> trovate poi scelte alternative per entrambi i casi, già pronte per la maggior parte delle situazioni affrontabili in pratica. Si noti come in fase di inizializzazione dell'algoritmo di ottimizzazione dobbiamo specificare i parametri su cui eseguire l'ottimizzazione.</p>
+<p>Il codice per l'ottimizzazione è quasi uguale alla prima parte:</p>
+<pre><code class="language-py">def train_step(x, y):
+
+  # Modalità di training
+  net.train()
+
+  # Calcola le predizioni
+  y_pred = net(x)
+
+  # Calcola funzione costo
+  loss_epoch = loss(y_pred, y)
+
+  # Esegui back-propagation
+  loss_epoch.backward()
+
+  # Aggiorna i parametri
+  opt.step()
+
+  # Resetta il gradiente
+  opt.zero_grad()
+
+for epoch in range(2500):
+  train_step(Xtrain, ytrain)</code></pre>
+<p>Per semplicità abbiamo inglobato il codice di una iterazione in una singola funzione. Vediamo qualche differenza fondamentale con quanto visto nella prima parte del tutorial:</p>
+<ol>
+<li>La prima differenza è l'uso di <code>net.train()</code>: questa istruzione dice semplicemente a PyTorch che da qui in poi useremo il modello per la fase di training. Questo è necessario perché alcune operazioni (come il dropout) hanno un comportamento differente in fase di training ed in fase di predizione.</li>
+<li><code>opt.step()</code> esegue l'ottimizzazione a seconda dell'algoritmo scelto. Una differenza essenziale con altri framework è che questa operazione <strong>non calcola i gradienti</strong>, ma usa quelli calcolati in precedenza con <code>loss_epoch.backward()</code> e salvati nei campi <code>grad</code> dei tensori.</li>
+<li><code>opt.zero_grad()</code> permette di cancellare i gradienti calcolati in precedenza, preparando il modello all'iterazione successiva di ottimizzazione.</li>
+</ol>
+<p>Possiamo vedere facilmente come il modello converga ad un minimo locale:</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/alle-prese-con-pytorch-parte-2/images/iris_loss_function.png"alt="Convergenza funzione costo" />
+        </figure>
+<p>Per verificare che tutto stia funzionando, possiamo calcolare l'accuratezza del modello sui dati di test:</p>
+<pre><code class="language-py">with torch.no_grad():
+  net.eval()
+  y_pred = net(Xtest)
+  correct = (y_pred.max(dim=1)[1] == ytest)
+  print(torch.mean(correct.float()).item())</code></pre>
+<p>Il codice può sembrare inutilmente complicato da leggere, ma la sua semantica è abbastanza semplice:</p>
+<ol>
+<li>
+<p><code>torch.no_grad()</code> evita che le operazioni per calcolare l'accuratezza siano tracciate (in modo da migliorare l'efficienza), utile in presenza di dataset più corposi.</p>
+</li>
+<li>
+<p><code>y_pred.max(dim=1)[1]</code> calcola le classi più probabili prendendo il massimo delle uscite della rete neurale. La funzione <code>max(dim=1)</code> ritorna due elementi: il massimo per ciascuna riga, e gli indici dei valori massimi, che sono quelli che ci interessano. </p>
+</li>
+<li>Il resto è un cast a float per calcolare la media, ed un altro cast per recuperare il valore in NumPy. Questo valore oscillerà molto vicino al 100% nella maggior parte dei casi.</li>
+</ol>
+<p>Questo conclude la parte base di questo tutorial. Vediamo ora come migliorare alcuni aspetti, cominciando con la fase di caricamento dei dati.</p>
+<h2>Parte 3: Mini-batching dei dati</h2>
+<p>Finora abbiamo lavorato con l'intero dataset ad ogni iterazione. Questo è però impossibile per dataset troppo grandi, ed un'alternativa è il <em>mini-batching</em>, ovvero campionare un certo numero di elementi ad ogni iterazione dal dataset complessivo. Per questo ed altre operazioni, PyTorch mette a disposizione <a href="http://pytorch.org/docs/master/data.html">una classe Dataset</a> per gestire e processare i dati, che diventerà particolarmente importante quando passeremo alle reti convolutive.</p>
+<p>La classe <code>torch.utils.data.Dataset</code> è una classe astratta che rappresenta un determinato insieme di dati. L'implementazione concreta più utile,  <code>TensorDataset</code>, costruisce un dataset a partire da tensori in memoria (vedremo come costruire dataset più avanzati in un tutorial successivo). </p>
+<p>Cominciamo incapsulando i nostri tensori in un oggetto di questo tipo:</p>
+<pre><code class="language-py">from torch.utils import data
+train_data = data.TensorDataset(Xtrain, ytrain)</code></pre>
+<p>Un <code>TensorDataset</code> da solo ha poca utilità, se non indicizzare elementi del dataset o calcolarne il numero:</p>
+<pre><code class="language-py">print(train_data[0]) 
+# Prints: (tensor([5.1000, 2.5000, 3.0000, 1.1000]), tensor(1))
+
+print(len(train_data))
+# Prints: 112</code></pre>
+<p>Possiamo però incapsulare il dataset all'interno di un ulteriore oggetto (un loader) per ottenere qualche funzionalità aggiuntiva:</p>
+<pre><code class="language-py">train_data_loader = data.DataLoader(train_data, batch_size=32, shuffle=True)</code></pre>
+<p>Il loader permette di estrarre mini-batch di dimensione fissa (in questo caso 32) dal nostro dataset, scegliendo inoltre se eseguire uno shuffling dopo ogni passaggio sul dataset completo. Possiamo riscrivere la nostra ottimizzazione, questa volta sfruttando il mini-batching:</p>
+<pre><code class="language-py">for epoch in range(1000):
+  net.train()
+  for Xb, yb in train_data_loader:
+    train_step(Xb, yb)</code></pre>
+<p>Come si vede, per ogni epoca possiamo usare il loader come un generatore di mini-batch presi dall'intero dataset - il resto del codice è perfettamente uguale. Vedremo di più sui dataset quando introdurremo le reti convolutive. Per ora, passiamo invece a vedere come sfruttare una GPU se installata sul nostro sistema.</p>
+<h2>Passo 4: Utilizzo della GPU</h2>
+<p>A differenza che in altri framework, eventuali GPU in PyTorch non vengono usate di default ma devono essere richiamate esplicitamente, spostando sia il modello che i dati su di esse. Prima di tutto, possiamo verificare se è disponibile CUDA sul nostro sistema con <code>torch.cuda.is_available()</code>. Possiamo anche verificare quante GPU sono presenti sul sistema, quale è in uso al momento, ed eventualmente selezionarne un'altra:</p>
+<pre><code class="language-py">torch.cuda.device_count()            # Numero di GPU disponibili
+torch.cuda.get_device_name(0)        # Nome della prima GPU disponibile
+torch.cuda.current_device()          # Device in uso al momento
+torch.cuda.set_device(0)             # Imposta la prima GPU come default
+torch.cuda.get_device_capability(0)  # Verifica le capacità della prima GPU</code></pre>
+<div class="notices yellow">
+<p>L'ultima istruzione è particolarmente importante per verificare la capacità di calcolo della nostra GPU (<a href="http://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#compute-capabilities">come descritto sulla guida ufficiale di CUDA</a>).</p>
+</div>
+<p>Avendo a disposizione una GPU, per sfruttarla è necessario fare solo due modifiche al nostro codice di training. La prima è quella di spostare il modello su GPU dopo l'inizializzazione:</p>
+<pre><code class="language-py">net = CustomModel()
+if torch.cuda.is_available():
+  net.to('cuda')
+loss = nn.CrossEntropyLoss()
+opt = torch.optim.Adam(params=net.parameters(), lr=0.01)</code></pre>
+<p>Si noti come lo spostamento su GPU si ottiene con una sola istruzione <code>net.to('cuda')</code>, ed è necessario farlo <em>prima</em> di instanziare un algoritmo di ottimizzazione. Una pratica abbastanza comune è quella di utilizzare delle istruzioni condizionali per permettere di eseguire lo stesso codice sia con una CPU che con una GPU, modificando il parametro del metodo <code>to</code>.</p>
+<p>Possiamo implementare la logica condizionale in modo più avanzato con l'utilizzo della classe <code>device</code>:</p>
+<pre><code class="language-py">device = torch.device("cuda" if use_cuda else "cpu")
+net.to(device)</code></pre>
+<p>La seconda modifica è di spostare anche i dati nel nostro mini-batch su GPU prima di eseguire l'ottimizzazione del modello:</p>
+<pre><code class="language-py">for epoch in range(2500):
+  net.train()
+  for Xb, yb in train_data_loader:
+    Xb, yb = Xb.to(device), yb.to(device)
+    train_step(Xb, yb)</code></pre>
+<p>Per riportare il modello su CPU (es., per calcolare l'accuratezza) possiamo eseguire l'operazione inversa con la funzione <code>.cpu()</code>:</p>
+<pre><code class="language-py">net.cpu()</code></pre>
+<p>Concludiamo questo tutorial vedendo come salvare e recuperare il nostro modello da disco.</p>
+<h2>Parte 5: Checkpointing</h2>
+<p>Il checkpointing (salvare l'intero stato del sistema ogni tot di iterazioni) è essenziale quando lavoriamo con modelli particolarmente complessi e/o con grandi moli di dati. Purtroppo, la gestione di questa operazione in PyTorch è meno semplice (e sofisticata) che in altri framework. </p>
+<p>Per cominciare, possiamo serializzare il nostro modello su disco con questa istruzione:</p>
+<pre><code class="language-py">torch.save(net.state_dict(), './tmp')</code></pre>
+<div class="notices yellow">
+<p>Potremmo salvare direttamente il modello al posto di usare la funzione <code>state_dict()</code>: questo però salverebbe anche tutte i tensori temporanei! L'utilizzo di questa funzione ci garantisce di salvare solo i tensori (e parametri) essenziali all'interno di un dizionario, ed è disponibile anche per altri oggetti del framework, come gli algoritmi di ottimizzazione.</p>
+</div>
+<p>Allo stesso modo, possiamo recuperare un modello da disco:</p>
+<pre><code class="language-py">net.load_state_dict(torch.load('./tmp'))</code></pre>
+<p>Più in generale, però, molto spesso vogliamo salvare un intero snapshot del processo di ottimizzazione per continuarlo in seguito. Vediamo una soluzione per questo problema molto comune ispirandoci ad una <a href="https://discuss.pytorch.org/t/saving-and-loading-a-model-in-pytorch/2610">discussione sul forum ufficiale della libreria</a>:</p>
+<pre><code class="language-py">start_epoch = resume_from_checkpoint('checkpoint.pth.tar')
+for epoch in range(start_epoch, 1000):
+
+  net.train()
+
+  for Xb, yb in train_data_loader:  
+    train_step(Xb, yb)
+
+  # Stato complessivo del processo di ottimizzazione
+  state = {
+    'epoch': epoch,
+    'state_dict': net.state_dict(),
+    'opt': opt.state_dict(),
+  }
+  torch.save(state, 'checkpoint.pth.tar') </code></pre>
+<p>Vediamo nel dettaglio cosa stiamo facendo:</p>
+<ol>
+<li>Prima di tutto, dopo ogni epoca definiamo un dizionario con lo stato <em>complessivo</em> del processo di ottimizzazione, che in questo caso include il nostro modello, l'epoca a cui siamo arrivati, e lo stato dell'algoritmo di ottimizzazione.</li>
+<li>Salviamo quindi lo stato complessivo su disco.</li>
+</ol>
+<p>La funzione <code>resume_from_checkpoint()</code> verifica che esista un file di checkpoint sul disco, ed eventualmente lo carica ripristinando lo stato della rete neurale e dell'algoritmo di ottimizzazione:</p>
+<pre><code class="language-py">import os
+def resume_from_checkpoint(path_to_checkpoint):
+
+  if os.path.isfile(path_to_checkpoint):
+
+    # Caricamento del checkpoint
+    checkpoint = torch.load(path_to_checkpoint)
+
+    # Ripristino dello stato del sistema
+    start_epoch = checkpoint['epoch']
+    model.load_state_dict(checkpoint['state_dict'])
+    opt.load_state_dict(checkpoint['opt'])
+    print("Caricato il checkpoint '{}' (epoca {})"
+                  .format(path_to_checkpoint, checkpoint['epoch']))
+
+  else:
+    start_epoch = 0
+
+  return start_epoch</code></pre>
+<p>La funzione dovrebbe essere abbastanza semplice da leggere sulla base di quanto visto finora. Ovviamente possiamo immaginare soluzioni più avanzate, che indubbiamente saranno anche considerate nelle prossime versioni della libreria.</p>
+<p>Possiamo dire che per questo tutorial è tutto! Nella terza parte scopriremo invece come implementare <em>nuovi</em> moduli all'interno della libreria: <a href="https://iaml.it/blog/alle-prese-con-pytorch-parte-3">Alle prese con PyTorch - Parte 3: Implementare Nuovi Moduli</a>.</p>
+<div class="notices blue">
+<h3>Leggi tutti gli articoli della serie:</h3>
+<ul>
+<li><a href="https://iaml.it/blog/alle-prese-con-pytorch-parte-1">Alle prese con PyTorch - Parte 1: Tensori e Gradienti</a></li>
+<li>Alle prese con PyTorch - Parte 2: Reti Neurali ed Ottimizzatori (questo)</li>
+<li><a href="https://iaml.it/blog/alle-prese-con-pytorch-parte-3">Alle prese con PyTorch - Parte 3: Implementare Nuovi Moduli</a></li>
+<li><a href="https://iaml.it/blog/alle-prese-con-pytorch-parte-4">Alle prese con PyTorch - Parte 4: Torchvision e Reti Convolutive</a></li>
+<li><a href="https://iaml.it/blog/alle-prese-con-pytorch-parte-5">Alle prese con PyTorch - Parte 5: JIT Compiler</a></li>
+</ul>
+</div>
+<hr />
+<p>Se questo articolo ti è piaciuto e vuoi tenerti aggiornato sulle nostre attività, ricordati che l'<a href="/member">iscrizione all'Italian Association for Machine Learning</a> è gratuita! Puoi seguirci anche su <a href="https://www.facebook.com/machinelearningitalia/">Facebook</a> e su <a href="https://www.linkedin.com/company/18312943/">LinkedIn</a>.</p></p>
+            
+    
+        <p class="prev-next">
+                            <a class="button" href="/blog/face-id-deep-learning"><i class="fa fa-chevron-left"></i> Previous Post</a>
+            
+                            <a class="button" href="/blog/multitask-learning-tensorflow">Next Post <i class="fa fa-chevron-right"></i></a>
+                    </p>
+    
+    </div>
+</div>
+			</div>
+			<div id="sidebar" class="g-block size-1-3 pure-u-1-3">
+				<div class="sidebar-content">
+    <h4>Search the blog</h4>
+    <input type="text" placeholder="Search..." value="" data-searchsidebar-input="/search/query" />
+<script>
+jQuery(document).ready(function($){
+    var input = $('[data-searchsidebar-input]');
+
+    input.on('keypress', function(event) {
+        if (event.which == 13 && input.val().length > 3) {
+            event.preventDefault();
+            window.location.href = input.data('searchsidebar-input') + ':' + input.val();
+        }
+    });
+});
+</script>
+</div>
+<!--
+<div class="sidebar-content">
+	<h4>Some Text Widget</h4>
+	<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna.</p>
+</div>
+!-->
+<div class="sidebar-content">
+    <h4>Categories</h4>
+    
+
+<ul class="archives">
+        <li>
+        <a href="/blog/category:Tutorials">Tutorials </a> (16)
+    </li>
+        <li>
+        <a href="/blog/category:Discussions">Discussions </a> (12)
+    </li>
+        <li>
+        <a href="/blog/category:Announcements">Announcements </a> (4)
+    </li>
+        <li>
+        <a href="/blog/category:Tutorials%20%28English%29">Tutorials (English) </a> (4)
+    </li>
+        <li>
+        <a href="/blog/category:Articles%27%20summaries">Articles' summaries </a> (3)
+    </li>
+        <li>
+        <a href="/blog/category:Discussions%20%28English%29">Discussions (English) </a> (2)
+    </li>
+        <li>
+        <a href="/blog/category:Focus-on">Focus-on </a> (1)
+    </li>
+        <li>
+        <a href="/blog/category:Reviews">Reviews </a> (1)
+    </li>
+        <li>
+        <a href="/blog/category:Discussion">Discussion </a> (1)
+    </li>
+    </ul>
+</div>
+<div class="sidebar-content">
+    <h4>Archives</h4>
+	<ul class="archives">
+    <li>
+    	<a href="/blog/archives_month:apr_2020">
+        <span class="archive_date">April 2020</span>
+                <span>(1)</span>
+                </a>
+    </li>
+</ul>
+</div>
+<div class="sidebar-content">
+    <h4>Popular Tags</h4>
+    
+
+<ul class="archives">
+        <li>
+        <a href="/blog/tag:deep%20learning">deep learning </a> (11)
+    </li>
+        <li>
+        <a href="/blog/tag:pytorch">pytorch </a> (9)
+    </li>
+        <li>
+        <a href="/blog/tag:reti%20neurali">reti neurali </a> (5)
+    </li>
+        <li>
+        <a href="/blog/tag:google">google </a> (4)
+    </li>
+        <li>
+        <a href="/blog/tag:jit">jit </a> (4)
+    </li>
+        <li>
+        <a href="/blog/tag:tensorflow">tensorflow </a> (4)
+    </li>
+        <li>
+        <a href="/blog/tag:ottimizzazione">ottimizzazione </a> (4)
+    </li>
+        <li>
+        <a href="/blog/tag:rete%20neurale">rete neurale </a> (3)
+    </li>
+        <li>
+        <a href="/blog/tag:time%20series">time series </a> (3)
+    </li>
+        <li>
+        <a href="/blog/tag:keras">keras </a> (3)
+    </li>
+        <li>
+        <a href="/blog/tag:reti%20convolutive">reti convolutive </a> (3)
+    </li>
+        <li>
+        <a href="/blog/tag:pipeline">pipeline </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:sklearn">sklearn </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:autodiff">autodiff </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:automatic%20differentation">automatic differentation </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:reverse-mode">reverse-mode </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:derivate">derivate </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:differenziazione">differenziazione </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:model%20selection">model selection </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:cross%20validation">cross validation </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:c%2B%2B">c++ </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:numpy">numpy </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:vmap">vmap </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:caffe">caffe </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:compiler">compiler </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:jax">jax </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:codemotion">codemotion </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:bias">bias </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:discrimination">discrimination </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:fairness">fairness </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:iaml">iaml </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:database">database </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:iperparametri">iperparametri </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:autograph">autograph </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:head">head </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:multi-task">multi-task </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:learning">learning </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:novit%C3%A0">novità </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:dev%20summit">dev summit </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:custom%20estimator">custom estimator </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:hyperopt">hyperopt </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:goodfellow">goodfellow </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:nlp">nlp </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:dati%20mancanti">dati mancanti </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:transformer">transformer </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:attenzione">attenzione </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:robocop">robocop </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:yolo">yolo </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:object%20detection">object detection </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:bayes">bayes </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:autoencoders">autoencoders </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:variational">variational </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:eager">eager </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:imputazione">imputazione </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:CIFAR">CIFAR </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:word%20embedding">word embedding </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:MNIST">MNIST </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:immagini">immagini </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:classificazione">classificazione </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:kpi">kpi </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:reprogramming">reprogramming </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:adversarial">adversarial </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:browser">browser </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:javascript">javascript </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:reti%20ricorsive">reti ricorsive </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:reti%20ricorrenti">reti ricorrenti </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:ftth">ftth </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:adversarial%20example">adversarial example </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:management">management </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:robotica">robotica </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:ocr">ocr </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:focus">focus </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:iphone">iphone </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:python">python </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:face%20id">face id </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:momento">momento </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:adam">adam </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:neuroscienza">neuroscienza </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:onde%20cerebrali">onde cerebrali </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:torchvision">torchvision </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:latin">latin </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:pretrained">pretrained </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:rete%20convolutiva">rete convolutiva </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:autograd">autograd </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:swish">swish </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:attivazione">attivazione </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:checkpoint">checkpoint </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:tensori">tensori </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:variabili">variabili </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:lineare">lineare </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:regressione">regressione </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:convolutional%20networks">convolutional networks </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:Vatican">Vatican </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:project">project </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:kernel">kernel </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:ICLR">ICLR </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:ipotesi">ipotesi </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:sparsit%C3%A0">sparsità </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:funzionale">funzionale </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:functional">functional </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:adversarial%20attack">adversarial attack </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:kmeans">kmeans </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:analysis">analysis </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:clustering">clustering </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:Google">Google </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:regression">regression </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:JAX">JAX </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:gaussian%20process">gaussian process </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:ensemble">ensemble </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:boosting">boosting </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:gradient">gradient </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:semi-supervised%20learning">semi-supervised learning </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:document%20classification">document classification </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:graphs">graphs </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:variables">variables </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:linear">linear </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:k-NN">k-NN </a> (1)
+    </li>
+    </ul>
+</div>
+<div class="sidebar-content syndicate">
+    <h4>Syndicate</h4>
+    <a class="button" href="/blog.atom"><i class="fa fa-rss-square"></i> Atom 1.0</a>
+    <a class="button" href="/blog.rss"><i class="fa fa-rss-square"></i> RSS</a>
+</div>
+			</div>
+		</div>
+	
+                        <div class="modular-row footer ">
+    <div class="footer-items">
+        <div class="footer-module large">
+		<h4>About</h4>
+                            <p>Italian Association for Machine Learning (C.F. 97949550582)</p>
+            			<p>Write us: info@iaml.it</p>
+        </div>
+        <div class="footer-module"><h4>Address</h4>
+            <p>
+                                    <span><strong>Operational office</strong></span>
+                                    <span>IAML c/o Pi Campus, via Indonesia 23, 00144 Rome</span>
+                                    <span><strong>Legal office</strong></span>
+                                    <span>Via Cassia 964, 00189, Rome</span>
+                            </p>
+        </div>
+        <div class="footer-module"><h4>Quick Links</h4>
+         <ul class="quickmenu">
+                            <li><i class="fa fa-chevron-right"></i><a href="https://iaml.it/home">Home</a></li>
+                            <li><i class="fa fa-chevron-right"></i><a href="https://iaml.it/documents">Documents (Italian)</a></li>
+                    </ul>
+    </div>
+   
+</div>
+<hr>
+<div class="footer-modules">
+    <div class="footer-copyright">
+        Copyright 2018 IAML.IT. All Rights Reserved.
+    </div>
+    <div class="footer-menu">
+    <ul class="othermenu">
+           <li><a href="https://learn.getgrav.org/">Powered by Grav</a></li>
+           <li><a href="https://github.com/getgrav/grav-theme-deliver">Theme (adapted) from Deliver</a></li>
+        </ul>
+    </div>
+</div>
+</div>                    </section>
+        
+    </div>
+    <div class="sb-slidebar sb-left sb-width-thin">
+        <div id="panel">
+        
+<ul class="navigation">
+                                                        <li class="">
+                    <a href="/">
+                                                Home
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/activities">
+                                                Activities
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/supporters">
+                                                Supporters
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/member">
+                                                Become a member
+                    </a>
+                </li>
+                                                                <li class="active">
+                    <a href="/blog">
+                                                Blog
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/governance">
+                                                Governance
+                    </a>
+                </li>
+                                                                                                                                </ul>                   </div>
+    </div>
+        <script src="/user/plugins/simplesearch/js/simplesearch.js" type="text/javascript" ></script>
+
+    <script>
+    $(function () {
+        $(document).ready(function() {
+          $.slidebars({
+            hideControlClasses: true,
+            scrollLock: true
+          });
+        });
+    });
+    </script>
+    </body>
+</html>

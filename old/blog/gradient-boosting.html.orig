@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Gradient Boosting | Italian Association for Machine Learning</title>
+    <meta content="GravCMS"  />
+<meta content="The Italian Association for Machine Learning (IAML) is a not-for-profit organization with the purpose of promoting knowledge of machine learning in all aspects of the Italian public life, from universities to enterprises and IT professionals."  />
+<meta property="og:title" content="Gradient Boosting | IAML.it"  />
+<meta property="og:image" content="https://iaml.it/blog/gradient-boosting/bsLqqgj.png"  />
+<meta property="og:url" content="https://iaml.it/blog/gradient-boosting/"  />
+<meta property="og:description" content="In questo articolo viene trattato uno storico algoritmo di ottimizzazione di tipo ensemble: il Gradient Boosting. Saranno descritte la teoria di base sulla quale questo algoritmo poggia e si cercherà di darne una descrizione quanto più possibile intuitiva attraverso un esempio pratico di regressione."  />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="icon" type="image/png" href="/user/themes/deliver/images/favicon.png" />
+
+	<!-- Global site tag (gtag.js) - Google Ads: 774709547 --> <script async src="https://www.googletagmanager.com/gtag/js?id=AW-774709547"></script> <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'AW-774709547'); </script> 
+	
+		
+                            		                                                <link href="/user/themes/deliver/css-compiled/nucleus.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css-compiled/template.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/custom.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/toc.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/font-awesome.min.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/facebook/css/facebook.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/facebook/assets/unitegallery/css/unite-gallery.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/facebook/assets/unitegallery/themes/default/ug-theme-default.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/markdown-notices/assets/notices.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/breadcrumbs/css/breadcrumbs.css" type="text/css" rel="stylesheet" />
+<link href="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/events/assets/events.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/form/assets/form-styles.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/mathjax/assets/css/mathjax.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/simplesearch/css/simplesearch.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/highlight/css/zenburn.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/login/css/login.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/slidebars.min.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/slideme.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/socialbuttons/vendor/rrssb/css/rrssb.css" type="text/css" rel="stylesheet" />
+
+
+                                                            <script src="/system/assets/jquery/jquery-2.x.min.js" type="text/javascript" ></script>
+<script src="/user/themes/deliver/js/modernizr.custom.71422.js" type="text/javascript" ></script>
+<script src="/user/plugins/facebook/assets/unitegallery/js/unitegallery.min.js" type="text/javascript" ></script>
+<script src="/user/plugins/facebook/assets/unitegallery/themes/default/ug-theme-default.js" type="text/javascript" ></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.js" type="text/javascript" ></script>
+<script src="/user/plugins/events/assets/events.js" type="text/javascript" ></script>
+<script src="/user/plugins/mathjax/assets/js/mathjax.js" type="text/javascript" ></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript" ></script>
+<script src="/user/plugins/highlight/js/highlight.pack.js" type="text/javascript" ></script>
+<script src="/user/themes/deliver/js/deliver.js" type="text/javascript" ></script>
+<script src="/user/themes/deliver/js/slidebars.min.js" type="text/javascript" ></script>
+<script src="/user/themes/deliver/js/jquery.slideme2.js" type="text/javascript" ></script>
+<script src="/user/plugins/socialbuttons/vendor/rrssb/js/rrssb.min.js" type="text/javascript" ></script>
+
+<script>
+window.addEventListener("load", function(){
+window.cookieconsent.initialise({
+"palette": {
+    "popup": {
+        "background": "#4d4d4d",
+        "text": "#fff"
+    },
+    "button": {
+        "background": "#f1d600",
+        "text": "#000",
+        "border": "#f1d600"
+    }
+},
+"position": "bottom",
+"theme": "block",
+"content": {
+    "message": "This website uses cookies to ensure you get the best experience on our website.",
+    "dismiss": "Got it!",
+    "link": "Learn more",
+    "href": "https://cookiesandyou.com"
+}
+})});
+hljs.initHighlightingOnLoad();
+
+</script>
+
+
+</head>
+<body id="top" class="header-lite fullwidth blogstyling">
+    <div id="sb-site">
+                <header id="header">
+                <div class="logo">
+                    <h3><a href="https://iaml.it"><img src="/user/pages/images/IAML_logo_viola.png" /></a></h3>
+                                            <ul class="social-icons">
+            <li>
+            <a href="https://twitter.com/iaml_it">
+                <i class="fa fa-twitter"></i>            </a>
+        </li>
+            <li>
+            <a href="https://www.linkedin.com/company/iaml/">
+                <i class="fa fa-linkedin"></i>            </a>
+        </li>
+            <li>
+            <a href="https://www.facebook.com/machinelearningitalia/">
+                <i class="fa fa-facebook"></i>            </a>
+        </li>
+            <li>
+            <a href="blog.rss">
+                <i class="fa fa-rss"></i>            </a>
+        </li>
+    </ul>  
+                                    </div>
+                <div id="navbar">
+                                                            
+<ul class="navigation">
+                                                        <li class="">
+                    <a href="/">
+                                                Home
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/activities">
+                                                Activities
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/supporters">
+                                                Supporters
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/member">
+                                                Become a member
+                    </a>
+                </li>
+                                                                <li class="active">
+                    <a href="/blog">
+                                                Blog
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/governance">
+                                                Governance
+                    </a>
+                </li>
+                                                                                                                                </ul>                                                   <form class="search-box">
+    <input type="search" placeholder="Search..." value="" data-search-input="/search/query" />
+    <script>
+    jQuery(document).ready(function($){
+        var input = $('[data-search-input]');
+
+        input.on('keypress', function(event) {
+            if (event.which == 13 && input.val().length > 3) {
+                event.preventDefault();
+                window.location.href = input.data('search-input') + ':' + input.val();
+            }
+        });
+    });
+    </script>
+    <i class="fa fa-search"></i>
+</form>                    <span class="panel-activation sb-toggle-left navbar-left menu-btn fa fa-bars"></span>
+                </div>
+        </header>
+        
+        
+                <section id="body" class="">
+                            
+				<div class="flush-top blog-header blog-header-image" style="background: #B4B093 url(/user/pages/05.blog/blue_header.jpg) no-repeat right;">
+            <h1>Gradient Boosting</h1>
+        </div>
+            
+        
+<div id="breadcrumbs" itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
+                                            <a href="/" itemprop="url"><span itemprop="title">Home</span></a>
+                        <i class="fa fa-angle-right"></i>
+                                                <a href="/blog" itemprop="url"><span itemprop="title">Blog</span></a>
+                        <i class="fa fa-angle-right"></i>
+                                                <span itemprop="title">Gradient Boosting</span>
+                        </div>
+		
+		<div class="blog-content-item g-grid pure-g-r">
+			<div id="item" class="g-block pure-u-2-3">
+			    <div class="list-item">
+
+    <div class="list-blog-header">
+                    <img src="/images/7/d/4/c/9/7d4c9d7cd912b69979d2e1919f308a635719a538-bslqqgj.png" />
+        
+                    <h4><a href="/blog/gradient-boosting">Gradient Boosting</a></h4>
+        
+        <span class="list-blog-date">
+            <i class="fa fa-calendar"></i>
+            26, Mar
+        </span>
+                <span class="list-blog-author">
+            <i class="fa fa-user"></i>
+            Stefano Di Pietro
+        </span>
+                       <ul class="tags">
+            <i class="fa fa-tag"></i>
+                        <li><a href="/blog/tag:gradient">gradient</a></li>
+                        <li><a href="/blog/tag:boosting">boosting</a></li>
+                        <li><a href="/blog/tag:ensemble">ensemble</a></li>
+                    </ul>
+        
+    </div>
+
+	<div>
+	<br />
+	<!-- AddToAny BEGIN -->
+<div class="a2a_kit a2a_kit_size_32 a2a_default_style">
+<a class="a2a_dd" href="https://www.addtoany.com/share"></a>
+<a class="a2a_button_facebook"></a>
+<a class="a2a_button_twitter"></a>
+<a class="a2a_button_linkedin"></a>
+<a class="a2a_button_google_plus"></a>
+<a class="a2a_button_email"></a>
+</div>
+<script async src="https://static.addtoany.com/menu/page.js"></script>
+<!-- AddToAny END -->
+</div>
+	
+    <div class="list-blog-padding">
+
+            <p><p>In questo articolo viene trattato uno storico algoritmo di ottimizzazione di tipo <a href="https://en.wikipedia.org/wiki/Ensemble_learning">ensemble</a>: il <strong>Gradient Boosting</strong>.
+Saranno descritte la teoria di base sulla quale questo algoritmo poggia e si cercherà di darne una descrizione quanto più possibile intuitiva attraverso un esempio pratico di regressione.</p>
+<p></p>
+<nav class="table-of-contents minitoc" role="navigation">
+                <span class="toctitle">Overview:</span>
+      
+                                                                            
+  <ul>
+      
+        
+        
+              <li><a href="#cosa--il-boosting" class="toclink" title="Cosa è il Boosting?">Cosa è il Boosting?</a></li>
+      
+        
+        
+              <li><a href="#boosting-algorithms" class="toclink" title="Boosting algorithms">Boosting algorithms</a></li>
+      
+        
+        
+              <li><a href="#gradient-boosting" class="toclink" title="Gradient Boosting">Gradient Boosting</a></li>
+      
+                      <li><ul>
+          
+        
+              <li><a href="#alberi-decisionali" class="toclink" title="Alberi decisionali">Alberi decisionali</a></li>
+      
+                      </ul></li>
+          
+        
+              <li><a href="#compriamo-un-auto-usata" class="toclink" title="Compriamo un'auto usata">Compriamo un'auto usata</a></li>
+      
+        
+        
+              <li><a href="#ma-che-fine-ha-fatto-il-mean..." class="toclink" title="Ma che fine ha fatto il mean squared error?">Ma che fine ha fatto il mean squared error?</a></li>
+      
+        
+        
+              <li><a href="#incremental-shrinkage" class="toclink" title="Incremental Shrinkage">Incremental Shrinkage</a></li>
+      
+        
+        
+              <li><a href="#stochastic-gradient-boosting" class="toclink" title="Stochastic Gradient Boosting">Stochastic Gradient Boosting</a></li>
+      
+        
+        
+              <li><a href="#utilizzo-attuale-del-gradient..." class="toclink" title="Utilizzo attuale del Gradient Boosting">Utilizzo attuale del Gradient Boosting</a></li>
+      
+        
+        
+              <li><a href="#conclusioni" class="toclink" title="Conclusioni">Conclusioni</a></li>
+      
+    
+  </ul>
+</nav>
+
+
+<h2 id="cosa--il-boosting" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#cosa--il-boosting" title="Permanent link: Cosa è il Boosting?" data-icon="#">Cosa è il Boosting?</a></h2>
+<p>Quante persone occorrono per avvitare una lampadina?</p>
+<p>La domanda, e l'ovvia risposta, sono il punto di partenza di una comunissima barzelletta adattata di volta in volta a soggetti diversi (ingegneri, geometri, fisici, ecc.) per ridicolizzarne le peculiarità pensando alle bizzarre e curiose metodologie che ciascuna di queste categorie userebbe per risolvere il problema.</p>
+<p><em>Quanti ingegneri servono per cambiare una lampadina? Meglio nessuno: passerebbero tutto il tempo a capire perché si è bruciata.</em> Dal punto di vista dell’ironia (se vogliamo definirla tale) le numerose varianti su questa barzelletta si basano su stereotipi (gli ingegneri cercano sempre di capire come funzionano o perché non funzionano le cose) e su soluzioni paradossali. Eppure un quesito non ironico basato sullo stesso principio porta ad interrogativi interessanti.</p>
+<p>Consideriamo, ad esempio: <em>quanti babbuini servono per avvitare una lampadina?</em> La risposta potrebbe non essere così banale. Il problema per il babbuino non è l’operazione di sostituzione della lampadina in sé. Scommetto che, se propriamente addestrato, un babbuino sarebbe del tutto in grado di avvitare una lampadina senza alcun bisogno di assistenza. Cambiamo allora leggermente la natura della domanda: <em>quanti babbuini servono per <strong>imparare</strong> ad avvitare una lampadina?</em>
+Il problema è cambiato: la complessità del quesito non è più legata alle abilità manuali necessarie all’avvitamento della lampadina, ma alla comprensione del meccanismo di avvitamento in sé.</p>
+<p>Onde evitare di offendere gli amanti dei babbuini che stanno leggendo questo articolo (e anche per gestire più agevolmente questa premessa) cambiamo il soggetto della frase: <em>quanti Ewok sono necessari per cambiare una lampadina?</em> Gli <a href="https://it.wikipedia.org/wiki/Ewok">Ewok</a> sono esseri intelligenti, ma decisamente poco pratici nell'uso della tecnologia, il che li rende poco adatti a svolgere un compito del genere. Però possiamo contare sul fatto che sono esseri sociali e che, collaborando, possano in qualche modo arrivare ad una soluzione.</p>
+<p>Uno di loro potrebbe intuire il verso corretto di inserimento, un altro potrebbe capire che non è il caso di stringere troppo il vetro onde evitare che si rompa mentre un altro ancora potrebbe scoprire il movimento rotatorio necessario al completamento del lavoro. In questo caso tre Ewok sono stati in grado di compiere un’impresa impossibile per un solo Ewok, dimostrando quindi che l’unione fa la forza (dando allo stesso tempo una parziale risposta alla domanda originale - servono almeno tre Ewok!).</p>
+<p>Nel 1988 <a href="https://en.wikipedia.org/wiki/Michael_Kearns_(computer_scientist)">Michael Kearns</a> e <a href="https://en.wikipedia.org/wiki/Leslie_Valiant">Leslie Gabriel Valiant</a> si posero un quesito simile al nostro. Non erano molto interessati allo studio sulle capacità degli Ewok (non sappiamo in che rapporto siano i due con i film di Lucas) ma erano invece particolarmente interessati ai modelli di apprendimento automatico, e quello che si chiesero fu: “Can a set of weak learners create a single strong learner?”, ossia, con liberissima traduzione, “Può un insieme di modelli di apprendimento deboli creare un singolo modello forte?”</p>
+<p>Sostanzialmente i due ricercatori si chiesero se per i modelli di apprendimento automatico, così come per gli Ewok, “l’unione facesse la forza”. In questo contesto un <em>weak learner</em> è un modello che genera delle risposte appena appena migliori di quelle che si otterrebbero in modo casuale, mentre uno <em>strong learner</em>, come intuibile, è un modello che si avvicina di molto ad un modello ideale. La risposta positiva al quesito di Kearns e Valiant arrivò solo un paio di anni dopo e darà il via allo studio di modelli di previsione ottenuti tramite la composizione di vari modelli più semplici (<em>ensemble models</em>).</p>
+<h2 id="boosting-algorithms" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#boosting-algorithms" title="Permanent link: Boosting algorithms" data-icon="#">Boosting algorithms</a></h2>
+<p>Il Boosting è un meta-algoritmo iterativo che detta le linee guida sul come collegare tra loro un insieme di Weak Learner per creare uno Strong Learner. Ma come è possibile estrapolare una buona risposta partendo dalle risposte di un insieme di modelli deboli? Il segreto del successo di questo paradigma si cela nella costruzione iterativa degli Strong Learner, nella quale ogni step corrisponde all’inserimento di un Weak Learner che ha lo scopo di “aggiustare il tiro” partendo dai risultati ottenuti dai suoi predecessori. In fase di previsione il risultato dello Strong Learner finale sarà la somma dei risultati dei Weak Learner in esso contenuti.</p>
+<p>Il concetto non è dissimile dal costruire la formula di una funzione complessa sommando tra loro un insieme di funzioni elementari. Immaginiamo di avere l'insieme di osservazioni in Figura 1 e di voler costruire una funzione (modello) che li approssimi.</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/gradient-boosting/images/I7emPmM.png" />
+        </figure>
+<figcaption>
+Fig 1. Insieme casuale di osservazioni lungo un piano.
+</figcaption>
+<p>A occhio e croce le osservazioni non hanno un andamento lineare e tendono a crescere leggermente spostandosi lungo l'asse x. Facciamo un primo tentativo utilizzando una funzione che sembra avere, grossomodo, lo stesso andamento: <span class="mathjax mathjax--inline">$\log(x)$</span>.</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/gradient-boosting/images/P4SrKe6.png" />
+        </figure>
+<figcaption>
+Fig 2. Funzione logaritmica passante per punti su un piano.
+</figcaption>
+<p>La funzione <span class="mathjax mathjax--inline">$\log(x)$</span> riesce ad attraversare la nuvola composta dalle nostre osservazioni, ma passa decisamente lontana da alcune di esse. Per riuscire a migliorare il nostro modello dovremmo far sì che tenda a salire e scendere in maniera ciclica in modo da avvicinarsi a più punti. Questa caratteristica ondulatoria fa subito pensare alla funzione che è caratteristica degli andamenti oscillatori: la funzione <span class="mathjax mathjax--inline">$\sin(x)$</span>.</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/gradient-boosting/images/BCGRovV.png" />
+        </figure>
+<figcaption>
+Fig 3. Funzione seno.
+</figcaption>
+<p>Come è possibile dare alla nostra funzione <span class="mathjax mathjax--inline">$\log$</span> le caratteristiche ondulatorie della funzione <span class="mathjax mathjax--inline">$\sin$</span>?</p>
+<p>Se costruiamo la funzione:</p>
+<p>\begin{equation}
+\mathbf{f(x)} = \log(x) + \sin(x)
+\tag{1}
+\end{equation}</p>
+<p>questa risulterebbe avere il seguente andamento:</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/gradient-boosting/images/7EUfGSi.png" />
+        </figure>
+<figcaption>
+Fig 4. Funzione composita passante per punti su un piano.
+</figcaption>
+<p>Questa nuova funzione è crescente come la funzione <span class="mathjax mathjax--inline">$\log$</span> ma è anche ondulatoria come la funzione <span class="mathjax mathjax--inline">$\sin$</span>. Si potrebbe affermare che la funzione <span class="mathjax mathjax--inline">$\sin$</span>, una volta sommata alla <span class="mathjax mathjax--inline">$\log$</span>, ne corregga l'andamento per renderla più adatta a modellare le osservazioni di partenza.</p>
+<p>Essendo i Learner stessi delle funzioni matematiche è possibile operare nella stessa maniera, sommandoli tra di loro in modo da aggiustare l'andamento dello Strong Learner finale e modellarlo nella forma che vogliamo. Come detto all'inizio gli algoritmi di Boosting sono iterativi, ossia costruiscono lo Strong Learner in un ciclo nel quale, ad ogni iterazione, viene costruito un Weak Learner che viene aggiunto a quelli già presenti per comporre un <strong>modello</strong>. Da questo punto in poi si definirà come modello la composizione di un certo numero di Weak Learner. Il modello costruito all'ultima iterazione corrisponderà allo Strong Learner finale.</p>
+<p>Chiamiamo <span class="mathjax mathjax--inline">$\mathbf{L_n(x)}$</span> la funzione corrispondente al modello costruito allo step <strong>n</strong>. In base a quanto detto finora la sua formula può essere scritta come:</p>
+<p class="mathjax mathjax--block">\[
+\mathbf{L_n(x)} = L_{n-1}(x) + l_n(x)
+\tag{2}\]</p>
+<p>dove <span class="mathjax mathjax--inline">$l_n(x)$</span> è un generico Weak Learner e <span class="mathjax mathjax--inline">$L_{n-1}$</span> è il modello costruito nell'iterazione precedente. Chiamando con <span class="mathjax mathjax--inline">$l_0$</span> un generico Weak Learner iniziale si può definire un modello nel modo seguente:</p>
+<p class="mathjax mathjax--block">\[
+\mathbf{L_n(x)} = l_{0}(x) + l_{1}(x) + ... +l_{n}(x)
+\tag{3}\]</p>
+<p>o in maniera più concisa:</p>
+<p class="mathjax mathjax--block">\[
+\mathbf{L_n(x)} = \sum_{i=0}^n l_i(x)
+\tag{4}\]</p>
+<p>Il Boosting, come detto, è un meta-algoritmo. In quanto tale lascia ampio margine di manovra per quanto riguarda la natura dei modelli da utilizzare. Anche se, in genere, il Boosting è implementato utilizzando dei modelli ad albero decisionale, questo non significa che non possa essere implementato basandosi su altre funzioni matematiche. Un esempio notevole di implementazione dell’algoritmo di Boosting è il Gradient Boosting, che è il protagonista del resto dell’articolo.</p>
+<h2 id="gradient-boosting" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#gradient-boosting" title="Permanent link: Gradient Boosting" data-icon="#">Gradient Boosting</a></h2>
+<p>Il Gradient Boosting è una implementazione dell'algoritmo di Boosting, dal quale eredita la logica di costruzione di uno Strong Learner. I modelli che vengono utilizzati sono, generalmente, alberi decisionali e il suo scopo è quello di minimizzare una generica <a href="https://en.wikipedia.org/wiki/Loss_function">funzione di costo</a>.</p>
+<h3 id="alberi-decisionali" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#alberi-decisionali" title="Permanent link: Alberi decisionali" data-icon="#">Alberi decisionali</a></h3>
+<p>Un albero decisionale (decision tree) è un tool di supporto alle decisioni basato su una struttura ad albero (per l'appunto), e che può essere usato (e spesso lo è) come base per algoritmi di classificazione o regressione.</p>
+<p>Usiamo come esempio un caso di studio particolarmente amato da chi studia Machine Learning: <a href="https://it.wikipedia.org/wiki/Dataset_Iris">Iris Dataset</a>. Questo dataset descrive una serie di fiori di genere Iris fornendo le dimensioni dei petali e dei sepali e li raggruppa in tre specie differenti. Chi di voi (come il sottoscritto la prima volta che ha avuto a che fare con questo dataset) non ha idea di cosa sia un sepalo, può scoprirlo <a href="https://it.wikipedia.org/wiki/Sepalo">qui</a> e farsi bello con gli amici.</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/gradient-boosting/images/n59BDR9.png" />
+        </figure>
+<figcaption>
+Fig 5. Albero decisionale
+</figcaption>
+<p>In Figura 5 è rappresentato un esempio di albero decisionale già istruito. È possibile vedere come ogni nodo faccia riferimento a un determinato attributo del dataset e come venga diviso in due nodi figli in funzione del valore di questo. La descrizione dell'algoritmo di apprendimento di un albero di decisione esula dallo scopo di questo articolo.</p>
+<p>Immaginiamo ora, forti del modello in Figura 5, di voler capire a quale specie di Iris fa parte il seguente fiore:</p>
+<p>Sepal length = 3.5<br />
+Petal length = 3.9<br />
+Sepal width = 0.2<br />
+Petal width = 1.1</p>
+<p>Una volta dato in pasto questo esempio all'albero questo inizierà a muoversi dall'alto verso il basso, partendo quindi dal nodo radice, decidendo, di volta in volta, in quale nodo figlio spostarsi in funzione del valore degli attributi del fiore in input.</p>
+<p>In Figura 6 è evidenziato il tragitto percorso per il nostro fiore di esempio, che ci porterà a concludere che questo fa parte della specie "Iris Setosa".</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/gradient-boosting/images/bsLqqgj.png" />
+        </figure>
+<figcaption>
+Fig 6. Tragitto di predizione lungo albero decisionale.
+</figcaption>
+<h2 id="compriamo-un-auto-usata" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#compriamo-un-auto-usata" title="Permanent link: Compriamo un'auto usata" data-icon="#">Compriamo un'auto usata</a></h2>
+<p>Vediamo un esempio di utilizzo del Gradient Boosting in un caso di regressione: il calcolo del valore di una automobile in funzione dei chilometri percorsi. Lo scopo del modello sarà quello di minimizzare la funzione di costo <a href="https://en.wikipedia.org/wiki/Mean_squared_error">Mean Squared Error</a> (MSE).</p>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Chilometri</th>
+<th>Prezzo (Y)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>112900</td>
+<td>14200</td>
+</tr>
+<tr>
+<td>2</td>
+<td>122182</td>
+<td>15000</td>
+</tr>
+<tr>
+<td>3</td>
+<td>181400</td>
+<td>9800</td>
+</tr>
+<tr>
+<td>4</td>
+<td>131231</td>
+<td>13300</td>
+</tr>
+<tr>
+<td>5</td>
+<td>190522</td>
+<td>9000</td>
+</tr>
+<tr>
+<td>6</td>
+<td>125452</td>
+<td>15600</td>
+</tr>
+</tbody>
+</table>
+<p>Per affrontare questo problema dobbiamo innanzitutto decidere quale funzione di partenza (<span class="mathjax mathjax--inline">$f_0$</span>) utilizzare, ossia, facendo riferimento all'esempio fatto in precedenza sulla costruzione di una funzione attraverso la somma di funzioni elementari, dobbiamo scegliere il nostro equivalente della funzione <span class="mathjax mathjax--inline">$\log(x)$</span>.</p>
+<p>Per capire quale posizione iniziale è la migliore dobbiamo concentrarci sullo scopo finale del modello, ossia minimizzare il MSE:</p>
+<p>\begin{equation}
+\mathbf{MSE} = \frac{1}{n}\sum_{i=1}^{n}(Y_i-\hat{Y}_i)^2
+\tag{5}
+\end{equation}</p>
+<p>dove <span class="mathjax mathjax--inline">$n$</span> è il numero di autovetture, <span class="mathjax mathjax--inline">$Y_i$</span> è il prezzo della i-esima autovettura, e <span class="mathjax mathjax--inline">$\hat{Y}_i$</span> è il prezzo che il modello ha predetto. L'argomento della sommatoria, ossia la differenza tra un valore osservato e un valore stimato, viene in genere chiamato <strong>residuo</strong> (residual). Dovendo noi minimizzare la funzione di costo, lo scopo dell'algoritmo sarà quello di abbassare iterativamente il valore assoluto di tutti i residui (ossia farli tendere a zero).</p>
+<p>Il valore che minimizza questa formula è, nel nostro caso, la media dei prezzi delle automobili su cui stiamo addestrando il modello, ossia:</p>
+<p class="mathjax mathjax--block">\[
+F_0 = \frac{1}{n}\sum_{i=1}^{n}x_i
+\tag{6}\]</p>
+<p>Quindi il nostro modello prevederà per ognuna delle vetture lo stesso valore corrispondente a 12816,7.</p>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Chilometri</th>
+<th>Prezzo (Y)</th>
+<th><span class="mathjax mathjax--inline">$F_0$</span></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>112900</td>
+<td>14200</td>
+<td>12816.7</td>
+</tr>
+<tr>
+<td>2</td>
+<td>122182</td>
+<td>15000</td>
+<td>12816.7</td>
+</tr>
+<tr>
+<td>3</td>
+<td>181400</td>
+<td>9800</td>
+<td>12816.7</td>
+</tr>
+<tr>
+<td>4</td>
+<td>131231</td>
+<td>13300</td>
+<td>12816.7</td>
+</tr>
+<tr>
+<td>5</td>
+<td>190522</td>
+<td>9000</td>
+<td>12816.7</td>
+</tr>
+<tr>
+<td>6</td>
+<td>125452</td>
+<td>15600</td>
+<td>12816.7</td>
+</tr>
+</tbody>
+</table>
+<p>A questo punto si calcolerà quanto queste "previsioni" siano distanti dal valore reale osservato. </p>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Chilometri</th>
+<th>Prezzo (Y)</th>
+<th><span class="mathjax mathjax--inline">$L_0$</span></th>
+<th><span class="mathjax mathjax--inline">$Y-L_0$</span> (residuo)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>112900</td>
+<td>14200</td>
+<td>12816.7</td>
+<td>1383.3</td>
+</tr>
+<tr>
+<td>2</td>
+<td>122182</td>
+<td>15000</td>
+<td>12816.7</td>
+<td>2183.3</td>
+</tr>
+<tr>
+<td>3</td>
+<td>181400</td>
+<td>9800</td>
+<td>12816.7</td>
+<td>-3016.7</td>
+</tr>
+<tr>
+<td>4</td>
+<td>131231</td>
+<td>13300</td>
+<td>12816.7</td>
+<td>483.3</td>
+</tr>
+<tr>
+<td>5</td>
+<td>190522</td>
+<td>9000</td>
+<td>12816.7</td>
+<td>-3816.7</td>
+</tr>
+<tr>
+<td>6</td>
+<td>125452</td>
+<td>15600</td>
+<td>12816.7</td>
+<td>2783.3</td>
+</tr>
+</tbody>
+</table>
+<p>Terminata questa prima fase passiamo all'iterazione successiva, nella quale si aggiungerà un Weak Learner (<span class="mathjax mathjax--inline">$l_1$</span>) che verrà istruito a prevedere la variazione del valore precedentemente previsto, affinché questo si avvicini al valore desiderato.</p>
+<p>Da sottolineare qui una questione importante: <u>il nuovo Weak Learner non sarà una versione migliorata di quelli che lo precedono</u>. Se così fosse il nuovo learner potrebbe completamente soppiantare quelli vecchi rendendoli inutili. Invece, mentre <span class="mathjax mathjax--inline">$L_k$</span> ha come scopo quello di prevedere <strong>il valore del prezzo</strong>, <span class="mathjax mathjax--inline">$l_{k+1}$</span> ha l'obbiettivo di predire e aggiungere <strong>la variazione sui valori del prezzo</strong> calcolato da <span class="mathjax mathjax--inline">$L_k$</span>.</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/gradient-boosting/images/ok2bocN.png" />
+        </figure>
+<figcaption>
+Fig 7. Albero decisionale di regressione.
+</figcaption>
+<p>La prima operazione che viene eseguita per la creazione di <span class="mathjax mathjax--inline">$l_1$</span> è quella di analizzare le feature in output (prezzo) e trovare tramite queste un valore di confine della feature <em>chilometri</em> che separi gli esempi in due gruppi. In questo esempio viene calcolato come valore di confine 156306,5.
+A questo punto il nodo principale viene diviso in due nodi figli che andranno ad accogliere i due gruppi. Visto che lo scopo dell'albero è calcolare le variazioni da apportare ai prezzi stimati, vengono presi i valori dei residui <span class="mathjax mathjax--inline">$y-L_0$</span> e se ne calcola la media: questi saranno i valori stimati da questo albero.</p>
+<p>I valori di <span class="mathjax mathjax--inline">$l_1$</span>, in base alla formula (2) devono essere aggiunti ad <span class="mathjax mathjax--inline">$L_0$</span> per calcolare <span class="mathjax mathjax--inline">$L_1$</span>
+Una volta note le predizione del nuovo modello possiamo calcolare i nuovi residui.</p>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th><span class="mathjax mathjax--inline">$l_1$</span></th>
+<th><span class="mathjax mathjax--inline">$L_1$</span></th>
+<th><span class="mathjax mathjax--inline">$Y - L_1$</span> (residuo)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>1708.3</td>
+<td>14525</td>
+<td>-325</td>
+</tr>
+<tr>
+<td>2</td>
+<td>1708.3</td>
+<td>14525</td>
+<td>475</td>
+</tr>
+<tr>
+<td>3</td>
+<td>-3416.7</td>
+<td>9400</td>
+<td>400</td>
+</tr>
+<tr>
+<td>4</td>
+<td>1708.3</td>
+<td>14525</td>
+<td>-1225</td>
+</tr>
+<tr>
+<td>5</td>
+<td>-3416.7</td>
+<td>9400</td>
+<td>-400</td>
+</tr>
+<tr>
+<td>6</td>
+<td>1708.3</td>
+<td>14525</td>
+<td>1075</td>
+</tr>
+</tbody>
+</table>
+<p>Questo procedimento dovrà essere effettuato più volte, perfezionando a ogni step le predizioni del modello generale. Alla fine di ogni step non tutti i residui vengono migliorati. Nell'esempio che abbiamo appena mostrato, il residuo del prezzo della macchina 4 è peggiorato (ha un valore assoluto maggiore) rispetto a quello calcolato allo step precedente. Questo non deve far pensare a un errore nell'algoritmo ma dipende dal fatto che abbiamo effettuato una sola iterazione. Le successive iterazioni apporteranno ulteriori modifiche e l'andamento generale del valore assoluto dei residui risulterà discendente.</p>
+<h2 id="ma-che-fine-ha-fatto-il-mean..." class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#ma-che-fine-ha-fatto-il-mean..." title="Permanent link: Ma che fine ha fatto il mean squared error?" data-icon="#">Ma che fine ha fatto il mean squared error?</a></h2>
+<p>In effetti in tutta la descrizione precedente non appare la formula del mean squared error da nessuna parte, ma lo abbiamo menzionato solamente per la scelta della funzione <span class="mathjax mathjax--inline">$F_0$</span>.
+In verità il MSE lo abbiamo avuto sotto gli occhi tutto il tempo!
+Come è stato ripetuto più volte, il modo attraverso il quale il Gradient Boosting costruisce lo Strong Learner è la minimizzazione del valore dei residui <span class="mathjax mathjax--inline">$Y-F_k$</span>, dove <span class="mathjax mathjax--inline">$F_k$</span> è lo Strong Learner costruito allo step k.</p>
+<p>È possibile dimostrare che la derivata parziale della funzione MSE rispetto a una generica previsione <span class="mathjax mathjax--inline">$\hat{Y}_k$</span> è la sequente:</p>
+<p class="mathjax mathjax--block">\[
+\frac {\partial}{\partial\hat{Y}_k}\left(\frac{1}{n}\sum_{i=1}^{n}(Y_i-\hat{Y}_i)^2\right) = Y- \hat{Y}_k
+\tag{7}\]</p>
+<p>ossia proprio i residui che stiamo minimizzando.</p>
+<p>Chi tra i lettori conosce già gli elementi base del Machine Learning avrà riconosciuto un vecchio amico: il gradient boosting ottimizza i propri risultati attraverso il meccanismo del <a href="https://en.wikipedia.org/wiki/Gradient_descent">Gradient Descent</a>, ossia minimizzando il gradiente della funzione di costo.</p>
+<p>È possibile utilizzare altre funzioni di costo che non siano il MSE.
+In questo caso saranno necessari due modifiche all'algoritmo spiegato nell'esempio precedente:</p>
+<ol>
+<li>La funzione <span class="mathjax mathjax--inline">$L_0$</span> dovrà essere scelta cercando di minimizzare la nuova funzione di costo.</li>
+<li>La formula per il calcolo dei residui andrà sostituita con la derivata parziale della nuova funzione di costo.</li>
+</ol>
+<p>Il resto del procedimento resterà inalterato.</p>
+<h2 id="incremental-shrinkage" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#incremental-shrinkage" title="Permanent link: Incremental Shrinkage" data-icon="#">Incremental Shrinkage</a></h2>
+<p>Come tutti gli algoritmi di machine learning anche il Gradient Boosting è soggetto a un fenomeno conosciuto e odiato da tutti i Data Scientist del mondo: l'overfitting.
+Per chi non avesse idea di cosa si tratti, possiamo dire che l'overfitting è la tendenza che ha un algoritmo a "memorizzare" gli esempi del training set, diventando incredibilmente bravo quando si tratta di predirne i valori, ma che gli impedisce di generalizzare al di fuori di questi.
+Dato che lo scopo finale di un modello è proprio quello di fare previsioni partendo da valori di input che siano diversi da quelli di training, è chiaro come l'overfitting sia un fenomeno da evitare.</p>
+<p>Uno dei metodi che vengono utilizzati nel Gradient Boosting è l'<strong>incremental shrinkage</strong>.
+Questo metodo consiste nell'aggiunta di una costante moltiplicativa <span class="mathjax mathjax--inline">$\lambda$</span>, chiamata <strong>learning rate</strong>, al valore di uscita dei Weak Learners.
+La formula di calcolo di <span class="mathjax mathjax--inline">$L_n$</span> diviene quindi:</p>
+<p class="mathjax mathjax--block">\[
+\mathbf{L_n(x)} = L_{n-1}(x) + \lambda l_n(x)
+\tag{8}\]</p>
+<p>dove <span class="mathjax mathjax--inline">$\lambda \in (0,1]$</span></p>
+<p>È una nota best practice cercare di utilizzare un valore di <span class="mathjax mathjax--inline">$\lambda$</span> pari a 0.1 e di abbassarne il valore gradualmente durante la fase di learning.</p>
+<h2 id="stochastic-gradient-boosting" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#stochastic-gradient-boosting" title="Permanent link: Stochastic Gradient Boosting" data-icon="#">Stochastic Gradient Boosting</a></h2>
+<p>Una piccola variante del Gradient Boosting, ispirata a un cugino dell'algoritmo di boosting, il <a href="https://en.wikipedia.org/wiki/Bootstrap_aggregating">bagging method</a>, è lo Stochastic Gradient Boosting.
+In questa implementazione l'algoritmo come lo abbiamo descritto non subisce modifiche, ma cambia la metodologia con la quale gli esempi del training set vengono sottoposti ai Weak Learners. Nella versione tradizionale ogni Weak Learner viene addestrato utilizzando tutti i valori di input generati nell'iterazione precedente. Nell'SGD, invece, ogni qual volta un Weak Learner viene addestrato gli viene sottoposto solamente un sottoinsieme di questi.
+Ovviamente, una volta istruito, viene utilizzato per calcolare le variazioni su tutti gli esempi del training set per creare i valori di input per l'iterazione successiva.
+Normalmente viene campionato il 50% degli elementi totali e questo meccanismo non solo previene l'insorgere dell'overfitting, ma accelera anche l'elaborazione complessiva.</p>
+<h2 id="utilizzo-attuale-del-gradient..." class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#utilizzo-attuale-del-gradient..." title="Permanent link: Utilizzo attuale del Gradient Boosting" data-icon="#">Utilizzo attuale del Gradient Boosting</a></h2>
+<p>Nonostante siano passati quasi venti anni dalla nascita degli algoritmi di boosting il Gradient Boosting è ancora un modello predittivo largamente utilizzato.
+Basti pensare che, nonostante i riflettori siano oggi tutti puntati sul paradigma delle reti neurali, in molte competizioni online (come quelle ospitate su <a href="https://www.kaggle.com/">Kaggle</a>) sono molte le soluzioni vincenti basate su questo algoritmo.</p>
+<p>In particolare sembra essere molto amata una implementazione nata come parte della <a href="https://github.com/dmlc">DMLC</a> (Distributed Machine Learning Community) implementata da Tianqi Chen: <a href="https://xgboost.readthedocs.io/en/latest/">XGBoost</a>.
+Con il passare degli anni questa libreria risultò tanto apprezzata da vantare un numero elevato di implementazioni in svariati linguaggi tra i quali Python, Scala, R e Java e l’integrazione in molti framework di Data Flow come Apache Spark e Hadoop.
+È possibile vedere una implementazione di una Gradient Boosting Machine con la libreria XGBoost sul <a href="https://colab.research.google.com/drive/1vKkp38NOpuB1lfUWl2YkBhZgIUo9jWYI">notebook</a> legato all'articolo.</p>
+<h2 id="conclusioni" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#conclusioni" title="Permanent link: Conclusioni" data-icon="#">Conclusioni</a></h2>
+<p>Il Gradient Boosting è tuttora riconosciuto come un valido strumento per classificazione e regressione e si trova spesso a competere a testa alta con tecniche più recenti e sponsorizzate, sia per le sue solide basi teoriche sia per la semplicità di utilizzo concessa dalle implementazioni esistenti. Per chi volesse approfondire l'argomento consiglio l'articolo scritto da Terence Parr e Jeremy Howard <a href="https://explained.ai/gradient-boosting/">"How to explain gradient boosting"</a>, dal quale sono state ispirate parti di questo articolo,  o, se preferite una lettura più accademica, potete far riferimento ai seguenti papers:</p>
+<ul>
+<li><a href="http://papers.nips.cc/paper/1766-boosting-algorithms-as-gradient-descent.pdf">Boosting Algorithms as Gradient Descent</a></li>
+<li><a href="https://www.maths.dur.ac.uk/~dma6kp/pdf/face_recognition/Boosting/Mason99AnyboostLong.pdf">Boosting Algorithms as Gradient Descent in Function Space</a></li>
+<li><a href="https://statweb.stanford.edu/~jhf/ftp/stobst.pdf">Stocastic Gradient Boosting</a></li>
+</ul>
+<hr />
+<p>Se questo articolo ti è piaciuto e vuoi tenerti aggiornato sulle nostre attività, ricordati che l'<a href="/member">iscrizione all'Italian Association for Machine Learning</a> è gratuita! Puoi seguirci su <a href="https://www.facebook.com/machinelearningitalia/">Facebook</a>, <a href="https://www.linkedin.com/company/iaml/">LinkedIn</a>, e <a href="https://twitter.com/iaml_it">Twitter</a>.</p></p>
+            
+    
+        <p class="prev-next">
+                            <a class="button" href="/blog/differenziazione-automatica-parte-2"><i class="fa fa-chevron-left"></i> Previous Post</a>
+            
+                            <a class="button" href="/blog/bilancio-2018">Next Post <i class="fa fa-chevron-right"></i></a>
+                    </p>
+    
+    </div>
+</div>
+			</div>
+			<div id="sidebar" class="g-block size-1-3 pure-u-1-3">
+				<div class="sidebar-content">
+    <h4>Search the blog</h4>
+    <input type="text" placeholder="Search..." value="" data-searchsidebar-input="/search/query" />
+<script>
+jQuery(document).ready(function($){
+    var input = $('[data-searchsidebar-input]');
+
+    input.on('keypress', function(event) {
+        if (event.which == 13 && input.val().length > 3) {
+            event.preventDefault();
+            window.location.href = input.data('searchsidebar-input') + ':' + input.val();
+        }
+    });
+});
+</script>
+</div>
+<!--
+<div class="sidebar-content">
+	<h4>Some Text Widget</h4>
+	<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna.</p>
+</div>
+!-->
+<div class="sidebar-content">
+    <h4>Categories</h4>
+    
+
+<ul class="archives">
+        <li>
+        <a href="/blog/category:Tutorials">Tutorials </a> (16)
+    </li>
+        <li>
+        <a href="/blog/category:Discussions">Discussions </a> (12)
+    </li>
+        <li>
+        <a href="/blog/category:Announcements">Announcements </a> (4)
+    </li>
+        <li>
+        <a href="/blog/category:Tutorials%20%28English%29">Tutorials (English) </a> (4)
+    </li>
+        <li>
+        <a href="/blog/category:Articles%27%20summaries">Articles' summaries </a> (3)
+    </li>
+        <li>
+        <a href="/blog/category:Discussions%20%28English%29">Discussions (English) </a> (2)
+    </li>
+        <li>
+        <a href="/blog/category:Focus-on">Focus-on </a> (1)
+    </li>
+        <li>
+        <a href="/blog/category:Reviews">Reviews </a> (1)
+    </li>
+        <li>
+        <a href="/blog/category:Discussion">Discussion </a> (1)
+    </li>
+    </ul>
+</div>
+<div class="sidebar-content">
+    <h4>Archives</h4>
+	<ul class="archives">
+    <li>
+    	<a href="/blog/archives_month:apr_2020">
+        <span class="archive_date">April 2020</span>
+                <span>(1)</span>
+                </a>
+    </li>
+</ul>
+</div>
+<div class="sidebar-content">
+    <h4>Popular Tags</h4>
+    
+
+<ul class="archives">
+        <li>
+        <a href="/blog/tag:deep%20learning">deep learning </a> (11)
+    </li>
+        <li>
+        <a href="/blog/tag:pytorch">pytorch </a> (9)
+    </li>
+        <li>
+        <a href="/blog/tag:reti%20neurali">reti neurali </a> (5)
+    </li>
+        <li>
+        <a href="/blog/tag:google">google </a> (4)
+    </li>
+        <li>
+        <a href="/blog/tag:jit">jit </a> (4)
+    </li>
+        <li>
+        <a href="/blog/tag:tensorflow">tensorflow </a> (4)
+    </li>
+        <li>
+        <a href="/blog/tag:ottimizzazione">ottimizzazione </a> (4)
+    </li>
+        <li>
+        <a href="/blog/tag:rete%20neurale">rete neurale </a> (3)
+    </li>
+        <li>
+        <a href="/blog/tag:time%20series">time series </a> (3)
+    </li>
+        <li>
+        <a href="/blog/tag:keras">keras </a> (3)
+    </li>
+        <li>
+        <a href="/blog/tag:reti%20convolutive">reti convolutive </a> (3)
+    </li>
+        <li>
+        <a href="/blog/tag:pipeline">pipeline </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:sklearn">sklearn </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:autodiff">autodiff </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:automatic%20differentation">automatic differentation </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:reverse-mode">reverse-mode </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:derivate">derivate </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:differenziazione">differenziazione </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:model%20selection">model selection </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:cross%20validation">cross validation </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:c%2B%2B">c++ </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:numpy">numpy </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:vmap">vmap </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:caffe">caffe </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:compiler">compiler </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:jax">jax </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:codemotion">codemotion </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:bias">bias </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:discrimination">discrimination </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:fairness">fairness </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:iaml">iaml </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:database">database </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:iperparametri">iperparametri </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:autograph">autograph </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:head">head </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:multi-task">multi-task </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:learning">learning </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:novit%C3%A0">novità </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:dev%20summit">dev summit </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:custom%20estimator">custom estimator </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:hyperopt">hyperopt </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:goodfellow">goodfellow </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:nlp">nlp </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:dati%20mancanti">dati mancanti </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:transformer">transformer </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:attenzione">attenzione </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:robocop">robocop </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:yolo">yolo </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:object%20detection">object detection </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:bayes">bayes </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:autoencoders">autoencoders </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:variational">variational </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:eager">eager </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:imputazione">imputazione </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:CIFAR">CIFAR </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:word%20embedding">word embedding </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:MNIST">MNIST </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:immagini">immagini </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:classificazione">classificazione </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:kpi">kpi </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:reprogramming">reprogramming </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:adversarial">adversarial </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:browser">browser </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:javascript">javascript </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:reti%20ricorsive">reti ricorsive </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:reti%20ricorrenti">reti ricorrenti </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:ftth">ftth </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:adversarial%20example">adversarial example </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:management">management </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:robotica">robotica </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:ocr">ocr </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:focus">focus </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:iphone">iphone </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:python">python </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:face%20id">face id </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:momento">momento </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:adam">adam </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:neuroscienza">neuroscienza </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:onde%20cerebrali">onde cerebrali </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:torchvision">torchvision </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:latin">latin </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:pretrained">pretrained </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:rete%20convolutiva">rete convolutiva </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:autograd">autograd </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:swish">swish </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:attivazione">attivazione </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:checkpoint">checkpoint </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:tensori">tensori </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:variabili">variabili </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:lineare">lineare </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:regressione">regressione </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:convolutional%20networks">convolutional networks </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:Vatican">Vatican </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:project">project </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:kernel">kernel </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:ICLR">ICLR </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:ipotesi">ipotesi </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:sparsit%C3%A0">sparsità </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:funzionale">funzionale </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:functional">functional </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:adversarial%20attack">adversarial attack </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:kmeans">kmeans </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:analysis">analysis </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:clustering">clustering </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:Google">Google </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:regression">regression </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:JAX">JAX </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:gaussian%20process">gaussian process </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:ensemble">ensemble </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:boosting">boosting </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:gradient">gradient </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:semi-supervised%20learning">semi-supervised learning </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:document%20classification">document classification </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:graphs">graphs </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:variables">variables </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:linear">linear </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:k-NN">k-NN </a> (1)
+    </li>
+    </ul>
+</div>
+<div class="sidebar-content syndicate">
+    <h4>Syndicate</h4>
+    <a class="button" href="/blog.atom"><i class="fa fa-rss-square"></i> Atom 1.0</a>
+    <a class="button" href="/blog.rss"><i class="fa fa-rss-square"></i> RSS</a>
+</div>
+			</div>
+		</div>
+	
+                        <div class="modular-row footer ">
+    <div class="footer-items">
+        <div class="footer-module large">
+		<h4>About</h4>
+                            <p>Italian Association for Machine Learning (C.F. 97949550582)</p>
+            			<p>Write us: info@iaml.it</p>
+        </div>
+        <div class="footer-module"><h4>Address</h4>
+            <p>
+                                    <span><strong>Operational office</strong></span>
+                                    <span>IAML c/o Pi Campus, via Indonesia 23, 00144 Rome</span>
+                                    <span><strong>Legal office</strong></span>
+                                    <span>Via Cassia 964, 00189, Rome</span>
+                            </p>
+        </div>
+        <div class="footer-module"><h4>Quick Links</h4>
+         <ul class="quickmenu">
+                            <li><i class="fa fa-chevron-right"></i><a href="https://iaml.it/home">Home</a></li>
+                            <li><i class="fa fa-chevron-right"></i><a href="https://iaml.it/documents">Documents (Italian)</a></li>
+                    </ul>
+    </div>
+   
+</div>
+<hr>
+<div class="footer-modules">
+    <div class="footer-copyright">
+        Copyright 2018 IAML.IT. All Rights Reserved.
+    </div>
+    <div class="footer-menu">
+    <ul class="othermenu">
+           <li><a href="https://learn.getgrav.org/">Powered by Grav</a></li>
+           <li><a href="https://github.com/getgrav/grav-theme-deliver">Theme (adapted) from Deliver</a></li>
+        </ul>
+    </div>
+</div>
+</div>                    </section>
+        
+    </div>
+    <div class="sb-slidebar sb-left sb-width-thin">
+        <div id="panel">
+        
+<ul class="navigation">
+                                                        <li class="">
+                    <a href="/">
+                                                Home
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/activities">
+                                                Activities
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/supporters">
+                                                Supporters
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/member">
+                                                Become a member
+                    </a>
+                </li>
+                                                                <li class="active">
+                    <a href="/blog">
+                                                Blog
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/governance">
+                                                Governance
+                    </a>
+                </li>
+                                                                                                                                </ul>                   </div>
+    </div>
+        <script src="/user/plugins/simplesearch/js/simplesearch.js" type="text/javascript" ></script>
+
+    <script>
+    $(function () {
+        $(document).ready(function() {
+          $.slidebars({
+            hideControlClasses: true,
+            scrollLock: true
+          });
+        });
+    });
+    </script>
+    </body>
+</html>

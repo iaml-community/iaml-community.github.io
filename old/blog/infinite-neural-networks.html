@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Infinite training with infinite networks | Italian Association for Machine Learning</title>
+    <meta content="GravCMS"  />
+<meta content="The Italian Association for Machine Learning (IAML) is a not-for-profit organization with the purpose of promoting knowledge of machine learning in all aspects of the Italian public life, from universities to enterprises and IT professionals."  />
+<meta property="og:title" content="Infinite neural networks | IAML.it"  />
+<meta property="og:image" content="https://iaml.it/blog/infinite-neural-networks/nt_figure.png"  />
+<meta property="og:url" content="https://iaml.it/blog/infinite-neural-networks/"  />
+<meta property="og:description" content="In this article we overview some results exploring the connection between neural networks and Gaussian Processes, most importantly the neural tangent kernel (NTK). We also introduce a JAX library to compute the predictions of such an infinite neural network in the general case!"  />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="icon" type="image/png" href="../user/themes/deliver/images/favicon.png" />
+
+	<!-- Global site tag (gtag.js) - Google Ads: 774709547 --> <script async src="https://www.googletagmanager.com/gtag/js?id=AW-774709547"></script> <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'AW-774709547'); </script> 
+	
+		
+                            		                                                <link href="../user/themes/deliver/css-compiled/nucleus.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css-compiled/template.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css/custom.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css/toc.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css/font-awesome.min.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/facebook/css/facebook.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/facebook/assets/unitegallery/css/unite-gallery.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/facebook/assets/unitegallery/themes/default/ug-theme-default.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/markdown-notices/assets/notices.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/breadcrumbs/css/breadcrumbs.css" type="text/css" rel="stylesheet" />
+<link href="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/events/assets/events.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/form/assets/form-styles.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/mathjax/assets/css/mathjax.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/simplesearch/css/simplesearch.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/highlight/css/zenburn.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/login/css/login.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css/slidebars.min.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css/slideme.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/socialbuttons/vendor/rrssb/css/rrssb.css" type="text/css" rel="stylesheet" />
+
+
+                                                            <script src="../system/assets/jquery/jquery-2.x.min.js" type="text/javascript" ></script>
+<script src="../user/themes/deliver/js/modernizr.custom.71422.js" type="text/javascript" ></script>
+<script src="../user/plugins/facebook/assets/unitegallery/js/unitegallery.min.js" type="text/javascript" ></script>
+<script src="../user/plugins/facebook/assets/unitegallery/themes/default/ug-theme-default.js" type="text/javascript" ></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.js" type="text/javascript" ></script>
+<script src="../user/plugins/events/assets/events.js" type="text/javascript" ></script>
+<script src="../user/plugins/mathjax/assets/js/mathjax.js" type="text/javascript" ></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript" ></script>
+<script src="../user/plugins/highlight/js/highlight.pack.js" type="text/javascript" ></script>
+<script src="../user/themes/deliver/js/deliver.js" type="text/javascript" ></script>
+<script src="../user/themes/deliver/js/slidebars.min.js" type="text/javascript" ></script>
+<script src="../user/themes/deliver/js/jquery.slideme2.js" type="text/javascript" ></script>
+<script src="../user/plugins/socialbuttons/vendor/rrssb/js/rrssb.min.js" type="text/javascript" ></script>
+
+<script>
+window.addEventListener("load", function(){
+window.cookieconsent.initialise({
+"palette": {
+    "popup": {
+        "background": "#4d4d4d",
+        "text": "#fff"
+    },
+    "button": {
+        "background": "#f1d600",
+        "text": "#000",
+        "border": "#f1d600"
+    }
+},
+"position": "bottom",
+"theme": "block",
+"content": {
+    "message": "This website uses cookies to ensure you get the best experience on our website.",
+    "dismiss": "Got it!",
+    "link": "Learn more",
+    "href": "https://cookiesandyou.com"
+}
+})});
+hljs.initHighlightingOnLoad();
+
+</script>
+
+
+</head>
+<body id="top" class="header-lite fullwidth blogstyling">
+    <div id="sb-site">
+                <header id="header">
+                <div class="logo">
+                    <h3><a href="../index.html"><img src="../user/pages/images/IAML_logo_viola.png" /></a></h3>
+                                            <ul class="social-icons">
+            <li>
+            <a href="https://twitter.com/iaml_it">
+                <i class="fa fa-twitter"></i>            </a>
+        </li>
+            <li>
+            <a href="https://www.linkedin.com/company/iaml/">
+                <i class="fa fa-linkedin"></i>            </a>
+        </li>
+            <li>
+            <a href="https://www.facebook.com/machinelearningitalia/">
+                <i class="fa fa-facebook"></i>            </a>
+        </li>
+            <li>
+            <a href="blog.rss">
+                <i class="fa fa-rss"></i>            </a>
+        </li>
+    </ul>  
+                                    </div>
+                <div id="navbar">
+                                                            
+<ul class="navigation">
+                                                        <li class="">
+                    <a href="../index.html">
+                                                Home
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../activities">
+                                                Activities
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../supporters.html">
+                                                Supporters
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../member.html">
+                                                Become a member
+                    </a>
+                </li>
+                                                                <li class="active">
+                    <a href="../blog">
+                                                Blog
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../governance.html">
+                                                Governance
+                    </a>
+                </li>
+                                                                                                                                </ul>                                                   <form class="search-box">
+    <input type="search" placeholder="Search..." value="" data-search-input="/search/query" />
+    <script>
+    jQuery(document).ready(function($){
+        var input = $('[data-search-input]');
+
+        input.on('keypress', function(event) {
+            if (event.which == 13 && input.val().length > 3) {
+                event.preventDefault();
+                window.location.href = input.data('search-input') + ':' + input.val();
+            }
+        });
+    });
+    </script>
+    <i class="fa fa-search"></i>
+</form>                    <span class="panel-activation sb-toggle-left navbar-left menu-btn fa fa-bars"></span>
+                </div>
+        </header>
+        
+        
+                <section id="body" class="">
+                            
+				<div class="flush-top blog-header blog-header-image" style="background: #B4B093 url(/user/pages/05.blog/blue_header.jpg) no-repeat right;">
+            <h1>Infinite training with infinite networks</h1>
+        </div>
+            
+        
+<div id="breadcrumbs" itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
+                                            <a href="../index.html" itemprop="url"><span itemprop="title">Home</span></a>
+                        <i class="fa fa-angle-right"></i>
+                                                <a href="../blog" itemprop="url"><span itemprop="title">Blog</span></a>
+                        <i class="fa fa-angle-right"></i>
+                                                <span itemprop="title">Infinite training with infinite networks</span>
+                        </div>
+		
+		<div class="blog-content-item g-grid pure-g-r">
+			<div id="item" class="g-block pure-u-2-3">
+			    <div class="list-item">
+
+    <div class="list-blog-header">
+                    <img src="../images/2/6/6/a/c/266ac245079322f2fedf381fe4b2bf718faca535-ntfigure.png" />
+        
+                    <h4><a href="infinite-neural-networks.html">Infinite training with infinite networks</a></h4>
+        
+        <span class="list-blog-date">
+            <i class="fa fa-calendar"></i>
+            20, Feb
+        </span>
+                <span class="list-blog-author">
+            <i class="fa fa-user"></i>
+            Simone Scardapane
+        </span>
+                       <ul class="tags">
+            <i class="fa fa-tag"></i>
+                        <li><a href="taggaussian process.html">gaussian process</a></li>
+                        <li><a href="tagJAX.html">JAX</a></li>
+                        <li><a href="tagGoogle.html">Google</a></li>
+                        <li><a href="tagkernel.html">kernel</a></li>
+                    </ul>
+        
+    </div>
+
+	<div>
+	<br />
+	<!-- AddToAny BEGIN -->
+<div class="a2a_kit a2a_kit_size_32 a2a_default_style">
+<a class="a2a_dd" href="https://www.addtoany.com/share"></a>
+<a class="a2a_button_facebook"></a>
+<a class="a2a_button_twitter"></a>
+<a class="a2a_button_linkedin"></a>
+<a class="a2a_button_google_plus"></a>
+<a class="a2a_button_email"></a>
+</div>
+<script async src="https://static.addtoany.com/menu/page.js"></script>
+<!-- AddToAny END -->
+</div>
+	
+    <div class="list-blog-padding">
+
+            <p><p>What happens to a neural network when its size goes to infinity? Despite the strangeness of the question, the answer turns out to be a fascinating one: the network converges to a so-called <strong>Gaussian Process</strong> (GP). In this article we overview some recent, notable results exploring the connections between the two, most importantly the <strong>neural tangent kernel</strong> (NTK). We also introduce a <a href="https://github.com/google/neural-tangents">JAX library</a>, Neural Tangents, to <em>compute</em> the predictions of such an infinite neural network in the general case!</p>
+<nav class="table-of-contents minitoc" role="navigation">
+                <span class="toctitle">Overview:</span>
+      
+                                                                
+  <ul>
+      
+        
+        
+              <li><a href="#a-brief-introduction-to..." class="toclink" title="A brief introduction to Gaussian Processes">A brief introduction to Gaussian Processes</a></li>
+      
+        
+        
+              <li><a href="#i-want-my-neural-networks-back" class="toclink" title="I want my neural networks back!">I want my neural networks back!</a></li>
+      
+        
+        
+              <li><a href="#infinite-deep-networks-are-also..." class="toclink" title="Infinite deep networks are also GPs">Infinite deep networks are also GPs</a></li>
+      
+        
+        
+              <li><a href="#training-networks-for-infinite..." class="toclink" title="Training networks for infinite time?">Training networks for infinite time?</a></li>
+      
+        
+        
+              <li><a href="#introducing-neural-tangents" class="toclink" title="Introducing Neural Tangents">Introducing Neural Tangents</a></li>
+      
+        
+        
+              <li><a href="#conclusion" class="toclink" title="Conclusion">Conclusion</a></li>
+      
+        
+        
+              <li><a href="#acknowledgments" class="toclink" title="Acknowledgments">Acknowledgments</a></li>
+      
+                      <li><ul>
+          
+        
+              <li><a href="#references" class="toclink" title="References">References</a></li>
+      
+              </ul></li>
+      
+  </ul>
+</nav>
+
+
+<h2 id="a-brief-introduction-to..." class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#a-brief-introduction-to..." title="Permanent link: A brief introduction to Gaussian Processes" data-icon="#">A brief introduction to Gaussian Processes</a></h2>
+<p><strong>Gaussian Processes</strong> (GPs) are one of those Bayesian techniques that one either loves or hates (or, maybe, simply finds confusing). If you have been around for a while, there is a good chance that you were introduced to the topic by the classic book from Williams and Rasmussen.<sup id="fnref1:fn1"><a href="#fn:fn1" class="footnote-ref">1</a></sup> Otherwise, you might have stumbled upon the beautiful <a href="https://distill.pub/2019/visual-exploration-gaussian-processes/">Distill article</a> devoted to them.</p>
+<p>A GP is a way to specify a <em>probability distribution</em> over functions, which makes them especially attractive whenever you want to deal with uncertainty. You probably already know how to define probabilities over real numbers (random variables) and over vectors (again, random variables, even if we usually call them random vectors). Now we want to introduce a probability measure over an infinite-dimensional space: for example, the space <span class="mathjax mathjax--inline">$L^2([0,1])$</span> of square-integrable functions over <span class="mathjax mathjax--inline">$I=[0,1]$</span>. Things get complicated, for reasons which are probably best left in a footnote <sup id="fnref1:fnLebesgue"><a href="#fn:fnLebesgue" class="footnote-ref">2</a></sup> 😜. Fascinatingly, a GP solves the complication by making only two assumptions: </p>
+<ol>
+<li>for any set of points <span class="mathjax mathjax--inline">$S_n=\{x_1,\dots,x_n\}$</span> belonging to the domain of our function, the corresponding function values <span class="mathjax mathjax--inline">$f(x_1),\dots,f(x_n)$</span> have a <strong>joint Gaussian</strong> density. </li>
+<li>(<em>this one is a more technical assumption that you might skip on first reading</em>) given two sets of points <span class="mathjax mathjax--inline">$S_m$</span> and <span class="mathjax mathjax--inline">$S_n$</span> such that <span class="mathjax mathjax--inline">$S_m \subset S_n$</span>, the two joint Gaussian densities <span class="mathjax mathjax--inline">$p_m(f_1,\dots,f_m)$</span> and <span class="mathjax mathjax--inline">$p_n(f_1,\dots,f_m,\dots,f_n)$</span> are <strong>consistent</strong>, i.e.,</li>
+</ol>
+<p class="mathjax mathjax--block">\[
+\int_{\mathbb{R}^{n-m+1}}p_n(x_1,\dots,x_{m},x_{m+1},\dots,x_n)\text{d}x_{m+1}\dots \text{d}x_n=f_m(x_1,\dots,x_m)\]</p>
+<p><a href="https://en.wikipedia.org/wiki/Kolmogorov_extension_theorem">By the Kolmogorov extension theorem</a>, just these two properties guarantee that we defined a consistent distribution over functions, i.e., a <em>stochastic process</em>. You can specify a GP completely by describing the mean of this probability distribution (generally, zero), and its covariance. The covariance describes the correlation existing between two different points: for example, if you suppose that two points spaced at a certain distance are heavily correlated (say, in financial trends), you can embed this knowledge inside the covariance function.</p>
+<p>The values of the covariance are represented through a <strong>kernel function</strong>, which you might remember from other algorithms, such as Support Vector Machines (SVMs), or kernel PCA. In this case, you will have seen, for example, the exponential kernel:</p>
+<p class="mathjax mathjax--block">$$
+\kappa(x_1, x_2) = \exp\left\{ \frac{\lVert x_1 - x_2 \rVert^2}{l}\right\}$$</p>
+<p>There is a beautiful algebra correlated to manually designing kernels, which powers several branches in machine learning. The key concept is that, by specifying this kernel, and conditioning on the training data, the GP allows to obtain entire distributions over functions, which is infinitely more expressive than a single function (as done, for example, in neural networks).</p>
+<p>Again, you HAVE TO read the <a href="https://distill.pub/2019/visual-exploration-gaussian-processes/">Distill blog</a> and see it visually.</p>
+<h2 id="i-want-my-neural-networks-back" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#i-want-my-neural-networks-back" title="Permanent link: I want my neural networks back!" data-icon="#">I want my neural networks back!</a></h2>
+<p>Sorry.</p>
+<p>Ok, here we go: consider a neural network with a single hidden layer and one output, of which you initialize all weights from a Gaussian distribution with mean zero and a certain standard deviation. Each weight can be seen as an i.i.d. variable, and because the output is a weighted sum, by the Central Limit theorem it will converge to a Gaussian distribution once you increase the hidden layer's width.</p>
+<p>In fact, in the limit of <strong>infinite</strong> width, the neural network converges exactly... to a GP! The GP is fully described by a zero mean and by a kernel with a simple form:</p>
+<p class="mathjax mathjax--block">$$
+\kappa(x_1, x_2) = \mathbb{E}\left[f(x_1)f(x_2)\right] \,,$$</p>
+<p>where <span class="mathjax mathjax--inline">$f(x)$</span> is the neural network, and the expectation is taken w.r.t. all possible weights. This notable result was obtained in the seminal PhD work from Neal,<sup id="fnref1:fn2"><a href="#fn:fn2" class="footnote-ref">3</a></sup> while an analytical form of the kernel for a single hidden layer neural network was derived by Williams.<sup id="fnref1:fn3"><a href="#fn:fn3" class="footnote-ref">4</a></sup></p>
+<figure role="group">
+        <img src="https://iaml.it/blog/infinite-neural-networks/images/Neal_fig_43.png">
+        </figure>
+<figcaption>Something vintage: predictive inference with infinite neural networks, from (Neal, 1995).</figcaption>
+<p>This result is more remarkable than it might sound: it allows to specify a neural network architecture, and then compute the predictions corresponding to an equivalent, <em>infinite</em> network!</p>
+<h2 id="infinite-deep-networks-are-also..." class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#infinite-deep-networks-are-also..." title="Permanent link: Infinite deep networks are also GPs" data-icon="#">Infinite deep networks are also GPs</a></h2>
+<p>While an extension to deeper networks was a common idea, only recently a number of papers have shown by induction that practically any neural network, once its widths are allowed to go to infinity, is equivalent to a GP.<sup id="fnref1:fn4"><a href="#fn:fn4" class="footnote-ref">5</a></sup> Even better, it is possible to provide a constructive process for computing the kernel of these GPs (we'll show how to implement this in the last section of the article; before, we take a detour on an even weirder application of the relation between neural networks and GPs).</p>
+<h2 id="training-networks-for-infinite..." class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#training-networks-for-infinite..." title="Permanent link: Training networks for infinite time?" data-icon="#">Training networks for infinite time?</a></h2>
+<p>If this was all there is to the connection between NNs and GPs, it would be remarkable, but probably not enough to justify the amount of attention this theme has been receiving lately. However, it turns out that a lot can be obtained by considering a closely related kernel, the <strong>neural tangent kernel</strong> (NTK):</p>
+<p class="mathjax mathjax--block">$$
+\text{NTK}(x_1, x_2) = \left[\nabla f(x_1)\right]^T \nabla f(x_2) \,,$$</p>
+<p>where the quantities represent the Jacobian of the network, i.e., their gradient w.r.t. all parameters. Why is this interesting? Consider performing gradient descent of the parameters <span class="mathjax mathjax--inline">$\theta$</span> of the network:</p>
+<p class="mathjax mathjax--block">$$
+\theta_{t+1} = \theta_t - \eta \nabla L(\theta_t) \,,$$</p>
+<p>where <span class="mathjax mathjax--inline">$L$</span> is some loss and <span class="mathjax mathjax--inline">$\eta$</span> the learning rate. If we take smaller and smaller learning rates, the dynamics of this process are described by a differential equation:</p>
+<p class="mathjax mathjax--block">$$
+\dot{\theta_t} = -\nabla L(\theta_t)$$</p>
+<p>Fascinatingly, this expression can be exactly analyzed with some quantities involving the NTK!<sup id="fnref1:fn5"><a href="#fn:fn5" class="footnote-ref">6</a></sup><sup id="fnref1:fn6"><a href="#fn:fn6" class="footnote-ref">7</a></sup> This is not as useful as it may seems because, in general, the NTK changes in time according to the parameters of the network. However, it can be shown that in the infinite-width regime, the NTK stays constant, and the previous expression can be solved in closed-form, obtaining the predictions corresponding to a neural network trained... <em>for infinite time</em>!</p>
+<p>If you are interested in a more formal, yet still accessible, derivation, there is a very nice blog post by Rajat Vadiraj Dwaraknath: <a href="https://rajatvd.github.io/NTK/">Understanding the neural tangent kernel</a>.</p>
+<p>How can we use all this machinery in practice?</p>
+<h2 id="introducing-neural-tangents" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#introducing-neural-tangents" title="Permanent link: Introducing Neural Tangents" data-icon="#">Introducing Neural Tangents</a></h2>
+<div class="notices yellow">
+<p>We'll be working in JAX now! It might be a good time to refresh your knowledge with <a href="jax-intro-english">our tutorial</a> or one of the <a href="https://github.com/google/jax">official guides</a>.</p>
+</div>
+<p>While this is all extremely interesting, actually computing the two kernels requires careful coding. In addition, exploiting them in a GP process requires to implement further code, and to handle a series of numerical and/or scaling problems.</p>
+<p>Luckily, a small time ago Google released <a href="https://github.com/google/neural-tangents">Neural Tangents</a>, a JAX library that makes this process almost automatic. We highlight some key ideas here, but you can find a full demo of its use on a <a href="https://colab.research.google.com/drive/1zh_XPEBQEyIDcT-JTe5-Xl-78_EVYjBq">companion Colab notebook</a>.</p>
+<p>To begin with, recall how we can specify a neural network in JAX using the internal Stax library:</p>
+<pre><code class="language-python">init_fn, apply_fn = stax.serial(
+    stax.Dense(100), stax.Relu,
+    stax.Dense(1)
+)</code></pre>
+<p>JAX is mostly functional, so the neural network is described by one function for its initialization, and one function for gathering predictions.</p>
+<p>The definition in NT is almost equivalent:</p>
+<pre><code class="language-python">from neural_tangents import stax as stax_nt
+init_fn, apply_fn, kernel_fn = stax_nt.serial(
+    stax_nt.Dense(100), stax_nt.Relu(),
+    stax_nt.Dense(1)
+)</code></pre>
+<p>We are using the Stax implementation from NT (not from JAX): the only difference (apart from the fact that Relu requires a function call), is that we also obtain a third function <code>kernel_fn</code>, which allows to automatically make predictions with one of the two kernels seen before!</p>
+<p>Let us see an example with the NTK:</p>
+<pre><code class="language-python">from neural_tangents import predict
+mean, var = predict.gp_inference(kernel_fn, X_train, y_train, X_test, \
+        diag_reg=1e-3, get='ntk', compute_cov=True)</code></pre>
+<p><code>gp_inference</code> performs GP inference using the kernel, and it can also use Monte Carlo approximations whenever the network does not admit a closed-form solution for the kernel. <code>mean</code> and <code>cov</code> and the mean and covariance of the predictions, which, as you recall, corresponds to an infinite-width network trained for infinite time!</p>
+<p>We can also plot them: you can notice some small vertical bars, corresponding to predictions with a small amount of uncertainty.</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/infinite-neural-networks/images/download.png">
+        </figure>
+<h2 id="conclusion" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#conclusion" title="Permanent link: Conclusion" data-icon="#">Conclusion</a></h2>
+<p>There is a lot to go to from here: the papers linked below and in the NT repository are a good starting point in this ever-growing body of literature which has already reserved several surprises. Notably, it is still unclear how much the dynamics described by the NTK corresponds to the dynamics empirically observed in neural networks  used in practice. Still, NT provides an extremely simple and practical way of playing around with infinite-width networks.</p>
+<h2 id="acknowledgments" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#acknowledgments" title="Permanent link: Acknowledgments" data-icon="#">Acknowledgments</a></h2>
+<p>The author thanks Andrea Panizza for help in proofreading and for rewriting part of the description on Gaussian Processes.</p>
+<h3 id="references" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#references" title="Permanent link: References" data-icon="#">References</a></h3>
+<hr />
+<div class="notices blue">
+<p>If you liked our article, remember that subscribing to the <a href="../member.html">Italian Association for Machine Learning</a> is free! You can follow us daily on <a href="https://www.facebook.com/machinelearningitalia/">Facebook</a>, <a href="https://www.linkedin.com/company/iaml/">LinkedIn</a>, and <a href="https://twitter.com/iaml_it">Twitter</a>.</p>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn:fn1">
+<p>Williams, C.K. and Rasmussen, C.E., 2006. <strong>Gaussian processes for machine learning</strong>. Cambridge, MA: MIT press.&#160;<a href="#fnref1:fn1" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:fnLebesgue">
+<p>When we defined probability on <span class="mathjax mathjax--inline">$\mathbb{R}$</span> or <span class="mathjax mathjax--inline">$\mathbb{R}^n$</span>, we were helped by the fact that the Lebesgue measure is defined on these spaces. However, there exists no Lebesgue measure over <span class="mathjax mathjax--inline">$L^2$</span> (or any infinite-dimensional Banach space, for that matter). There are various solutions to this conundrum, most of which require some familiarity with Functional Analysis.&#160;<a href="#fnref1:fnLebesgue" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:fn2">
+<p>Neal, R.M., 1995. <strong>Bayesian Learning for Neural Networks</strong>. Doctoral dissertation, University of Toronto.&#160;<a href="#fnref1:fn2" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:fn3">
+<p>Williams, C.K., 1997. <strong>Computing with infinite networks</strong>. In Advances in neural information processing systems (pp. 295-301).&#160;<a href="#fnref1:fn3" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:fn4">
+<p>Lee, J., Bahri, Y., Novak, R., Schoenholz, S.S., Pennington, J. and Sohl-Dickstein, J., 2017. <strong>Deep neural networks as Gaussian Processes</strong>. ICLR 2018.&#160;<a href="#fnref1:fn4" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:fn5">
+<p>Jacot, A., Gabriel, F. and Hongler, C., 2018. <strong>Neural tangent kernel: Convergence and generalization in neural networks</strong>. In Advances in neural information processing systems (pp. 8571-8580).&#160;<a href="#fnref1:fn5" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:fn6">
+<p>Yang, G., 2019. <strong>Scaling limits of wide neural networks with weight sharing: Gaussian process behavior, gradient independence, and neural tangent kernel derivation</strong>. arXiv preprint arXiv:1902.04760.&#160;<a href="#fnref1:fn6" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+</ol>
+</div></p>
+            
+    
+        <p class="prev-next">
+                            <a class="button" href="deep-learning-ottimizzazione.html"><i class="fa fa-chevron-left"></i> Previous Post</a>
+            
+                            <a class="button" href="serie-storiche-1-dati-mancanti.html">Next Post <i class="fa fa-chevron-right"></i></a>
+                    </p>
+    
+    </div>
+</div>
+			</div>
+			<div id="sidebar" class="g-block size-1-3 pure-u-1-3">
+				<div class="sidebar-content">
+    <h4>Search the blog</h4>
+    <input type="text" placeholder="Search..." value="" data-searchsidebar-input="/search/query" />
+<script>
+jQuery(document).ready(function($){
+    var input = $('[data-searchsidebar-input]');
+
+    input.on('keypress', function(event) {
+        if (event.which == 13 && input.val().length > 3) {
+            event.preventDefault();
+            window.location.href = input.data('searchsidebar-input') + ':' + input.val();
+        }
+    });
+});
+</script>
+</div>
+<!--
+<div class="sidebar-content">
+	<h4>Some Text Widget</h4>
+	<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna.</p>
+</div>
+!-->
+<div class="sidebar-content">
+    <h4>Categories</h4>
+    
+
+<ul class="archives">
+        <li>
+        <a href="categoryTutorials.html">Tutorials </a> (16)
+    </li>
+        <li>
+        <a href="categoryDiscussions.html">Discussions </a> (12)
+    </li>
+        <li>
+        <a href="categoryAnnouncements.html">Announcements </a> (4)
+    </li>
+        <li>
+        <a href="categoryTutorials (English).html">Tutorials (English) </a> (4)
+    </li>
+        <li>
+        <a href="categoryArticles' summaries.html">Articles' summaries </a> (3)
+    </li>
+        <li>
+        <a href="categoryDiscussions (English).html">Discussions (English) </a> (2)
+    </li>
+        <li>
+        <a href="categoryFocus-on.html">Focus-on </a> (1)
+    </li>
+        <li>
+        <a href="categoryReviews.html">Reviews </a> (1)
+    </li>
+        <li>
+        <a href="categoryDiscussion.html">Discussion </a> (1)
+    </li>
+    </ul>
+</div>
+<div class="sidebar-content">
+    <h4>Archives</h4>
+	<ul class="archives">
+    <li>
+    	<a href="archives_monthapr_2020.html">
+        <span class="archive_date">April 2020</span>
+                <span>(1)</span>
+                </a>
+    </li>
+</ul>
+</div>
+<div class="sidebar-content">
+    <h4>Popular Tags</h4>
+    
+
+<ul class="archives">
+        <li>
+        <a href="tagdeep learning.html">deep learning </a> (11)
+    </li>
+        <li>
+        <a href="tagpytorch.html">pytorch </a> (9)
+    </li>
+        <li>
+        <a href="tagreti neurali.html">reti neurali </a> (5)
+    </li>
+        <li>
+        <a href="taggoogle.html">google </a> (4)
+    </li>
+        <li>
+        <a href="tagjit.html">jit </a> (4)
+    </li>
+        <li>
+        <a href="tagtensorflow.html">tensorflow </a> (4)
+    </li>
+        <li>
+        <a href="tagottimizzazione.html">ottimizzazione </a> (4)
+    </li>
+        <li>
+        <a href="tagrete neurale.html">rete neurale </a> (3)
+    </li>
+        <li>
+        <a href="tagtime series.html">time series </a> (3)
+    </li>
+        <li>
+        <a href="tagkeras.html">keras </a> (3)
+    </li>
+        <li>
+        <a href="tagreti convolutive.html">reti convolutive </a> (3)
+    </li>
+        <li>
+        <a href="tagpipeline.html">pipeline </a> (2)
+    </li>
+        <li>
+        <a href="tagsklearn.html">sklearn </a> (2)
+    </li>
+        <li>
+        <a href="tagautodiff.html">autodiff </a> (2)
+    </li>
+        <li>
+        <a href="tagautomatic differentation.html">automatic differentation </a> (2)
+    </li>
+        <li>
+        <a href="tagreverse-mode.html">reverse-mode </a> (2)
+    </li>
+        <li>
+        <a href="tagderivate.html">derivate </a> (2)
+    </li>
+        <li>
+        <a href="tagdifferenziazione.html">differenziazione </a> (2)
+    </li>
+        <li>
+        <a href="tagmodel selection.html">model selection </a> (2)
+    </li>
+        <li>
+        <a href="tagcross validation.html">cross validation </a> (2)
+    </li>
+        <li>
+        <a href="tagc++.html">c++ </a> (2)
+    </li>
+        <li>
+        <a href="tagnumpy.html">numpy </a> (2)
+    </li>
+        <li>
+        <a href="tagvmap.html">vmap </a> (2)
+    </li>
+        <li>
+        <a href="tagcaffe.html">caffe </a> (2)
+    </li>
+        <li>
+        <a href="tagcompiler.html">compiler </a> (2)
+    </li>
+        <li>
+        <a href="tagjax.html">jax </a> (2)
+    </li>
+        <li>
+        <a href="tagcodemotion.html">codemotion </a> (1)
+    </li>
+        <li>
+        <a href="tagbias.html">bias </a> (1)
+    </li>
+        <li>
+        <a href="tagdiscrimination.html">discrimination </a> (1)
+    </li>
+        <li>
+        <a href="tagfairness.html">fairness </a> (1)
+    </li>
+        <li>
+        <a href="tagiaml.html">iaml </a> (1)
+    </li>
+        <li>
+        <a href="tagdatabase.html">database </a> (1)
+    </li>
+        <li>
+        <a href="tagiperparametri.html">iperparametri </a> (1)
+    </li>
+        <li>
+        <a href="tagautograph.html">autograph </a> (1)
+    </li>
+        <li>
+        <a href="taghead.html">head </a> (1)
+    </li>
+        <li>
+        <a href="tagmulti-task.html">multi-task </a> (1)
+    </li>
+        <li>
+        <a href="taglearning.html">learning </a> (1)
+    </li>
+        <li>
+        <a href="tagnovità.html">novità </a> (1)
+    </li>
+        <li>
+        <a href="tagdev summit.html">dev summit </a> (1)
+    </li>
+        <li>
+        <a href="tagcustom estimator.html">custom estimator </a> (1)
+    </li>
+        <li>
+        <a href="taghyperopt.html">hyperopt </a> (1)
+    </li>
+        <li>
+        <a href="taggoodfellow.html">goodfellow </a> (1)
+    </li>
+        <li>
+        <a href="tagnlp.html">nlp </a> (1)
+    </li>
+        <li>
+        <a href="tagdati mancanti.html">dati mancanti </a> (1)
+    </li>
+        <li>
+        <a href="tagtransformer.html">transformer </a> (1)
+    </li>
+        <li>
+        <a href="tagattenzione.html">attenzione </a> (1)
+    </li>
+        <li>
+        <a href="tagrobocop.html">robocop </a> (1)
+    </li>
+        <li>
+        <a href="tagyolo.html">yolo </a> (1)
+    </li>
+        <li>
+        <a href="tagobject detection.html">object detection </a> (1)
+    </li>
+        <li>
+        <a href="tagbayes.html">bayes </a> (1)
+    </li>
+        <li>
+        <a href="tagautoencoders.html">autoencoders </a> (1)
+    </li>
+        <li>
+        <a href="tagvariational.html">variational </a> (1)
+    </li>
+        <li>
+        <a href="tageager.html">eager </a> (1)
+    </li>
+        <li>
+        <a href="tagimputazione.html">imputazione </a> (1)
+    </li>
+        <li>
+        <a href="tagCIFAR.html">CIFAR </a> (1)
+    </li>
+        <li>
+        <a href="tagword embedding.html">word embedding </a> (1)
+    </li>
+        <li>
+        <a href="tagMNIST.html">MNIST </a> (1)
+    </li>
+        <li>
+        <a href="tagimmagini.html">immagini </a> (1)
+    </li>
+        <li>
+        <a href="tagclassificazione.html">classificazione </a> (1)
+    </li>
+        <li>
+        <a href="tagkpi.html">kpi </a> (1)
+    </li>
+        <li>
+        <a href="tagreprogramming.html">reprogramming </a> (1)
+    </li>
+        <li>
+        <a href="tagadversarial.html">adversarial </a> (1)
+    </li>
+        <li>
+        <a href="tagbrowser.html">browser </a> (1)
+    </li>
+        <li>
+        <a href="tagjavascript.html">javascript </a> (1)
+    </li>
+        <li>
+        <a href="tagreti ricorsive.html">reti ricorsive </a> (1)
+    </li>
+        <li>
+        <a href="tagreti ricorrenti.html">reti ricorrenti </a> (1)
+    </li>
+        <li>
+        <a href="tagftth.html">ftth </a> (1)
+    </li>
+        <li>
+        <a href="tagadversarial example.html">adversarial example </a> (1)
+    </li>
+        <li>
+        <a href="tagmanagement.html">management </a> (1)
+    </li>
+        <li>
+        <a href="tagrobotica.html">robotica </a> (1)
+    </li>
+        <li>
+        <a href="tagocr.html">ocr </a> (1)
+    </li>
+        <li>
+        <a href="tagfocus.html">focus </a> (1)
+    </li>
+        <li>
+        <a href="tagiphone.html">iphone </a> (1)
+    </li>
+        <li>
+        <a href="tagpython.html">python </a> (1)
+    </li>
+        <li>
+        <a href="tagface id.html">face id </a> (1)
+    </li>
+        <li>
+        <a href="tagmomento.html">momento </a> (1)
+    </li>
+        <li>
+        <a href="tagadam.html">adam </a> (1)
+    </li>
+        <li>
+        <a href="tagneuroscienza.html">neuroscienza </a> (1)
+    </li>
+        <li>
+        <a href="tagonde cerebrali.html">onde cerebrali </a> (1)
+    </li>
+        <li>
+        <a href="tagtorchvision.html">torchvision </a> (1)
+    </li>
+        <li>
+        <a href="taglatin.html">latin </a> (1)
+    </li>
+        <li>
+        <a href="tagpretrained.html">pretrained </a> (1)
+    </li>
+        <li>
+        <a href="tagrete convolutiva.html">rete convolutiva </a> (1)
+    </li>
+        <li>
+        <a href="tagautograd.html">autograd </a> (1)
+    </li>
+        <li>
+        <a href="tagswish.html">swish </a> (1)
+    </li>
+        <li>
+        <a href="tagattivazione.html">attivazione </a> (1)
+    </li>
+        <li>
+        <a href="tagcheckpoint.html">checkpoint </a> (1)
+    </li>
+        <li>
+        <a href="tagtensori.html">tensori </a> (1)
+    </li>
+        <li>
+        <a href="tagvariabili.html">variabili </a> (1)
+    </li>
+        <li>
+        <a href="taglineare.html">lineare </a> (1)
+    </li>
+        <li>
+        <a href="tagregressione.html">regressione </a> (1)
+    </li>
+        <li>
+        <a href="tagconvolutional networks.html">convolutional networks </a> (1)
+    </li>
+        <li>
+        <a href="tagVatican.html">Vatican </a> (1)
+    </li>
+        <li>
+        <a href="tagproject.html">project </a> (1)
+    </li>
+        <li>
+        <a href="tagkernel.html">kernel </a> (1)
+    </li>
+        <li>
+        <a href="tagICLR.html">ICLR </a> (1)
+    </li>
+        <li>
+        <a href="tagipotesi.html">ipotesi </a> (1)
+    </li>
+        <li>
+        <a href="tagsparsità.html">sparsità </a> (1)
+    </li>
+        <li>
+        <a href="tagfunzionale.html">funzionale </a> (1)
+    </li>
+        <li>
+        <a href="tagfunctional.html">functional </a> (1)
+    </li>
+        <li>
+        <a href="tagadversarial attack.html">adversarial attack </a> (1)
+    </li>
+        <li>
+        <a href="tagkmeans.html">kmeans </a> (1)
+    </li>
+        <li>
+        <a href="taganalysis.html">analysis </a> (1)
+    </li>
+        <li>
+        <a href="tagclustering.html">clustering </a> (1)
+    </li>
+        <li>
+        <a href="tagGoogle.html">Google </a> (1)
+    </li>
+        <li>
+        <a href="tagregression.html">regression </a> (1)
+    </li>
+        <li>
+        <a href="tagJAX.html">JAX </a> (1)
+    </li>
+        <li>
+        <a href="taggaussian process.html">gaussian process </a> (1)
+    </li>
+        <li>
+        <a href="tagensemble.html">ensemble </a> (1)
+    </li>
+        <li>
+        <a href="tagboosting.html">boosting </a> (1)
+    </li>
+        <li>
+        <a href="taggradient.html">gradient </a> (1)
+    </li>
+        <li>
+        <a href="tagsemi-supervised learning.html">semi-supervised learning </a> (1)
+    </li>
+        <li>
+        <a href="tagdocument classification.html">document classification </a> (1)
+    </li>
+        <li>
+        <a href="taggraphs.html">graphs </a> (1)
+    </li>
+        <li>
+        <a href="tagvariables.html">variables </a> (1)
+    </li>
+        <li>
+        <a href="taglinear.html">linear </a> (1)
+    </li>
+        <li>
+        <a href="tagk-NN.html">k-NN </a> (1)
+    </li>
+    </ul>
+</div>
+<div class="sidebar-content syndicate">
+    <h4>Syndicate</h4>
+    <a class="button" href="../blog.atom"><i class="fa fa-rss-square"></i> Atom 1.0</a>
+    <a class="button" href="../blog.rss"><i class="fa fa-rss-square"></i> RSS</a>
+</div>
+			</div>
+		</div>
+	
+                        <div class="modular-row footer ">
+    <div class="footer-items">
+        <div class="footer-module large">
+		<h4>About</h4>
+                            <p>Italian Association for Machine Learning (C.F. 97949550582)</p>
+            			<p>Write us: info@iaml.it</p>
+        </div>
+        <div class="footer-module"><h4>Address</h4>
+            <p>
+                                    <span><strong>Operational office</strong></span>
+                                    <span>IAML c/o Pi Campus, via Indonesia 23, 00144 Rome</span>
+                                    <span><strong>Legal office</strong></span>
+                                    <span>Via Cassia 964, 00189, Rome</span>
+                            </p>
+        </div>
+        <div class="footer-module"><h4>Quick Links</h4>
+         <ul class="quickmenu">
+                            <li><i class="fa fa-chevron-right"></i><a href="../home">Home</a></li>
+                            <li><i class="fa fa-chevron-right"></i><a href="https://iaml.it/documents">Documents (Italian)</a></li>
+                    </ul>
+    </div>
+   
+</div>
+<hr>
+<div class="footer-modules">
+    <div class="footer-copyright">
+        Copyright 2018 IAML.IT. All Rights Reserved.
+    </div>
+    <div class="footer-menu">
+    <ul class="othermenu">
+           <li><a href="https://learn.getgrav.org/">Powered by Grav</a></li>
+           <li><a href="https://github.com/getgrav/grav-theme-deliver">Theme (adapted) from Deliver</a></li>
+        </ul>
+    </div>
+</div>
+</div>                    </section>
+        
+    </div>
+    <div class="sb-slidebar sb-left sb-width-thin">
+        <div id="panel">
+        
+<ul class="navigation">
+                                                        <li class="">
+                    <a href="../index.html">
+                                                Home
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../activities">
+                                                Activities
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../supporters.html">
+                                                Supporters
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../member.html">
+                                                Become a member
+                    </a>
+                </li>
+                                                                <li class="active">
+                    <a href="../blog">
+                                                Blog
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../governance.html">
+                                                Governance
+                    </a>
+                </li>
+                                                                                                                                </ul>                   </div>
+    </div>
+        <script src="../user/plugins/simplesearch/js/simplesearch.js" type="text/javascript" ></script>
+
+    <script>
+    $(function () {
+        $(document).ready(function() {
+          $.slidebars({
+            hideControlClasses: true,
+            scrollLock: true
+          });
+        });
+    });
+    </script>
+    </body>
+</html>
+
+

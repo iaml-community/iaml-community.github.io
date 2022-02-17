@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Breve introduzione al Dynamic Time Warping | Italian Association for Machine Learning</title>
+    <meta content="GravCMS"  />
+<meta content="The Italian Association for Machine Learning (IAML) is a not-for-profit organization with the purpose of promoting knowledge of machine learning in all aspects of the Italian public life, from universities to enterprises and IT professionals."  />
+<meta property="og:title" content="Breve introduzione al Dynamic Time Warping | IAML.it"  />
+<meta property="og:image" content="https://iaml.it/blog/serie-storiche-3-dynamic-time-warping/lMmjyOM.png"  />
+<meta property="og:url" content="https://iaml.it/blog/serie-storiche-3-dynamic-time-warping/"  />
+<meta property="og:description" content="Continuano i nostri articoli dedicati al processamento di serie temporali! Nel [secondo articolo della serie](https://iaml.it/blog/serie-storiche-2-sax-encoding) abbiamo visto come confrontare sequenze diverse utilizzando il **SAX Encoding**. Ma se volessimo quantificare la distanza tra due Time Series? A questo scopo, introduciamo un&#039;altra tecnica estremamente utile, il **Dynamic Time Warping** (DTW)."  />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="icon" type="image/png" href="../user/themes/deliver/images/favicon.png" />
+
+	<!-- Global site tag (gtag.js) - Google Ads: 774709547 --> <script async src="https://www.googletagmanager.com/gtag/js?id=AW-774709547"></script> <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'AW-774709547'); </script> 
+	
+		
+                            		                                                <link href="../user/themes/deliver/css-compiled/nucleus.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css-compiled/template.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css/custom.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css/toc.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css/font-awesome.min.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/facebook/css/facebook.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/facebook/assets/unitegallery/css/unite-gallery.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/facebook/assets/unitegallery/themes/default/ug-theme-default.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/markdown-notices/assets/notices.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/breadcrumbs/css/breadcrumbs.css" type="text/css" rel="stylesheet" />
+<link href="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/events/assets/events.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/form/assets/form-styles.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/mathjax/assets/css/mathjax.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/simplesearch/css/simplesearch.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/highlight/css/zenburn.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/login/css/login.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css/slidebars.min.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css/slideme.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/socialbuttons/vendor/rrssb/css/rrssb.css" type="text/css" rel="stylesheet" />
+
+
+                                                            <script src="../system/assets/jquery/jquery-2.x.min.js" type="text/javascript" ></script>
+<script src="../user/themes/deliver/js/modernizr.custom.71422.js" type="text/javascript" ></script>
+<script src="../user/plugins/facebook/assets/unitegallery/js/unitegallery.min.js" type="text/javascript" ></script>
+<script src="../user/plugins/facebook/assets/unitegallery/themes/default/ug-theme-default.js" type="text/javascript" ></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.js" type="text/javascript" ></script>
+<script src="../user/plugins/events/assets/events.js" type="text/javascript" ></script>
+<script src="../user/plugins/mathjax/assets/js/mathjax.js" type="text/javascript" ></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript" ></script>
+<script src="../user/plugins/highlight/js/highlight.pack.js" type="text/javascript" ></script>
+<script src="../user/themes/deliver/js/deliver.js" type="text/javascript" ></script>
+<script src="../user/themes/deliver/js/slidebars.min.js" type="text/javascript" ></script>
+<script src="../user/themes/deliver/js/jquery.slideme2.js" type="text/javascript" ></script>
+<script src="../user/plugins/socialbuttons/vendor/rrssb/js/rrssb.min.js" type="text/javascript" ></script>
+
+<script>
+window.addEventListener("load", function(){
+window.cookieconsent.initialise({
+"palette": {
+    "popup": {
+        "background": "#4d4d4d",
+        "text": "#fff"
+    },
+    "button": {
+        "background": "#f1d600",
+        "text": "#000",
+        "border": "#f1d600"
+    }
+},
+"position": "bottom",
+"theme": "block",
+"content": {
+    "message": "This website uses cookies to ensure you get the best experience on our website.",
+    "dismiss": "Got it!",
+    "link": "Learn more",
+    "href": "https://cookiesandyou.com"
+}
+})});
+hljs.initHighlightingOnLoad();
+
+</script>
+
+
+</head>
+<body id="top" class="header-lite fullwidth blogstyling">
+    <div id="sb-site">
+                <header id="header">
+                <div class="logo">
+                    <h3><a href="../index.html"><img src="../user/pages/images/IAML_logo_viola.png" /></a></h3>
+                                            <ul class="social-icons">
+            <li>
+            <a href="https://twitter.com/iaml_it">
+                <i class="fa fa-twitter"></i>            </a>
+        </li>
+            <li>
+            <a href="https://www.linkedin.com/company/iaml/">
+                <i class="fa fa-linkedin"></i>            </a>
+        </li>
+            <li>
+            <a href="https://www.facebook.com/machinelearningitalia/">
+                <i class="fa fa-facebook"></i>            </a>
+        </li>
+            <li>
+            <a href="blog.rss">
+                <i class="fa fa-rss"></i>            </a>
+        </li>
+    </ul>  
+                                    </div>
+                <div id="navbar">
+                                                            
+<ul class="navigation">
+                                                        <li class="">
+                    <a href="../index.html">
+                                                Home
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../activities">
+                                                Activities
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../supporters.html">
+                                                Supporters
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../member.html">
+                                                Become a member
+                    </a>
+                </li>
+                                                                <li class="active">
+                    <a href="../blog">
+                                                Blog
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../governance">
+                                                Governance
+                    </a>
+                </li>
+                                                                                                                                </ul>                                                   <form class="search-box">
+    <input type="search" placeholder="Search..." value="" data-search-input="/search/query" />
+    <script>
+    jQuery(document).ready(function($){
+        var input = $('[data-search-input]');
+
+        input.on('keypress', function(event) {
+            if (event.which == 13 && input.val().length > 3) {
+                event.preventDefault();
+                window.location.href = input.data('search-input') + ':' + input.val();
+            }
+        });
+    });
+    </script>
+    <i class="fa fa-search"></i>
+</form>                    <span class="panel-activation sb-toggle-left navbar-left menu-btn fa fa-bars"></span>
+                </div>
+        </header>
+        
+        
+                <section id="body" class="">
+                            
+				<div class="flush-top blog-header blog-header-image" style="background: #B4B093 url(/user/pages/05.blog/blue_header.jpg) no-repeat right;">
+            <h1>Breve introduzione al Dynamic Time Warping</h1>
+        </div>
+            
+        
+<div id="breadcrumbs" itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
+                                            <a href="../index.html" itemprop="url"><span itemprop="title">Home</span></a>
+                        <i class="fa fa-angle-right"></i>
+                                                <a href="../blog" itemprop="url"><span itemprop="title">Blog</span></a>
+                        <i class="fa fa-angle-right"></i>
+                                                <span itemprop="title">Breve introduzione al Dynamic Time Warping</span>
+                        </div>
+		
+		<div class="blog-content-item g-grid pure-g-r">
+			<div id="item" class="g-block pure-u-2-3">
+			    <div class="list-item">
+
+    <div class="list-blog-header">
+                    <img src="../images/e/2/5/8/b/e258bfe01527917bb5acc8ad4f3fdb1efaefa04d-lmmjyom.png" />
+        
+                    <h4><a href="serie-storiche-3-dynamic-time-warping.html">Breve introduzione al Dynamic Time Warping</a></h4>
+        
+        <span class="list-blog-date">
+            <i class="fa fa-calendar"></i>
+            18, Jun
+        </span>
+                <span class="list-blog-author">
+            <i class="fa fa-user"></i>
+            Nicola Procopio
+        </span>
+                       <ul class="tags">
+            <i class="fa fa-tag"></i>
+                        <li><a href="tagtime series.html">time series</a></li>
+                    </ul>
+        
+    </div>
+
+	<div>
+	<br />
+	<!-- AddToAny BEGIN -->
+<div class="a2a_kit a2a_kit_size_32 a2a_default_style">
+<a class="a2a_dd" href="https://www.addtoany.com/share"></a>
+<a class="a2a_button_facebook"></a>
+<a class="a2a_button_twitter"></a>
+<a class="a2a_button_linkedin"></a>
+<a class="a2a_button_google_plus"></a>
+<a class="a2a_button_email"></a>
+</div>
+<script async src="https://static.addtoany.com/menu/page.js"></script>
+<!-- AddToAny END -->
+</div>
+	
+    <div class="list-blog-padding">
+
+            <p><p>Continuano i nostri articoli dedicati al processamento di serie temporali! Nel <a href="serie-storiche-2-sax-encoding">secondo articolo della serie</a> abbiamo visto come confrontare sequenze diverse utilizzando il <strong>SAX Encoding</strong>. Ma se volessimo quantificare la distanza tra due Time Series? A questo scopo, introduciamo un'altra tecnica estremamente utile, il <strong>Dynamic Time Warping</strong> (DTW).</p>
+<nav class="table-of-contents minitoc" role="navigation">
+                <span class="toctitle">Overview:</span>
+      
+                                                          
+  <ul>
+      
+        
+        
+              <li><a href="#dynamic-time-warping" class="toclink" title="Dynamic Time Warping">Dynamic Time Warping</a></li>
+      
+                      <li><ul>
+          
+        
+              <li><a href="#definizione" class="toclink" title="Definizione">Definizione</a></li>
+      
+        
+        
+              <li><a href="#algoritmo" class="toclink" title="Algoritmo">Algoritmo</a></li>
+      
+        
+        
+              <li><a href="#window-constraint" class="toclink" title="Window Constraint">Window Constraint</a></li>
+      
+        
+        
+              <li><a href="#miglioramenti-al-dtw" class="toclink" title="Miglioramenti al DTW">Miglioramenti al DTW</a></li>
+      
+                      </ul></li>
+          
+        
+              <li><a href="#dtw-e-machine-learning" class="toclink" title="DTW e Machine Learning">DTW e Machine Learning</a></li>
+      
+                      <li><ul>
+          
+        
+              <li><a href="#ringraziamenti" class="toclink" title="Ringraziamenti">Ringraziamenti</a></li>
+      
+              </ul></li>
+      
+  </ul>
+</nav>
+
+
+<blockquote>
+<p>Il codice di questo articolo è disponibile su un <a href="https://colab.research.google.com/drive/1UBfxXzjmctxorJhaYTG0rLwvFSc9LpNs?usp=sharing">notebook Google Colab</a>.</p>
+</blockquote>
+<h2 id="dynamic-time-warping" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#dynamic-time-warping" title="Permanent link: Dynamic Time Warping" data-icon="#">Dynamic Time Warping</a></h2>
+<h3 id="definizione" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#definizione" title="Permanent link: Definizione" data-icon="#">Definizione</a></h3>
+<p>Il <strong>Dynamic Time Warping</strong> (DTW) è un algoritmo utilizzato per misurare la similarità tra due o più serie temporali, andando a leggere su <a href="https://en.wikipedia.org/wiki/Dynamic_time_warping">Wikipedia</a> troviamo la seguente definizione:</p>
+<blockquote>
+<p><em>"Il Dynamic time warping, o DTW, è un algoritmo che permette l'allineamento tra due sequenze, e che può portare ad una misura di distanza tra le due sequenze allineate. Tale algoritmo è particolarmente utile per trattare sequenze in cui singole componenti hanno caratteristiche che variano nel tempo, e per le quali la semplice espansione o compressione lineare delle due sequenze non porta risultati soddisfacenti."</em></p>
+</blockquote>
+<p>Che casi d'uso ci suggerisce la definizione? Prendiamo ad esempio il riconoscimento vocale: una persona potrebbe parlare più velocemente o più lentamente della voce campione preregistrata, mentre il DTW non risentirebbe di questo problema, a differenza di una distanza che venisse applicata "punto per punto".</p>
+<p>Il DTW è molto utilizzato in ambito <em>IoT</em> dove gli stream di dati proveninenti da video, audio, sensori, possono essere trasformati in una sequenza lineare per essere analizzati con questa tecnica, in particolare è molto efficace con serie ad alta frequenza di campionamento, pensiamo ad esempio al mercato delle utilities o dell'automotive.</p>
+<p>L'idea di base è calcolare la distanza tra due vettori/serie storiche <strong>indipendentemente dalla loro lunghezza</strong>, e per farlo bisogna che i vettori rispettino le seguenti regole:</p>
+<ul>
+<li>ogni indice della prima sequenza deve poter essere confrontato con tutti gli indici delle altre e viceversa;</li>
+<li>il primo indice della prima sequenza deve essere associato al primo indice dell'altra sequenza (ma non deve essere la sua unica corrispondenza);</li>
+<li>l'ultimo indice della prima sequenza deve corrispondere all'ultimo indice dell'altra sequenza (ma non deve essere la sua unica corrispondenza);</li>
+<li>La mappatura degli indici dalla prima sequenza agli indici dell'altra sequenza deve essere monotonicamente crescente. A grandi linee, indipendentemente dalla lunghezza delle serie l'indice iniziale e finale devono coincidere.</li>
+</ul>
+<h3 id="algoritmo" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#algoritmo" title="Permanent link: Algoritmo" data-icon="#">Algoritmo</a></h3>
+<blockquote>
+<p>Per illustrare il DTW userò in parte un breve esempio con due sequenze di pochi elementi preso da <a href="https://riptutorial.com/it/algorithm/example/24981/introduzione-al-dynamic-time-warping">riptutorial</a>.</p>
+</blockquote>
+<p>L'algoritmo di base è molto semplice, vedremo la differenza della similarità tra serie con DTW e distanza euclidea. Partiamo creando gli array:</p>
+<pre><code class="language-python">import numpy as np
+serie_1 = np.array([1, 2, 3, 5, 5, 5, 6], ndmin = 2)
+serie_2 = np.array([1, 1, 2, 2, 3, 5], ndmin =2)</code></pre>
+<p>Le due serie hanno lunghezza diversa, quindi un confronto punto per punto con distanza euclidea (o altra distanza) non sarebbe del tutto corretto. Supponiamo che le due serie partano nello stesso periodo e che la serie_2 finisca prima, quindi aggiungiamo un elemento per calcolare la distanza (<em>non rispetta le regole sugli indici del DTW</em>).</p>
+<p class="mathjax mathjax--block">\[
+d\left( p,q\right)   = \sqrt {\sum _{i=1}^{n}  \left( q_{i}-p_{i}\right)^2 }\]</p>
+<pre><code class="language-python">serie_2New = serie_2.copy()
+serie_2New = np.append(serie_2New, 0)
+
+distance = np.sqrt(np.sum((serie_1-serie_2New)**2))
+print(distance)</code></pre>
+<p>La distanza calcolata è 7.14.</p>
+<p>Passiamo ora al calcolo della distanza mediante DTW, per farlo ci servirà una matrice di dimensione <span class="mathjax mathjax--inline">$n \times m$</span> dove <span class="mathjax mathjax--inline">$m$</span> ed <span class="mathjax mathjax--inline">$n$</span> sono la lunghezza della serie più 1.</p>
+<pre><code class="language-python">n = serie_1.shape[1]+ 1
+m = serie_2.shape[1]+ 1
+DTW = np.zeros([n,m])</code></pre>
+<p>Il primo elemento della matrice <em>DTW[0,0]</em> deve essere pari a 0, mentre prima riga e prima colonna pari ad infinito. Quanto fatto serve per il <strong><em>cold start</em></strong> dell'algoritmo.
+Il cold start è il confronto con i periodi precedenti quando si è al primo passo dell'algoritmo, impostando una riga fittizia ad infinito non si incorre in situazioni anomale e si evita di implementare condizioni sullo start che appesantirebbero ulteriormente il calcolo.</p>
+<pre><code class="language-python">DTW[0,1:] = np.inf
+DTW[1:,0] = np.inf
+print(DTW)</code></pre>
+<figure role="group">
+        <img src="https://iaml.it/blog/serie-storiche-3-dynamic-time-warping/images/hRwFtvu.png" alt="matrice1">
+        </figure>
+<p>Per ogni posizione della matrice verrà calcolata la distanza euclidea di ogni punto di una serie da tutti i punti delle altre partendo dalla posizione <em>DTW[1,1]</em>. Ad ogni distanza viene aggiunto il minimo tra:</p>
+<ul>
+<li>il valore precedente sulle righe: <strong>cancellazione</strong>;</li>
+<li>il valore precedente sulle colonne: <strong>inserimento</strong>;</li>
+<li>il valore precedente in diagonale: <strong>corrispondenza</strong>.</li>
+</ul>
+<pre><code class="language-python">for i in range(1,n):
+    for j in range(1, m):
+        dist = abs(serie_1[:,i-1] - serie_2[:,j-1]) 
+        DTW[i,j] = dist + min([DTW[i-1,j], DTW[i,j-1], DTW[i-1,j-1]])
+
+print(DTW)</code></pre>
+<p>L'algoritmo restituisce una matrice con tutte le posizioni valorizzate.
+Arrivati a questo punto partendo da <em>DTW[0,0]</em> bisogna costruire un percorso che tocchi il valore minimo più vicino a quello nella posizione in cui ci troviamo muovendoci da sinistra verso destra in orizzontale/verticale/obliquo, questo è il <strong>Warping Path</strong>.</p>
+<ul>
+<li>Uno spostamento orizzontale significa che <em>serie_2</em> è accelerata durante questo intervallo.</li>
+<li>Uno spostamento verticale significa che <em>serie_2</em> è decelerata durante questo intervallo.</li>
+<li>Una mossa diagonale significa che durante questo periodo le serie camminano di pari passo.</li>
+</ul>
+<p><strong>Il valore finale del path è la distanza tra le serie.</strong>
+Dalla matrice si nota che il calcolo non è stato influenzato dalla diversa dimensione delle sequenze e che il valore finale è molto più piccolo di quello calcolato punto per punto con la distanza euclidea.</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/serie-storiche-3-dynamic-time-warping/images/OqkHF5t.png" alt="matrice2">
+        </figure>
+<h3 id="window-constraint" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#window-constraint" title="Permanent link: Window Constraint" data-icon="#">Window Constraint</a></h3>
+<p>La complessità di calcolo del DTW è <span class="mathjax mathjax--inline">$\mathcal{O}(m \times n)$</span> dove <span class="mathjax mathjax--inline">$m$</span> ed <span class="mathjax mathjax--inline">$n$</span> rappresentano la lunghezza di ciascuna sequenza. Se avessimo sequenze molto lunghe, il confronto tra le due risulterebbe complesso, ed anche inutile, perchè alcuni confronti verrebbero effettuati su posizioni lontanissime.
+Prendiamo l'esempio della serie storica, vorrebbe dire confrontare periodi molto distanti temporalmente che non hanno nessuna relazione ed influenza tra loro.
+Per questo motivo viene inserita un parametro <span class="mathjax mathjax--inline">$w$</span>, una <strong>finestra temporale</strong> su cui calcolare le differenze.</p>
+<p>La finestra temporale è il valore minimo tra un intero definito dall'utente (io ho utilizzato 1) e la differenza in valore assoluto tra <span class="mathjax mathjax--inline">$m$</span> ed <span class="mathjax mathjax--inline">$n$</span>.</p>
+<pre><code class="language-python">w = max([1, abs(n-m)])</code></pre>
+<p>Di seguito come cambia l'algoritmo per il calcolo della distanza.</p>
+<pre><code class="language-python">for i in range(1,n):
+    for j in range(max([1,i-w]), min([m, i+w])):
+        dist = abs(serie_1[:,i-1] - serie_2[:,j-1]) 
+        DTW[i,j] = dist + min([DTW[i-1,j], DTW[i,j-1], DTW[i-1,j-1]])
+
+print(DTW)</code></pre>
+<p>Nell'esempio proposto non si noteranno differenze viste le sequenze molto corte e con una differenza di una sola posizione, ma per sequenze molto lunghe e con differenze di lunghezza evidenti l'impatto è tangibile.</p>
+<h3 id="miglioramenti-al-dtw" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#miglioramenti-al-dtw" title="Permanent link: Miglioramenti al DTW" data-icon="#">Miglioramenti al DTW</a></h3>
+<p>Vista la complessità quadratica del DTW sono stati proposti alcuni migliorameti dell'algoritmo, il più conosciuto è probabilmente il <a href="https://www.semanticscholar.org/paper/FastDTW:-Toward-Accurate-Dynamic-Time-Warping-in-Salvador-Chan/05a20cde15e172fc82f32774dd0cf4fe5827cad2">FastDTW</a>.
+Il FastDTW cerca di migliorare le performance approssimando alcuni risultati, ma non sempre questa riduzione di tempi si traduce in una qualità del risultato accettabile.
+Ci sono molti paper e package su questo algoritmo, vi lascio il link della libreria Python <a href="https://pypi.org/project/fastdtw/">fastdtw</a> e il paper <a href="https://arxiv.org/abs/2003.11246"><em>"FastDTW is approximate and Generally Slower than the Algorithm it Approximates"</em></a> che spiega in quali casi questo algoritmo sia davvero più performante (mantenendo accettabile l'efficacia) del DTW classico.</p>
+<h2 id="dtw-e-machine-learning" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#dtw-e-machine-learning" title="Permanent link: DTW e Machine Learning" data-icon="#">DTW e Machine Learning</a></h2>
+<p>Tornando a quanto detto nell'introduzione, come può essere/viene usato il DTW nei problemi di Machine Learning?</p>
+<ul>
+<li><strong>Apprendimento supervisionato</strong>, come distanza per algoritmi KNN su Time Series.</li>
+<li><strong>Apprendimento non supervisionato</strong>, come misura di similarità nel clustering di Time Series.</li>
+<li><strong>Apprendimento semi-supervisionato</strong>, etichettare le Time Series utilizzando un algoritmo di clustering basato su DTW e successivamente classificare secondo queste assegnazioni.</li>
+</ul>
+<p>Di seguito un esempio di clustering basato sul DTW.</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/serie-storiche-3-dynamic-time-warping/images/9WK5DXr.png" alt="clustering">
+        </figure>
+<p>Ingrandendo il grafico finale si può notare come alcune serie dei cluster B e C sembrino molto più vicine al centroide A in alcuni periodi, ma il DTW non ne risente e permette un raggruppamento migliore.</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/serie-storiche-3-dynamic-time-warping/images/sbwJBX6.png" alt="dettaglio">
+        </figure>
+<p>Lascio alcuni paper del 2020 sull'argomento per chi volesse approfondire:</p>
+<ul>
+<li><a href="https://www.mdpi.com/1999-4893/13/3/57">Time Series Clustering Model Based on DTW for Classifying Car Parks</a></li>
+<li><a href="https://link.springer.com/content/pdf/10.1007/s10614-020-09986-0.pdf">Intertemporal Similarity of Economic Time Series: An Application of Dynamic Time Warping</a></li>
+<li><a href="https://www.sciencedirect.com/science/article/pii/S0031320319303279">Time series classification using local distance-based features in multi-modal fusion networks</a></li>
+<li><a href="https://www.sciencedirect.com/science/article/abs/pii/S0950705119303995">DTW-NN: A novel neural network for time series recognition using dynamic alignment between inputs and weights</a></li>
+<li><a href="https://www.sciencedirect.com/science/article/pii/S0020025520303054">Adaptively constrained dynamic time warping for time series classification and clustering</a></li>
+</ul>
+<h3 id="ringraziamenti" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#ringraziamenti" title="Permanent link: Ringraziamenti" data-icon="#">Ringraziamenti</a></h3>
+<p>L'immagine di copertina è presa da <a href="https://databricks.com/blog/2019/04/30/understanding-dynamic-time-warping.html">https://databricks.com/blog/2019/04/30/understanding-dynamic-time-warping.html</a>.</p>
+<hr />
+<div class="notices blue">
+<p>Se questo articolo ti è piaciuto e vuoi tenerti aggiornato sulle nostre attività, ricordati che l'<a href="../member.html">iscrizione all'Italian Association for Machine Learning</a> è gratuita! Puoi seguirci su <a href="https://www.facebook.com/machinelearningitalia/">Facebook</a>, <a href="https://www.linkedin.com/company/iaml/">LinkedIn</a>, e <a href="https://twitter.com/iaml_it">Twitter</a>.</p>
+</div></p>
+            
+    
+        <p class="prev-next">
+                            <a class="button" href="serie-storiche-2-sax-encoding.html"><i class="fa fa-chevron-left"></i> Previous Post</a>
+            
+                            <a class="button" href="machine-learning-project-management.html">Next Post <i class="fa fa-chevron-right"></i></a>
+                    </p>
+    
+    </div>
+</div>
+			</div>
+			<div id="sidebar" class="g-block size-1-3 pure-u-1-3">
+				<div class="sidebar-content">
+    <h4>Search the blog</h4>
+    <input type="text" placeholder="Search..." value="" data-searchsidebar-input="/search/query" />
+<script>
+jQuery(document).ready(function($){
+    var input = $('[data-searchsidebar-input]');
+
+    input.on('keypress', function(event) {
+        if (event.which == 13 && input.val().length > 3) {
+            event.preventDefault();
+            window.location.href = input.data('searchsidebar-input') + ':' + input.val();
+        }
+    });
+});
+</script>
+</div>
+<!--
+<div class="sidebar-content">
+	<h4>Some Text Widget</h4>
+	<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna.</p>
+</div>
+!-->
+<div class="sidebar-content">
+    <h4>Categories</h4>
+    
+
+<ul class="archives">
+        <li>
+        <a href="categoryTutorials">Tutorials </a> (16)
+    </li>
+        <li>
+        <a href="categoryDiscussions">Discussions </a> (12)
+    </li>
+        <li>
+        <a href="categoryAnnouncements.html">Announcements </a> (4)
+    </li>
+        <li>
+        <a href="categoryTutorials (English).html">Tutorials (English) </a> (4)
+    </li>
+        <li>
+        <a href="categoryArticles' summaries.html">Articles' summaries </a> (3)
+    </li>
+        <li>
+        <a href="categoryDiscussions (English).html">Discussions (English) </a> (2)
+    </li>
+        <li>
+        <a href="categoryFocus-on.html">Focus-on </a> (1)
+    </li>
+        <li>
+        <a href="categoryReviews.html">Reviews </a> (1)
+    </li>
+        <li>
+        <a href="categoryDiscussion.html">Discussion </a> (1)
+    </li>
+    </ul>
+</div>
+<div class="sidebar-content">
+    <h4>Archives</h4>
+	<ul class="archives">
+    <li>
+    	<a href="archives_monthjun_2020.html">
+        <span class="archive_date">June 2020</span>
+                <span>(1)</span>
+                </a>
+    </li>
+</ul>
+</div>
+<div class="sidebar-content">
+    <h4>Popular Tags</h4>
+    
+
+<ul class="archives">
+        <li>
+        <a href="tagdeep learning">deep learning </a> (11)
+    </li>
+        <li>
+        <a href="tagpytorch">pytorch </a> (9)
+    </li>
+        <li>
+        <a href="tagreti neurali.html">reti neurali </a> (5)
+    </li>
+        <li>
+        <a href="taggoogle.html">google </a> (4)
+    </li>
+        <li>
+        <a href="tagjit.html">jit </a> (4)
+    </li>
+        <li>
+        <a href="tagtensorflow.html">tensorflow </a> (4)
+    </li>
+        <li>
+        <a href="tagottimizzazione.html">ottimizzazione </a> (4)
+    </li>
+        <li>
+        <a href="tagrete neurale.html">rete neurale </a> (3)
+    </li>
+        <li>
+        <a href="tagtime series.html">time series </a> (3)
+    </li>
+        <li>
+        <a href="tagkeras.html">keras </a> (3)
+    </li>
+        <li>
+        <a href="tagreti convolutive.html">reti convolutive </a> (3)
+    </li>
+        <li>
+        <a href="tagpipeline.html">pipeline </a> (2)
+    </li>
+        <li>
+        <a href="tagsklearn.html">sklearn </a> (2)
+    </li>
+        <li>
+        <a href="tagautodiff.html">autodiff </a> (2)
+    </li>
+        <li>
+        <a href="tagautomatic differentation.html">automatic differentation </a> (2)
+    </li>
+        <li>
+        <a href="tagreverse-mode.html">reverse-mode </a> (2)
+    </li>
+        <li>
+        <a href="tagderivate.html">derivate </a> (2)
+    </li>
+        <li>
+        <a href="tagdifferenziazione.html">differenziazione </a> (2)
+    </li>
+        <li>
+        <a href="tagmodel selection.html">model selection </a> (2)
+    </li>
+        <li>
+        <a href="tagcross validation.html">cross validation </a> (2)
+    </li>
+        <li>
+        <a href="tagc++.html">c++ </a> (2)
+    </li>
+        <li>
+        <a href="tagnumpy.html">numpy </a> (2)
+    </li>
+        <li>
+        <a href="tagvmap.html">vmap </a> (2)
+    </li>
+        <li>
+        <a href="tagcaffe.html">caffe </a> (2)
+    </li>
+        <li>
+        <a href="tagcompiler.html">compiler </a> (2)
+    </li>
+        <li>
+        <a href="tagjax.html">jax </a> (2)
+    </li>
+        <li>
+        <a href="tagcodemotion.html">codemotion </a> (1)
+    </li>
+        <li>
+        <a href="tagbias.html">bias </a> (1)
+    </li>
+        <li>
+        <a href="tagdiscrimination.html">discrimination </a> (1)
+    </li>
+        <li>
+        <a href="tagfairness.html">fairness </a> (1)
+    </li>
+        <li>
+        <a href="tagiaml.html">iaml </a> (1)
+    </li>
+        <li>
+        <a href="tagdatabase.html">database </a> (1)
+    </li>
+        <li>
+        <a href="tagiperparametri.html">iperparametri </a> (1)
+    </li>
+        <li>
+        <a href="tagautograph.html">autograph </a> (1)
+    </li>
+        <li>
+        <a href="taghead.html">head </a> (1)
+    </li>
+        <li>
+        <a href="tagmulti-task.html">multi-task </a> (1)
+    </li>
+        <li>
+        <a href="taglearning.html">learning </a> (1)
+    </li>
+        <li>
+        <a href="tagnovità.html">novità </a> (1)
+    </li>
+        <li>
+        <a href="tagdev summit.html">dev summit </a> (1)
+    </li>
+        <li>
+        <a href="tagcustom estimator.html">custom estimator </a> (1)
+    </li>
+        <li>
+        <a href="taghyperopt.html">hyperopt </a> (1)
+    </li>
+        <li>
+        <a href="taggoodfellow.html">goodfellow </a> (1)
+    </li>
+        <li>
+        <a href="tagnlp.html">nlp </a> (1)
+    </li>
+        <li>
+        <a href="tagdati mancanti.html">dati mancanti </a> (1)
+    </li>
+        <li>
+        <a href="tagtransformer.html">transformer </a> (1)
+    </li>
+        <li>
+        <a href="tagattenzione.html">attenzione </a> (1)
+    </li>
+        <li>
+        <a href="tagrobocop.html">robocop </a> (1)
+    </li>
+        <li>
+        <a href="tagyolo.html">yolo </a> (1)
+    </li>
+        <li>
+        <a href="tagobject detection.html">object detection </a> (1)
+    </li>
+        <li>
+        <a href="tagbayes.html">bayes </a> (1)
+    </li>
+        <li>
+        <a href="tagautoencoders.html">autoencoders </a> (1)
+    </li>
+        <li>
+        <a href="tagvariational.html">variational </a> (1)
+    </li>
+        <li>
+        <a href="tageager.html">eager </a> (1)
+    </li>
+        <li>
+        <a href="tagimputazione.html">imputazione </a> (1)
+    </li>
+        <li>
+        <a href="tagCIFAR.html">CIFAR </a> (1)
+    </li>
+        <li>
+        <a href="tagword embedding.html">word embedding </a> (1)
+    </li>
+        <li>
+        <a href="tagMNIST.html">MNIST </a> (1)
+    </li>
+        <li>
+        <a href="tagimmagini.html">immagini </a> (1)
+    </li>
+        <li>
+        <a href="tagclassificazione.html">classificazione </a> (1)
+    </li>
+        <li>
+        <a href="tagkpi.html">kpi </a> (1)
+    </li>
+        <li>
+        <a href="tagreprogramming.html">reprogramming </a> (1)
+    </li>
+        <li>
+        <a href="tagadversarial.html">adversarial </a> (1)
+    </li>
+        <li>
+        <a href="tagbrowser.html">browser </a> (1)
+    </li>
+        <li>
+        <a href="tagjavascript.html">javascript </a> (1)
+    </li>
+        <li>
+        <a href="tagreti ricorsive.html">reti ricorsive </a> (1)
+    </li>
+        <li>
+        <a href="tagreti ricorrenti.html">reti ricorrenti </a> (1)
+    </li>
+        <li>
+        <a href="tagftth.html">ftth </a> (1)
+    </li>
+        <li>
+        <a href="tagadversarial example.html">adversarial example </a> (1)
+    </li>
+        <li>
+        <a href="tagmanagement.html">management </a> (1)
+    </li>
+        <li>
+        <a href="tagrobotica.html">robotica </a> (1)
+    </li>
+        <li>
+        <a href="tagocr.html">ocr </a> (1)
+    </li>
+        <li>
+        <a href="tagfocus.html">focus </a> (1)
+    </li>
+        <li>
+        <a href="tagiphone.html">iphone </a> (1)
+    </li>
+        <li>
+        <a href="tagpython.html">python </a> (1)
+    </li>
+        <li>
+        <a href="tagface id.html">face id </a> (1)
+    </li>
+        <li>
+        <a href="tagmomento.html">momento </a> (1)
+    </li>
+        <li>
+        <a href="tagadam.html">adam </a> (1)
+    </li>
+        <li>
+        <a href="tagneuroscienza.html">neuroscienza </a> (1)
+    </li>
+        <li>
+        <a href="tagonde cerebrali.html">onde cerebrali </a> (1)
+    </li>
+        <li>
+        <a href="tagtorchvision.html">torchvision </a> (1)
+    </li>
+        <li>
+        <a href="taglatin.html">latin </a> (1)
+    </li>
+        <li>
+        <a href="tagpretrained.html">pretrained </a> (1)
+    </li>
+        <li>
+        <a href="tagrete convolutiva.html">rete convolutiva </a> (1)
+    </li>
+        <li>
+        <a href="tagautograd.html">autograd </a> (1)
+    </li>
+        <li>
+        <a href="tagswish.html">swish </a> (1)
+    </li>
+        <li>
+        <a href="tagattivazione.html">attivazione </a> (1)
+    </li>
+        <li>
+        <a href="tagcheckpoint.html">checkpoint </a> (1)
+    </li>
+        <li>
+        <a href="tagtensori.html">tensori </a> (1)
+    </li>
+        <li>
+        <a href="tagvariabili.html">variabili </a> (1)
+    </li>
+        <li>
+        <a href="taglineare.html">lineare </a> (1)
+    </li>
+        <li>
+        <a href="tagregressione.html">regressione </a> (1)
+    </li>
+        <li>
+        <a href="tagconvolutional networks.html">convolutional networks </a> (1)
+    </li>
+        <li>
+        <a href="tagVatican.html">Vatican </a> (1)
+    </li>
+        <li>
+        <a href="tagproject.html">project </a> (1)
+    </li>
+        <li>
+        <a href="tagkernel.html">kernel </a> (1)
+    </li>
+        <li>
+        <a href="tagICLR.html">ICLR </a> (1)
+    </li>
+        <li>
+        <a href="tagipotesi.html">ipotesi </a> (1)
+    </li>
+        <li>
+        <a href="tagsparsità.html">sparsità </a> (1)
+    </li>
+        <li>
+        <a href="tagfunzionale.html">funzionale </a> (1)
+    </li>
+        <li>
+        <a href="tagfunctional.html">functional </a> (1)
+    </li>
+        <li>
+        <a href="tagadversarial attack.html">adversarial attack </a> (1)
+    </li>
+        <li>
+        <a href="tagkmeans.html">kmeans </a> (1)
+    </li>
+        <li>
+        <a href="taganalysis.html">analysis </a> (1)
+    </li>
+        <li>
+        <a href="tagclustering.html">clustering </a> (1)
+    </li>
+        <li>
+        <a href="tagGoogle.html">Google </a> (1)
+    </li>
+        <li>
+        <a href="tagregression.html">regression </a> (1)
+    </li>
+        <li>
+        <a href="tagJAX.html">JAX </a> (1)
+    </li>
+        <li>
+        <a href="taggaussian process.html">gaussian process </a> (1)
+    </li>
+        <li>
+        <a href="tagensemble.html">ensemble </a> (1)
+    </li>
+        <li>
+        <a href="tagboosting.html">boosting </a> (1)
+    </li>
+        <li>
+        <a href="taggradient.html">gradient </a> (1)
+    </li>
+        <li>
+        <a href="tagsemi-supervised learning.html">semi-supervised learning </a> (1)
+    </li>
+        <li>
+        <a href="tagdocument classification.html">document classification </a> (1)
+    </li>
+        <li>
+        <a href="taggraphs.html">graphs </a> (1)
+    </li>
+        <li>
+        <a href="tagvariables.html">variables </a> (1)
+    </li>
+        <li>
+        <a href="taglinear.html">linear </a> (1)
+    </li>
+        <li>
+        <a href="tagk-NN.html">k-NN </a> (1)
+    </li>
+    </ul>
+</div>
+<div class="sidebar-content syndicate">
+    <h4>Syndicate</h4>
+    <a class="button" href="../blog.atom"><i class="fa fa-rss-square"></i> Atom 1.0</a>
+    <a class="button" href="../blog.rss"><i class="fa fa-rss-square"></i> RSS</a>
+</div>
+			</div>
+		</div>
+	
+                        <div class="modular-row footer ">
+    <div class="footer-items">
+        <div class="footer-module large">
+		<h4>About</h4>
+                            <p>Italian Association for Machine Learning (C.F. 97949550582)</p>
+            			<p>Write us: info@iaml.it</p>
+        </div>
+        <div class="footer-module"><h4>Address</h4>
+            <p>
+                                    <span><strong>Operational office</strong></span>
+                                    <span>IAML c/o Pi Campus, via Indonesia 23, 00144 Rome</span>
+                                    <span><strong>Legal office</strong></span>
+                                    <span>Via Cassia 964, 00189, Rome</span>
+                            </p>
+        </div>
+        <div class="footer-module"><h4>Quick Links</h4>
+         <ul class="quickmenu">
+                            <li><i class="fa fa-chevron-right"></i><a href="../home">Home</a></li>
+                            <li><i class="fa fa-chevron-right"></i><a href="https://iaml.it/documents">Documents (Italian)</a></li>
+                    </ul>
+    </div>
+   
+</div>
+<hr>
+<div class="footer-modules">
+    <div class="footer-copyright">
+        Copyright 2018 IAML.IT. All Rights Reserved.
+    </div>
+    <div class="footer-menu">
+    <ul class="othermenu">
+           <li><a href="https://learn.getgrav.org/">Powered by Grav</a></li>
+           <li><a href="https://github.com/getgrav/grav-theme-deliver">Theme (adapted) from Deliver</a></li>
+        </ul>
+    </div>
+</div>
+</div>                    </section>
+        
+    </div>
+    <div class="sb-slidebar sb-left sb-width-thin">
+        <div id="panel">
+        
+<ul class="navigation">
+                                                        <li class="">
+                    <a href="../index.html">
+                                                Home
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../activities">
+                                                Activities
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../supporters.html">
+                                                Supporters
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../member.html">
+                                                Become a member
+                    </a>
+                </li>
+                                                                <li class="active">
+                    <a href="../blog">
+                                                Blog
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../governance">
+                                                Governance
+                    </a>
+                </li>
+                                                                                                                                </ul>                   </div>
+    </div>
+        <script src="../user/plugins/simplesearch/js/simplesearch.js" type="text/javascript" ></script>
+
+    <script>
+    $(function () {
+        $(document).ready(function() {
+          $.slidebars({
+            hideControlClasses: true,
+            scrollLock: true
+          });
+        });
+    });
+    </script>
+    </body>
+</html>
+
+

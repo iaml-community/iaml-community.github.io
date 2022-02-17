@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Deep learning: un problema di ottimizzazione | Italian Association for Machine Learning</title>
+    <meta content="GravCMS"  />
+<meta content="The Italian Association for Machine Learning (IAML) is a not-for-profit organization with the purpose of promoting knowledge of machine learning in all aspects of the Italian public life, from universities to enterprises and IT professionals."  />
+<meta property="og:title" content="Deep learning: un problema di ottimizzazione | IAML.it"  />
+<meta property="og:image" content="https://iaml.it/blog/deep-learning-ottimizzazione/images/non_convex_sgd.png"  />
+<meta property="og:url" content="https://iaml.it/blog/deep-learning-ottimizzazione/"  />
+<meta property="og:description" content="In questo articolo analizzeremo i metodi di ottimizzazione del primo ordine, dei quali il metodo della discesa del gradiente stocastico e tutte le sue varianti sono fra quelli ampiamente utilizzati ed in continua evoluzione."  />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="icon" type="image/png" href="/user/themes/deliver/images/favicon.png" />
+
+	<!-- Global site tag (gtag.js) - Google Ads: 774709547 --> <script async src="https://www.googletagmanager.com/gtag/js?id=AW-774709547"></script> <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'AW-774709547'); </script> 
+	
+		
+                            		                                                <link href="/user/themes/deliver/css-compiled/nucleus.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css-compiled/template.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/custom.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/toc.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/font-awesome.min.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/facebook/css/facebook.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/facebook/assets/unitegallery/css/unite-gallery.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/facebook/assets/unitegallery/themes/default/ug-theme-default.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/markdown-notices/assets/notices.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/breadcrumbs/css/breadcrumbs.css" type="text/css" rel="stylesheet" />
+<link href="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/events/assets/events.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/form/assets/form-styles.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/mathjax/assets/css/mathjax.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/simplesearch/css/simplesearch.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/highlight/css/zenburn.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/login/css/login.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/slidebars.min.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/slideme.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/socialbuttons/vendor/rrssb/css/rrssb.css" type="text/css" rel="stylesheet" />
+
+
+                                                            <script src="/system/assets/jquery/jquery-2.x.min.js" type="text/javascript" ></script>
+<script src="/user/themes/deliver/js/modernizr.custom.71422.js" type="text/javascript" ></script>
+<script src="/user/plugins/facebook/assets/unitegallery/js/unitegallery.min.js" type="text/javascript" ></script>
+<script src="/user/plugins/facebook/assets/unitegallery/themes/default/ug-theme-default.js" type="text/javascript" ></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.js" type="text/javascript" ></script>
+<script src="/user/plugins/events/assets/events.js" type="text/javascript" ></script>
+<script src="/user/plugins/mathjax/assets/js/mathjax.js" type="text/javascript" ></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript" ></script>
+<script src="/user/plugins/highlight/js/highlight.pack.js" type="text/javascript" ></script>
+<script src="/user/themes/deliver/js/deliver.js" type="text/javascript" ></script>
+<script src="/user/themes/deliver/js/slidebars.min.js" type="text/javascript" ></script>
+<script src="/user/themes/deliver/js/jquery.slideme2.js" type="text/javascript" ></script>
+<script src="/user/plugins/socialbuttons/vendor/rrssb/js/rrssb.min.js" type="text/javascript" ></script>
+
+<script>
+window.addEventListener("load", function(){
+window.cookieconsent.initialise({
+"palette": {
+    "popup": {
+        "background": "#4d4d4d",
+        "text": "#fff"
+    },
+    "button": {
+        "background": "#f1d600",
+        "text": "#000",
+        "border": "#f1d600"
+    }
+},
+"position": "bottom",
+"theme": "block",
+"content": {
+    "message": "This website uses cookies to ensure you get the best experience on our website.",
+    "dismiss": "Got it!",
+    "link": "Learn more",
+    "href": "https://cookiesandyou.com"
+}
+})});
+hljs.initHighlightingOnLoad();
+
+</script>
+
+
+</head>
+<body id="top" class="header-lite fullwidth blogstyling">
+    <div id="sb-site">
+                <header id="header">
+                <div class="logo">
+                    <h3><a href="https://iaml.it"><img src="/user/pages/images/IAML_logo_viola.png" /></a></h3>
+                                            <ul class="social-icons">
+            <li>
+            <a href="https://twitter.com/iaml_it">
+                <i class="fa fa-twitter"></i>            </a>
+        </li>
+            <li>
+            <a href="https://www.linkedin.com/company/iaml/">
+                <i class="fa fa-linkedin"></i>            </a>
+        </li>
+            <li>
+            <a href="https://www.facebook.com/machinelearningitalia/">
+                <i class="fa fa-facebook"></i>            </a>
+        </li>
+            <li>
+            <a href="blog.rss">
+                <i class="fa fa-rss"></i>            </a>
+        </li>
+    </ul>  
+                                    </div>
+                <div id="navbar">
+                                                            
+<ul class="navigation">
+                                                        <li class="">
+                    <a href="/">
+                                                Home
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/activities">
+                                                Activities
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/supporters">
+                                                Supporters
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/member">
+                                                Become a member
+                    </a>
+                </li>
+                                                                <li class="active">
+                    <a href="/blog">
+                                                Blog
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/governance">
+                                                Governance
+                    </a>
+                </li>
+                                                                                                                                </ul>                                                   <form class="search-box">
+    <input type="search" placeholder="Search..." value="" data-search-input="/search/query" />
+    <script>
+    jQuery(document).ready(function($){
+        var input = $('[data-search-input]');
+
+        input.on('keypress', function(event) {
+            if (event.which == 13 && input.val().length > 3) {
+                event.preventDefault();
+                window.location.href = input.data('search-input') + ':' + input.val();
+            }
+        });
+    });
+    </script>
+    <i class="fa fa-search"></i>
+</form>                    <span class="panel-activation sb-toggle-left navbar-left menu-btn fa fa-bars"></span>
+                </div>
+        </header>
+        
+        
+                <section id="body" class="">
+                            
+				<div class="flush-top blog-header blog-header-image" style="background: #B4B093 url(/user/pages/05.blog/blue_header.jpg) no-repeat right;">
+            <h1>Deep learning: un problema di ottimizzazione</h1>
+        </div>
+            
+        
+<div id="breadcrumbs" itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
+                                            <a href="/" itemprop="url"><span itemprop="title">Home</span></a>
+                        <i class="fa fa-angle-right"></i>
+                                                <a href="/blog" itemprop="url"><span itemprop="title">Blog</span></a>
+                        <i class="fa fa-angle-right"></i>
+                                                <span itemprop="title">Deep learning: un problema di ottimizzazione</span>
+                        </div>
+		
+		<div class="blog-content-item g-grid pure-g-r">
+			<div id="item" class="g-block pure-u-2-3">
+			    <div class="list-item">
+
+    <div class="list-blog-header">
+                    <img src="/images/7/5/7/5/1/75751b47fd00dbd42c92ea5ccee720ec97cccdb4-nonconvexsgd.jpeg" />
+        
+                    <h4><a href="/blog/deep-learning-ottimizzazione">Deep learning: un problema di ottimizzazione</a></h4>
+        
+        <span class="list-blog-date">
+            <i class="fa fa-calendar"></i>
+            09, Dec
+        </span>
+                <span class="list-blog-author">
+            <i class="fa fa-user"></i>
+            Bruno Neri
+        </span>
+                       <ul class="tags">
+            <i class="fa fa-tag"></i>
+                        <li><a href="/blog/tag:ottimizzazione">ottimizzazione</a></li>
+                        <li><a href="/blog/tag:deep learning">deep learning</a></li>
+                        <li><a href="/blog/tag:adam">adam</a></li>
+                        <li><a href="/blog/tag:momento">momento</a></li>
+                    </ul>
+        
+    </div>
+
+	<div>
+	<br />
+	<!-- AddToAny BEGIN -->
+<div class="a2a_kit a2a_kit_size_32 a2a_default_style">
+<a class="a2a_dd" href="https://www.addtoany.com/share"></a>
+<a class="a2a_button_facebook"></a>
+<a class="a2a_button_twitter"></a>
+<a class="a2a_button_linkedin"></a>
+<a class="a2a_button_google_plus"></a>
+<a class="a2a_button_email"></a>
+</div>
+<script async src="https://static.addtoany.com/menu/page.js"></script>
+<!-- AddToAny END -->
+</div>
+	
+    <div class="list-blog-padding">
+
+            <p><p>Il concetto di ottimizzazione gioca un ruolo chiave quando si parla di machine learning e deep learning in particolare. Lo scopo principale degli algoritmi di deep learning è quello di costruire un modello di ottimizzazione che, tramite un processo iterativo, minimizzi o massimizzi una funzione obiettivo <span class="mathjax mathjax--inline">$J(\theta)$</span> denominata anche <strong>loss function</strong> o <strong>cost function</strong>.</p>
+<p>I più popolari metodi di ottimizzazione possono essere suddivisi in due categorie: metodi di ottimizzazione <em>del primo ordine</em>, rappresentati dal metodo del gradiente, e metodi di ottimizzazione <em>del secondo ordine</em> o di ordine superiore, fra i quali il metodo di Newton ne è un tipico esempio. In questo articolo analizzeremo i metodi di ottimizzazione del primo ordine, dei quali il metodo della discesa del gradiente stocastico e tutte le sue varianti sono fra quelli ampiamente utilizzati ed in continua evoluzione.</p>
+<p>Ci occuperemo delle loro caratteristiche con l'auspicio di stimolare nel lettore il giusto spirito critico per scelta del metodo più appropriato e renderne più ragionevole la calibrazione dei parametri. Gli algoritmi di ottimizzazione trattati nel seguente articolo sono disponibili nei framework di deep learning quali <a href="https://keras.io/">Keras</a>, <a href="https://www.tensorflow.org/">TensorFlow</a> e <a href="https://pytorch.org/">PyTorch</a>. Gli esempi riportati saranno implementati in Python con l'utilizzo del framework Keras.</p>
+<p></p>
+<nav class="table-of-contents minitoc" role="navigation">
+                <span class="toctitle">Overview:</span>
+      
+                                                                            
+  <ul>
+      
+        
+        
+              <li><a href="#metodi-di-ottimizzazione-del..." class="toclink" title="Metodi di ottimizzazione del primo ordine">Metodi di ottimizzazione del primo ordine</a></li>
+      
+                      <li><ul>
+          
+        
+              <li><a href="#la-discesa-del-gradiente-batch" class="toclink" title="La discesa del gradiente (batch)"><strong>La discesa del gradiente (batch)</strong></a></li>
+      
+        
+        
+              <li><a href="#discesa-del-gradiente..." class="toclink" title="Discesa del gradiente stocastico I (SGD)"><strong>Discesa del gradiente stocastico I (SGD)</strong></a></li>
+      
+        
+        
+              <li><a href="#discesa-del-gradiente...-1" class="toclink" title="Discesa del gradiente  stocastico II (mini-batch)"><strong>Discesa del gradiente  stocastico II (mini-batch)</strong></a></li>
+      
+        
+        
+              <li><a href="#metodo-del-momento" class="toclink" title="Metodo del momento"><strong>Metodo del momento</strong></a></li>
+      
+        
+        
+              <li><a href="#momento-di-nesterov" class="toclink" title="Momento di Nesterov"><strong>Momento di Nesterov</strong></a></li>
+      
+        
+        
+              <li><a href="#metodi-di-learning-rate..." class="toclink" title="Metodi di learning rate adattativo">Metodi di learning rate adattativo</a></li>
+      
+                      </ul></li>
+          
+        
+              <li><a href="#esempio-addestramento-di-una-cnn" class="toclink" title="Esempio: addestramento di una CNN">Esempio: addestramento di una CNN</a></li>
+      
+        
+        
+              <li><a href="#conclusioni" class="toclink" title="Conclusioni">Conclusioni</a></li>
+      
+                      <li><ul>
+          
+        
+              <li><a href="#riferimenti" class="toclink" title="Riferimenti">Riferimenti</a></li>
+      
+              </ul></li>
+      
+  </ul>
+</nav>
+
+
+<h2 id="metodi-di-ottimizzazione-del..." class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#metodi-di-ottimizzazione-del..." title="Permanent link: Metodi di ottimizzazione del primo ordine" data-icon="#">Metodi di ottimizzazione del primo ordine</a></h2>
+<p>Nei modelli di machine learning e deep learning i metodi di ottimizzazione del primo ordine principalmente utilizzati sono basati sul concetto di discesa del gradiente. In questa sezione introdurremo gli algoritmi più rappresentativi.</p>
+<h3 id="la-discesa-del-gradiente-batch" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#la-discesa-del-gradiente-batch" title="Permanent link: La discesa del gradiente (batch)" data-icon="#"><strong>La discesa del gradiente (batch)</strong></a></h3>
+<p>Il metodo della discesa del gradiente è il primo e più comune metodo di ottimizzazione. L'algoritmo si basa sull'aggiornamento iterativo di un parametro <span class="mathjax mathjax--inline">$\theta$</span> lungo la direzione opposta a quella del gradiente della funzione obiettivo <span class="mathjax mathjax--inline">$J(\theta)$</span>. L'aggiornamento viene sviluppato in modo da convergere gradualmente al valore ottimo della funzione obiettivo.</p>
+<p>Uno dei parametri del metodo è il learning rate <span class="mathjax mathjax--inline">$\eta$</span> che determina l'ampiezza della variazione di <span class="mathjax mathjax--inline">$\theta$</span> in ciascuna iterazione e quindi influenza il numero di iterazioni necessarie a raggiungere il valore ottimo della funzione obiettivo.</p>
+<p class="mathjax mathjax--block">$$
+\theta_{t+1} = \theta_t  - \eta \nabla_\theta J(\theta)$$</p>
+<p>Il metodo è di semplice implementazione e nel caso in cui <span class="mathjax mathjax--inline">$J(\theta)$</span> sia una funzione (fortemente) convessa, la soluzione trovata sarà un punto di ottimo globale. Nel caso in cui la funzione obiettivo non sia convessa, la soluzione trovata potrebbe essere un minimo locale (o più in generale un <em>punto stazionario</em>).
+Il nome deriva dal fatto che, ad ogni iterazione, l'algoritmo impiega tutti i dati del training set per calcolare il gradiente <span class="mathjax mathjax--inline">$\nabla_\theta J(\theta)$</span>.</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/deep-learning-ottimizzazione/images/gradient_descent.png"alt="gradient_descent" />
+        </figure>
+<h3 id="discesa-del-gradiente..." class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#discesa-del-gradiente..." title="Permanent link: Discesa del gradiente stocastico I (SGD)" data-icon="#"><strong>Discesa del gradiente stocastico I (SGD)</strong></a></h3>
+<p>Nel metodo appena descritto, il gradiente <span class="mathjax mathjax--inline">$\nabla_ \theta J(\theta)$</span> è calcolato utilizzando, ad ogni iterazione, tutto il training set. Questo determina una elevata e ridondante complessità computazionale e non consente di effettuare gli update online di <span class="mathjax mathjax--inline">$\theta$</span>.</p>
+<p>Per ovviare a questo punto debole la soluzione proposta è stata quella del metodo della discesa del gradiente stocastico. L'idea è quella di calcolare il gradiente non più mediante tutto il training set ma mediante un singolo campione selezionato in modo casuale ad ogni iterazione.</p>
+<p class="mathjax mathjax--block">$$
+\theta_{t+1} = \theta_t  - \eta  \nabla_\theta J(\theta; x^{(i)}; y^{(i)})$$</p>
+<p>L'utilizzo di un singolo campione determina una forte diminuzione della complessità computazionale che in ciascuna iterazione adesso è dovuta esclusivamente al numero <em>D</em> delle feature del training set.
+La stocasticità nella selezione dei campioni dal training set determina anche che la ricerca della soluzione possa non rimanere <em>"intrappolata"</em> in un minimo locale di <span class="mathjax mathjax--inline">$J(\theta)$</span>.</p>
+<p>Di seguito un esempio in Python dell'utilizzo di SGD fornito da Keras: </p>
+<pre><code class="language-python">model.compile(loss="categorical_crossentropy",
+              optimizer=keras.optimizers.SGD(lr=0.001),
+              metrics=["accuracy"])
+model.fit(x_train, y_train, epochs=10,
+                    validation_data=(x_valid, y_valid), batch_size=1)</code></pre>
+<h3 id="discesa-del-gradiente...-1" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#discesa-del-gradiente...-1" title="Permanent link: Discesa del gradiente  stocastico II (mini-batch)" data-icon="#"><strong>Discesa del gradiente  stocastico II (mini-batch)</strong></a></h3>
+<p>L'utilizzo di una selezione casuale di singoli campioni dal training set ha lo svantaggio di determinare una oscillazione della direzione del gradiente e un procedere in modo cieco del processo di ricerca della soluzione all'interno dello spazio delle soluzioni.</p>
+<p>Un modo per diminuire la varianza del gradiente è stato quello di introdurre una variante denominata mini-batch gradient descent. Questa modalità impiega, ad ogni iterazione, un insieme di <span class="mathjax mathjax--inline">$n$</span> campioni del training set e con questi calcola il gradiente <span class="mathjax mathjax--inline">$\nabla_\theta J(\theta)$</span>. In questo modo si raggiunge il duplice obiettivo di ridurre la varianza del gradiente e rendere più stabile la convergenza.</p>
+<p class="mathjax mathjax--block">$$
+\theta_{t+1} = \theta_t  - \eta \nabla_\theta J(\theta; x^{(i:i+n)}; y^{(i:i+n)})$$</p>
+<p>Il codice Python seguente è un esempio di implementazione del mini batch SGD utilizzando Keras:  </p>
+<pre><code class="language-python">model.compile(loss="categorical_crossentropy",
+              optimizer=keras.optimizers.SGD(lr=0.001),
+              metrics=["accuracy"])
+model.fit(x_train, y_train, epochs=10,batch_size=64
+          validation_data=(x_valid, y_valid))</code></pre>
+<h3 id="metodo-del-momento" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#metodo-del-momento" title="Permanent link: Metodo del momento" data-icon="#"><strong>Metodo del momento</strong></a></h3>
+<p>Nonostante il metodo SGD sia molto popolare ed ampiamente utilizzato, il processo di aggiornamento di <span class="mathjax mathjax--inline">$\theta$</span> risulta spesso molto lento. </p>
+<p>Fra i punti aperti infatti c'è una più opportuna regolazione del learning rate per velocizzare la convergenza e fare in modo che il processo di ricerca della soluzione non rimanga intrappolato in un minimo locale di <span class="mathjax mathjax--inline">$J(\theta)$</span>.</p>
+<p>Una delle idee che si è fatta strada è quella del <em>"momento"</em> che, per come è stato pensato, gioca il ruolo di una velocità <span class="mathjax mathjax--inline">$v$</span>. Il concetto è infatti derivato dalla fisica, in particolare dalla meccanica, ed è stato pensato per  accellerare il processo di aggiornamento di <span class="mathjax mathjax--inline">$\theta$</span>, specialmente in  casi di elevate curvature di <span class="mathjax mathjax--inline">$J(\theta)$</span> e di valori piccoli, costanti e rumorosi del gradiente <span class="mathjax mathjax--inline">$\nabla_ \theta J(\theta)$</span>. L'idea è quella di calcolare, ad ogni iterazione, una media mobile esponenziale dei gradienti storici ed utilizzare questo valore come direzione da seguire nell'aggiornamento di <span class="mathjax mathjax--inline">$\theta$</span>. Il parametro <span class="mathjax mathjax--inline">$\beta \in [0,1)$</span> determina la velocità di decadimento dei contributi dei gradienti storici.</p>
+<p class="mathjax mathjax--block">$$
+v_ t = \beta v_ {t-1} - \eta \nabla_ \theta J(\theta)$$</p>
+<p class="mathjax mathjax--block">$$
+\theta_{t+1} = \theta_t + v_t$$</p>
+<p>Di seguito il codice Python per l'implementazione del metodo del momento utilizzando Keras, in cui il parametro momentum corrisponde al parametro <span class="mathjax mathjax--inline">$\beta$</span> dell'equazione precedente:  </p>
+<pre><code class="language-python">model.compile(loss="categorical_crossentropy",
+              optimizer=keras.optimizers.SGD(lr=0.001, momentum=0.9),
+              metrics=["accuracy"])
+model.fit(x_train, y_train, epochs=10,batch_size=64,
+          validation_data=(x_valid, y_valid))
+</code></pre>
+<h3 id="momento-di-nesterov" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#momento-di-nesterov" title="Permanent link: Momento di Nesterov" data-icon="#"><strong>Momento di Nesterov</strong></a></h3>
+<p>Una variante del metodo del momento è quella denominata <em>Nesterov accelerated gradient</em>.
+L'idea alla base di questa variante è quella di valutare il gradiente non più alla posizione attuale <span class="mathjax mathjax--inline">$\theta$</span> bensi in una posizione <span class="mathjax mathjax--inline">$\theta + \beta v_{t-1}$</span> un po' più avanzata lungo la direzione del momento <span class="mathjax mathjax--inline">$v_{t-1}$</span>. Anche questo algoritmo utilizza un parametro <span class="mathjax mathjax--inline">$\beta \in [0,1)$</span> che, come per il metodo standard del momento, determina la velocità di decadimento dei contributi dei gradienti storici.</p>
+<p class="mathjax mathjax--block">$$
+\tilde{\theta_t} = \theta_t +\beta v_{t-1}$$</p>
+<p class="mathjax mathjax--block">$$
+v_ t = \beta v_{t-1} - \eta \nabla _\theta J(\tilde{\theta})$$</p>
+<p class="mathjax mathjax--block">$$
+\theta_{t+1} = \theta_t + v_ t $$</p>
+<p>Il codice che segue implementa il metodo di Nesterov in Keras:</p>
+<pre><code class="language-python">model.compile(loss="categorical_crossentropy",
+              optimizer=keras.optimizers.SGD(lr=0.001, momentum=0.9, nesterov=True),
+              metrics=["accuracy"])
+
+model.fit(x_train, y_train, epochs=10,batch_size=64,
+          validation_data=(x_valid, y_valid))</code></pre>
+<h3 id="metodi-di-learning-rate..." class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#metodi-di-learning-rate..." title="Permanent link: Metodi di learning rate adattativo" data-icon="#">Metodi di learning rate adattativo</a></h3>
+<p>Risulta evidente quanto una opportuna regolazione del learning rate possa avere una forte influenza sugli effetti del metodo SGD. A tal riguardo sono stati proposti diversi meccanismi adattativi per una regolazione automatica del learning rate</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/deep-learning-ottimizzazione/images/adaptive_learning_rate.png"alt="adaptive_learning_rate" />
+        </figure>
+<p>Un importante miglioramento all'algoritmo della discesa del gradiente stocastico è dovuto al metodo AdaGrad [2] che implementa una regolazione dinamica del learning rate basandosi sui valori storici del gradiente.</p>
+<p>La differenza tra AdaGrad e la classica discesa del gradiente risiede nel fatto che, durante il processo di aggiornamento di <span class="mathjax mathjax--inline">$\theta$</span>, il learning rate non sarà più costante ma sarà continuamente ricalcolato utilizzando i valori storici del gradiente accumulati fino alla corrente iterazione. Lo svantaggio di questo procedimento deriva dal fatto che, nei casi di training time molto lungo, l'elevato valore cumulativo dei gradienti farà tendere a zero il valore del learning rate e di consequenza <span class="mathjax mathjax--inline">$\theta$</span> tenderà ad un valore stazionario non corretto.</p>
+<p class="mathjax mathjax--block">$$
+g_t = \nabla_{\theta_t}J(\theta_t)$$</p>
+<p class="mathjax mathjax--block">$$
+v_t = \sqrt{\sum_{i=1}^{t} (g_i)^2  +\epsilon}$$</p>
+<p class="mathjax mathjax--block">$$
+\theta_{t+1} = \theta_t -\eta \frac{gt}{v_t}$$</p>
+<p>Il problema della tendenza di <span class="mathjax mathjax--inline">$\theta$</span> alla non corretta stazionarietà è stato affrontato e risolto da Geoffrey Hinton con il metodo RMSProp [2]. Questo algoritmo utilizza una finestra temporale dei gradienti storici e ne calcola, ad ogni iterazione, il momento cumulativo del secondo ordine (la varianza).</p>
+<p class="mathjax mathjax--block">$$
+v_t = \beta v_{t-1} + (1 - \beta) g_t^2$$</p>
+<p>È possibile utilizzare il metodo RMSProp di Keras implementando il codice seguente. Da notare che adesso il parametro <span class="mathjax mathjax--inline">$\beta \in [0,1)$</span> di decadimento dei gradienti corrisponde al parametro <em>rho</em> dell'ottimizzatore RMSProp di Keras:</p>
+<pre><code class="language-python">model.compile(loss="categorical_crossentropy",
+              optimizer=keras.optimizers.RMSprop(lr=0.001, rho=0.9),
+              metrics=["accuracy"])
+model.fit(x_train, y_train, epochs=10,batch_size=64,
+                    validation_data=(x_valid, y_valid))</code></pre>
+<p>Il metodo Adam (Adaptive momentum estimation)[4] introduce un ulteriore miglioramento a quanto visto in precedenza. Oltre a memorizzare la media mobile esponenziale dei quadrati dei gradienti delle precedenti iterazioni, viene memorizzata anche la media mobile esponenziale dei gradienti <span class="mathjax mathjax--inline">$m_ t =\beta_1 m_{t-1} + (1 - \beta_1) g_t$</span>. Il nome dell'algoritmo deriva dal fatto che, ad ogni iterazione, <span class="mathjax mathjax--inline">$m_t$</span> e <span class="mathjax mathjax--inline">$v_t$</span> corrispondono al momento primo (la media) ed al momento secondo (la varianza) del gradiente.</p>
+<p class="mathjax mathjax--block">$$
+g_t = \nabla_{\theta_t}J(\theta_t)$$</p>
+<p class="mathjax mathjax--block">$$
+m_ t =\beta_1 m_{t-1} + (1 - \beta_1) g_t$$</p>
+<p class="mathjax mathjax--block">$$
+\alpha_t= \alpha \frac{\sqrt{1 - \beta_2^t}}{1-\beta_1^t}$$</p>
+<p class="mathjax mathjax--block">$$
+\theta_{t+1} = \theta_{t} - \alpha_t \frac{m_t}{\sqrt{v_t }+\epsilon}$$</p>
+<p>Nella seguente implementazione i parametri <span class="mathjax mathjax--inline">$\beta_1$</span> e <span class="mathjax mathjax--inline">$\beta_2$</span> <span class="mathjax mathjax--inline">$\in [0,1)$</span> di decadimento dei momenti del primo e secondo ordine assumono i valori di default indicati dagli autori in [4].</p>
+<pre><code class="language-python">model.compile(loss="categorical_crossentropy",
+              optimizer=keras.optimizers.Adam(lr=0.001, beta_1=0.9, beta_2=0.999),
+              metrics=["accuracy"])
+model.fit(x_train, y_train, epochs=10,batch_size=64,
+                    validation_data=(x_valid, y_valid))
+</code></pre>
+<h2 id="esempio-addestramento-di-una-cnn" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#esempio-addestramento-di-una-cnn" title="Permanent link: Esempio: addestramento di una CNN" data-icon="#">Esempio: addestramento di una CNN</a></h2>
+<p>Fin qui ci siamo occupati prettamente di aspetti teorici degli algoritmi di ottimizzazione. Vedremo adesso gli effetti di ciascuno di essi ha nell'addestramento di una <strong>convolutional neural network</strong>.</p>
+<p>Nell'esempio proposto verrà addestrata una Deep Convolutional Neural Network pensata per la classificazione delle immagini presenti nel dataset Fashion MNIST.
+Fashion MNIST è un dataset prodotto da Zalando Research e contiene immagini di articoli di abbigliamento.</p>
+<p>Il dataset è composto da un training set 60000 esempi e un test set di 10000 esempi. Ciascun esempio è composto da una immagine 28x28 in scala di grigi associata ad una etichetta appartenente ad un insieme di 10.</p>
+<p>Di seguito l'implementazione della rete come modello sequenziale di Keras:</p>
+<pre><code class="language-python">model = keras.models.Sequential([
+    keras.layers.Conv2D(filters=64, kernel_size=2, padding='same', activation='relu', input_shape=(28,28,1)),
+    keras.layers.MaxPooling2D(pool_size=2),
+    keras.layers.Dropout(0.3),
+    keras.layers.Conv2D(filters=32, kernel_size=2, padding='same', activation='relu'),
+    keras.layers.MaxPooling2D(pool_size=2),
+    keras.layers.Dropout(0.3),
+    keras.layers.Flatten(),
+    keras.layers.Dense(256, activation='relu'),
+    keras.layers.Dropout(0.5),
+    keras.layers.Dense(10, activation='softmax')
+])
+</code></pre>
+<p>Per poter iniziare l'addestramento della rete servirà prima compilare il modello associando una loss function, un metodo di ottimizazione ed una metrica che ci consenta di valutare la bontà del training.</p>
+<pre><code class="language-python">model.compile(loss="categorical_crossentropy",
+              optimizer=keras.optimizers.SGD(lr=0.001),
+              metrics=["accuracy"])
+</code></pre>
+<p>Il nostro modello di classificazione è del tipo multiclass, pertanto utilizzeremo una loss function di tipo <em>categorical_crossentropy</em>. Il metodo di ottimizzazione utilizzato per la fase di training è SGD con un learning rate pari a 0.001. Per la valutazione della bontà della modello la metrica di riferimento utilizzata sarà l'accuratezza.</p>
+<p>Una volta che il modello è stato compilato siamo pronti per avviare la fase di training:</p>
+<pre><code class="language-python">model.fit(x_train, y_train, epochs=10,batch_size=64,
+                    validation_data=(x_valid, y_valid))
+</code></pre>
+<p>Il metodo fit si occuperà di avviare la fasi di training e validazione del modello utilizzando i seguenti parametri:</p>
+<ul>
+<li>x_train: training set di 55000 immagini 28x28;</li>
+<li>y_train: training set di 55000 label;</li>
+<li>epochs: numero di iterazioni, 10 nel nostro esempio;</li>
+<li>batch_size= dimensione del mini batch di esempi utilizzati per il  calcolo del gradiente;</li>
+<li>validation_data: validation set per la valutazione del modello composto da 5000 immagini 28x28 e da 5000 label.</li>
+</ul>
+<pre><code>Train on 55000 samples, validate on 5000 samples
+Epoch 1/10
+55000/55000 [==============================] - 80s 1ms/sample - loss: 2.2660 - accuracy: 0.1528 - val_loss: 2.2002 - val_accuracy: 0.3628
+Epoch 2/10
+55000/55000 [==============================] - 80s 1ms/sample - loss: 2.0501 - accuracy: 0.2872 - val_loss: 1.7805 - val_accuracy: 0.5460
+Epoch 3/10
+55000/55000 [==============================] - 81s 1ms/sample - loss: 1.6004 - accuracy: 0.4140 - val_loss: 1.2416 - val_accuracy: 0.6064
+Epoch 4/10
+55000/55000 [==============================] - 80s 1ms/sample - loss: 1.3230 - accuracy: 0.4853 - val_loss: 1.0459 - val_accuracy: 0.6238
+Epoch 5/10
+55000/55000 [==============================] - 79s 1ms/sample - loss: 1.1873 - accuracy: 0.5333 - val_loss: 0.9594 - val_accuracy: 0.6342
+Epoch 6/10
+55000/55000 [==============================] - 79s 1ms/sample - loss: 1.1098 - accuracy: 0.5602 - val_loss: 0.9073 - val_accuracy: 0.6528
+Epoch 7/10
+55000/55000 [==============================] - 82s 1ms/sample - loss: 1.0559 - accuracy: 0.5781 - val_loss: 0.8708 - val_accuracy: 0.6694
+Epoch 8/10
+55000/55000 [==============================] - 82s 1ms/sample - loss: 1.0129 - accuracy: 0.5987 - val_loss: 0.8459 - val_accuracy: 0.6772
+Epoch 9/10
+55000/55000 [==============================] - 81s 1ms/sample - loss: 0.9877 - accuracy: 0.6086 - val_loss: 0.8252 - val_accuracy: 0.6816
+Epoch 10/10
+55000/55000 [==============================] - 81s 1ms/sample - loss: 0.9578 - accuracy: 0.6202 - val_loss: 0.8073 - val_accuracy: 0.6898</code></pre>
+<p>Analizzando i risultati delle singole iterazioni si nota chiaramente come il valore della loss function diminuisca ed il valore dell'accuratezza aumenti, come evidenziato anche dai grafici seguenti:</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/deep-learning-ottimizzazione/images/sgd_loss.png"alt="sgd_loss " />
+        </figure>
+<figure role="group">
+        <img src="https://iaml.it/blog/deep-learning-ottimizzazione/images/sgd_acc.png"alt="sgd_acc " />
+        </figure>
+<p>Per effettuare un confronto più puntuale delle prestazioni dei metodi di ottimizzazione analizzati in questo articolo, il modello di rete convoluzionale è stato addestrato più volte utilizzando diversi ottimizzatori. I grafici seguenti evidenziano l'andamento delle loss function e dell'accuratezza prodotti da ciascuno dei metodi analizzati</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/deep-learning-ottimizzazione/images/compare.png"alt="compare" />
+        </figure>
+<p>Come si può notare chiaramente dai grafici, le prestazioni, sia in termini di velocità di convergenza sia di accuratezza della classificazione, crescono costantemente all'aumentare della complessità dell'ottimizzatore utilizzato. Risulta evidente lo scarto esistente tra SGD e tutti gli altri algoritmi.</p>
+<h2 id="conclusioni" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#conclusioni" title="Permanent link: Conclusioni" data-icon="#">Conclusioni</a></h2>
+<p>Sono stati presentati alcuni metodi di ottimizzazione del primo ordine utilizzati per l'addestramento di modelli di deep learning. Partendo dal metodo del gradiente si sono analizzati i metodi più complessi che, grazie anche ad un aggiornamento adattativo del learning rate, consentono al processo di addestramento di migliorare le prestazioni in termini di velocità di convergenza.</p>
+<p>Un aspetto non trattato ma degno di nota è quello relativo alle effettive prestazioni dei metodi di adaptive learning rate in contesti diversi e magari più complessi. Il lettore interessato può trovare in [5] gli spunti per un ulteriore approfondimento personale.</p>
+<p>Il codice sorgente dell'esempio è riportato nel notebook Colab [7].</p>
+<h3 id="riferimenti" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#riferimenti" title="Permanent link: Riferimenti" data-icon="#">Riferimenti</a></h3>
+<p>[1] <a href="http://proceedings.mlr.press/v28/sutskever13.pdf">On the importance of initialization and momentum in deep learning</a></p>
+<p>[2] <a href="http://www.jmlr.org/papers/volume12/duchi11a/duchi11a.pdf">Adaptive Subgradient Methods for Online Learning and Stochastic Optimization</a></p>
+<p>[3] <a href="http://www.cs.toronto.edu/~tijmen/csc321/slides/lecture_slides_lec6.pdf">RMSProp by Geoffrey Hinton on lecture 6e Coursera class</a></p>
+<p>[4] <a href="https://arxiv.org/abs/1412.6980">Adam: A Method for Stochastic Optimization</a></p>
+<p>[5] <a href="https://arxiv.org/abs/1705.08292">The Marginal Value of Adaptive Gradient Methods in Machine Learning</a></p>
+<p>[6] <a href="https://keras.io/optimizers/">Keras optimizers</a></p>
+<p>[7] <a href="https://github.com/brunoneri/KerasOptimizers/blob/master/keras_optimizer_colab.ipynb">Notebook Colab: Esempio di classificazione immagini Fashion MINST</a></p></p>
+            
+    
+        <p class="prev-next">
+                            <a class="button" href="/blog/yolo-you-only-look-once"><i class="fa fa-chevron-left"></i> Previous Post</a>
+            
+                            <a class="button" href="/blog/infinite-neural-networks">Next Post <i class="fa fa-chevron-right"></i></a>
+                    </p>
+    
+    </div>
+</div>
+			</div>
+			<div id="sidebar" class="g-block size-1-3 pure-u-1-3">
+				<div class="sidebar-content">
+    <h4>Search the blog</h4>
+    <input type="text" placeholder="Search..." value="" data-searchsidebar-input="/search/query" />
+<script>
+jQuery(document).ready(function($){
+    var input = $('[data-searchsidebar-input]');
+
+    input.on('keypress', function(event) {
+        if (event.which == 13 && input.val().length > 3) {
+            event.preventDefault();
+            window.location.href = input.data('searchsidebar-input') + ':' + input.val();
+        }
+    });
+});
+</script>
+</div>
+<!--
+<div class="sidebar-content">
+	<h4>Some Text Widget</h4>
+	<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna.</p>
+</div>
+!-->
+<div class="sidebar-content">
+    <h4>Categories</h4>
+    
+
+<ul class="archives">
+        <li>
+        <a href="/blog/category:Tutorials">Tutorials </a> (16)
+    </li>
+        <li>
+        <a href="/blog/category:Discussions">Discussions </a> (12)
+    </li>
+        <li>
+        <a href="/blog/category:Announcements">Announcements </a> (4)
+    </li>
+        <li>
+        <a href="/blog/category:Tutorials%20%28English%29">Tutorials (English) </a> (4)
+    </li>
+        <li>
+        <a href="/blog/category:Articles%27%20summaries">Articles' summaries </a> (3)
+    </li>
+        <li>
+        <a href="/blog/category:Discussions%20%28English%29">Discussions (English) </a> (2)
+    </li>
+        <li>
+        <a href="/blog/category:Focus-on">Focus-on </a> (1)
+    </li>
+        <li>
+        <a href="/blog/category:Reviews">Reviews </a> (1)
+    </li>
+        <li>
+        <a href="/blog/category:Discussion">Discussion </a> (1)
+    </li>
+    </ul>
+</div>
+<div class="sidebar-content">
+    <h4>Archives</h4>
+	<ul class="archives">
+    <li>
+    	<a href="/blog/archives_month:apr_2020">
+        <span class="archive_date">April 2020</span>
+                <span>(1)</span>
+                </a>
+    </li>
+</ul>
+</div>
+<div class="sidebar-content">
+    <h4>Popular Tags</h4>
+    
+
+<ul class="archives">
+        <li>
+        <a href="/blog/tag:deep%20learning">deep learning </a> (11)
+    </li>
+        <li>
+        <a href="/blog/tag:pytorch">pytorch </a> (9)
+    </li>
+        <li>
+        <a href="/blog/tag:reti%20neurali">reti neurali </a> (5)
+    </li>
+        <li>
+        <a href="/blog/tag:google">google </a> (4)
+    </li>
+        <li>
+        <a href="/blog/tag:jit">jit </a> (4)
+    </li>
+        <li>
+        <a href="/blog/tag:tensorflow">tensorflow </a> (4)
+    </li>
+        <li>
+        <a href="/blog/tag:ottimizzazione">ottimizzazione </a> (4)
+    </li>
+        <li>
+        <a href="/blog/tag:rete%20neurale">rete neurale </a> (3)
+    </li>
+        <li>
+        <a href="/blog/tag:time%20series">time series </a> (3)
+    </li>
+        <li>
+        <a href="/blog/tag:keras">keras </a> (3)
+    </li>
+        <li>
+        <a href="/blog/tag:reti%20convolutive">reti convolutive </a> (3)
+    </li>
+        <li>
+        <a href="/blog/tag:pipeline">pipeline </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:sklearn">sklearn </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:autodiff">autodiff </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:automatic%20differentation">automatic differentation </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:reverse-mode">reverse-mode </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:derivate">derivate </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:differenziazione">differenziazione </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:model%20selection">model selection </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:cross%20validation">cross validation </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:c%2B%2B">c++ </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:numpy">numpy </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:vmap">vmap </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:caffe">caffe </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:compiler">compiler </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:jax">jax </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:codemotion">codemotion </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:bias">bias </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:discrimination">discrimination </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:fairness">fairness </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:iaml">iaml </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:database">database </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:iperparametri">iperparametri </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:autograph">autograph </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:head">head </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:multi-task">multi-task </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:learning">learning </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:novit%C3%A0">novità </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:dev%20summit">dev summit </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:custom%20estimator">custom estimator </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:hyperopt">hyperopt </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:goodfellow">goodfellow </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:nlp">nlp </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:dati%20mancanti">dati mancanti </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:transformer">transformer </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:attenzione">attenzione </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:robocop">robocop </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:yolo">yolo </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:object%20detection">object detection </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:bayes">bayes </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:autoencoders">autoencoders </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:variational">variational </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:eager">eager </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:imputazione">imputazione </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:CIFAR">CIFAR </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:word%20embedding">word embedding </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:MNIST">MNIST </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:immagini">immagini </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:classificazione">classificazione </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:kpi">kpi </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:reprogramming">reprogramming </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:adversarial">adversarial </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:browser">browser </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:javascript">javascript </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:reti%20ricorsive">reti ricorsive </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:reti%20ricorrenti">reti ricorrenti </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:ftth">ftth </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:adversarial%20example">adversarial example </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:management">management </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:robotica">robotica </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:ocr">ocr </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:focus">focus </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:iphone">iphone </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:python">python </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:face%20id">face id </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:momento">momento </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:adam">adam </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:neuroscienza">neuroscienza </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:onde%20cerebrali">onde cerebrali </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:torchvision">torchvision </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:latin">latin </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:pretrained">pretrained </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:rete%20convolutiva">rete convolutiva </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:autograd">autograd </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:swish">swish </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:attivazione">attivazione </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:checkpoint">checkpoint </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:tensori">tensori </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:variabili">variabili </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:lineare">lineare </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:regressione">regressione </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:convolutional%20networks">convolutional networks </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:Vatican">Vatican </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:project">project </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:kernel">kernel </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:ICLR">ICLR </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:ipotesi">ipotesi </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:sparsit%C3%A0">sparsità </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:funzionale">funzionale </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:functional">functional </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:adversarial%20attack">adversarial attack </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:kmeans">kmeans </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:analysis">analysis </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:clustering">clustering </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:Google">Google </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:regression">regression </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:JAX">JAX </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:gaussian%20process">gaussian process </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:ensemble">ensemble </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:boosting">boosting </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:gradient">gradient </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:semi-supervised%20learning">semi-supervised learning </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:document%20classification">document classification </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:graphs">graphs </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:variables">variables </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:linear">linear </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:k-NN">k-NN </a> (1)
+    </li>
+    </ul>
+</div>
+<div class="sidebar-content syndicate">
+    <h4>Syndicate</h4>
+    <a class="button" href="/blog.atom"><i class="fa fa-rss-square"></i> Atom 1.0</a>
+    <a class="button" href="/blog.rss"><i class="fa fa-rss-square"></i> RSS</a>
+</div>
+			</div>
+		</div>
+	
+                        <div class="modular-row footer ">
+    <div class="footer-items">
+        <div class="footer-module large">
+		<h4>About</h4>
+                            <p>Italian Association for Machine Learning (C.F. 97949550582)</p>
+            			<p>Write us: info@iaml.it</p>
+        </div>
+        <div class="footer-module"><h4>Address</h4>
+            <p>
+                                    <span><strong>Operational office</strong></span>
+                                    <span>IAML c/o Pi Campus, via Indonesia 23, 00144 Rome</span>
+                                    <span><strong>Legal office</strong></span>
+                                    <span>Via Cassia 964, 00189, Rome</span>
+                            </p>
+        </div>
+        <div class="footer-module"><h4>Quick Links</h4>
+         <ul class="quickmenu">
+                            <li><i class="fa fa-chevron-right"></i><a href="https://iaml.it/home">Home</a></li>
+                            <li><i class="fa fa-chevron-right"></i><a href="https://iaml.it/documents">Documents (Italian)</a></li>
+                    </ul>
+    </div>
+   
+</div>
+<hr>
+<div class="footer-modules">
+    <div class="footer-copyright">
+        Copyright 2018 IAML.IT. All Rights Reserved.
+    </div>
+    <div class="footer-menu">
+    <ul class="othermenu">
+           <li><a href="https://learn.getgrav.org/">Powered by Grav</a></li>
+           <li><a href="https://github.com/getgrav/grav-theme-deliver">Theme (adapted) from Deliver</a></li>
+        </ul>
+    </div>
+</div>
+</div>                    </section>
+        
+    </div>
+    <div class="sb-slidebar sb-left sb-width-thin">
+        <div id="panel">
+        
+<ul class="navigation">
+                                                        <li class="">
+                    <a href="/">
+                                                Home
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/activities">
+                                                Activities
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/supporters">
+                                                Supporters
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/member">
+                                                Become a member
+                    </a>
+                </li>
+                                                                <li class="active">
+                    <a href="/blog">
+                                                Blog
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/governance">
+                                                Governance
+                    </a>
+                </li>
+                                                                                                                                </ul>                   </div>
+    </div>
+        <script src="/user/plugins/simplesearch/js/simplesearch.js" type="text/javascript" ></script>
+
+    <script>
+    $(function () {
+        $(document).ready(function() {
+          $.slidebars({
+            hideControlClasses: true,
+            scrollLock: true
+          });
+        });
+    });
+    </script>
+    </body>
+</html>

@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Geometric deep learning 1: graph convolutional network | Italian Association for Machine Learning</title>
+    <meta content="GravCMS"  />
+<meta content="The Italian Association for Machine Learning (IAML) is a not-for-profit organization with the purpose of promoting knowledge of machine learning in all aspects of the Italian public life, from universities to enterprises and IT professionals."  />
+<meta property="og:title" content="Geometric deep learning | IAML.it"  />
+<meta property="og:image" content="https://iaml.it/blog/geometric-deep-learning-1/images/gcn_web.png"  />
+<meta property="og:url" content="https://iaml.it/blog/geometric-deep-learning-1/"  />
+<meta property="og:description" content="In questo articolo vediamo una breve introduzione al geometric deep learning, soffermandoci sulle graph convolutional network. Concludiamo con un vero caso d&#039;uso (con notebook Jupyter) su un dataset di testi."  />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="icon" type="image/png" href="/user/themes/deliver/images/favicon.png" />
+
+	<!-- Global site tag (gtag.js) - Google Ads: 774709547 --> <script async src="https://www.googletagmanager.com/gtag/js?id=AW-774709547"></script> <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'AW-774709547'); </script> 
+	
+		
+                            		                                                <link href="/user/themes/deliver/css-compiled/nucleus.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css-compiled/template.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/custom.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/toc.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/font-awesome.min.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/facebook/css/facebook.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/facebook/assets/unitegallery/css/unite-gallery.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/facebook/assets/unitegallery/themes/default/ug-theme-default.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/markdown-notices/assets/notices.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/breadcrumbs/css/breadcrumbs.css" type="text/css" rel="stylesheet" />
+<link href="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/events/assets/events.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/form/assets/form-styles.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/mathjax/assets/css/mathjax.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/simplesearch/css/simplesearch.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/highlight/css/zenburn.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/login/css/login.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/slidebars.min.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/slideme.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/socialbuttons/vendor/rrssb/css/rrssb.css" type="text/css" rel="stylesheet" />
+
+
+                                                            <script src="/system/assets/jquery/jquery-2.x.min.js" type="text/javascript" ></script>
+<script src="/user/themes/deliver/js/modernizr.custom.71422.js" type="text/javascript" ></script>
+<script src="/user/plugins/facebook/assets/unitegallery/js/unitegallery.min.js" type="text/javascript" ></script>
+<script src="/user/plugins/facebook/assets/unitegallery/themes/default/ug-theme-default.js" type="text/javascript" ></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.js" type="text/javascript" ></script>
+<script src="/user/plugins/events/assets/events.js" type="text/javascript" ></script>
+<script src="/user/plugins/mathjax/assets/js/mathjax.js" type="text/javascript" ></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript" ></script>
+<script src="/user/plugins/highlight/js/highlight.pack.js" type="text/javascript" ></script>
+<script src="/user/themes/deliver/js/deliver.js" type="text/javascript" ></script>
+<script src="/user/themes/deliver/js/slidebars.min.js" type="text/javascript" ></script>
+<script src="/user/themes/deliver/js/jquery.slideme2.js" type="text/javascript" ></script>
+<script src="/user/plugins/socialbuttons/vendor/rrssb/js/rrssb.min.js" type="text/javascript" ></script>
+
+<script>
+window.addEventListener("load", function(){
+window.cookieconsent.initialise({
+"palette": {
+    "popup": {
+        "background": "#4d4d4d",
+        "text": "#fff"
+    },
+    "button": {
+        "background": "#f1d600",
+        "text": "#000",
+        "border": "#f1d600"
+    }
+},
+"position": "bottom",
+"theme": "block",
+"content": {
+    "message": "This website uses cookies to ensure you get the best experience on our website.",
+    "dismiss": "Got it!",
+    "link": "Learn more",
+    "href": "https://cookiesandyou.com"
+}
+})});
+hljs.initHighlightingOnLoad();
+
+</script>
+
+
+</head>
+<body id="top" class="header-lite fullwidth blogstyling">
+    <div id="sb-site">
+                <header id="header">
+                <div class="logo">
+                    <h3><a href="https://iaml.it"><img src="/user/pages/images/IAML_logo_viola.png" /></a></h3>
+                                            <ul class="social-icons">
+            <li>
+            <a href="https://twitter.com/iaml_it">
+                <i class="fa fa-twitter"></i>            </a>
+        </li>
+            <li>
+            <a href="https://www.linkedin.com/company/iaml/">
+                <i class="fa fa-linkedin"></i>            </a>
+        </li>
+            <li>
+            <a href="https://www.facebook.com/machinelearningitalia/">
+                <i class="fa fa-facebook"></i>            </a>
+        </li>
+            <li>
+            <a href="blog.rss">
+                <i class="fa fa-rss"></i>            </a>
+        </li>
+    </ul>  
+                                    </div>
+                <div id="navbar">
+                                                            
+<ul class="navigation">
+                                                        <li class="">
+                    <a href="/">
+                                                Home
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/activities">
+                                                Activities
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/supporters">
+                                                Supporters
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/member">
+                                                Become a member
+                    </a>
+                </li>
+                                                                <li class="active">
+                    <a href="/blog">
+                                                Blog
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/governance">
+                                                Governance
+                    </a>
+                </li>
+                                                                                                                                </ul>                                                   <form class="search-box">
+    <input type="search" placeholder="Search..." value="" data-search-input="/search/query" />
+    <script>
+    jQuery(document).ready(function($){
+        var input = $('[data-search-input]');
+
+        input.on('keypress', function(event) {
+            if (event.which == 13 && input.val().length > 3) {
+                event.preventDefault();
+                window.location.href = input.data('search-input') + ':' + input.val();
+            }
+        });
+    });
+    </script>
+    <i class="fa fa-search"></i>
+</form>                    <span class="panel-activation sb-toggle-left navbar-left menu-btn fa fa-bars"></span>
+                </div>
+        </header>
+        
+        
+                <section id="body" class="">
+                            
+				<div class="flush-top blog-header blog-header-image" style="background: #B4B093 url(/user/pages/05.blog/blue_header.jpg) no-repeat right;">
+            <h1>Geometric deep learning 1: graph convolutional network</h1>
+        </div>
+            
+        
+<div id="breadcrumbs" itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
+                                            <a href="/" itemprop="url"><span itemprop="title">Home</span></a>
+                        <i class="fa fa-angle-right"></i>
+                                                <a href="/blog" itemprop="url"><span itemprop="title">Blog</span></a>
+                        <i class="fa fa-angle-right"></i>
+                                                <span itemprop="title">Geometric deep learning 1: graph convolutional network</span>
+                        </div>
+		
+		<div class="blog-content-item g-grid pure-g-r">
+			<div id="item" class="g-block pure-u-2-3">
+			    <div class="list-item">
+
+    <div class="list-blog-header">
+                    <img src="/images/2/5/9/e/9/259e9837389e85304ddd8f9a7251c0c30773a95a-gcnweb.png" />
+        
+                    <h4><a href="/blog/geometric-deep-learning-1">Geometric deep learning 1: graph convolutional network</a></h4>
+        
+        <span class="list-blog-date">
+            <i class="fa fa-calendar"></i>
+            10, Oct
+        </span>
+                <span class="list-blog-author">
+            <i class="fa fa-user"></i>
+            Simone Scardapane
+        </span>
+                       <ul class="tags">
+            <i class="fa fa-tag"></i>
+                        <li><a href="/blog/tag:deep learning">deep learning</a></li>
+                        <li><a href="/blog/tag:graphs">graphs</a></li>
+                        <li><a href="/blog/tag:pytorch">pytorch</a></li>
+                        <li><a href="/blog/tag:document classification">document classification</a></li>
+                        <li><a href="/blog/tag:semi-supervised learning">semi-supervised learning</a></li>
+                    </ul>
+        
+    </div>
+
+	<div>
+	<br />
+	<!-- AddToAny BEGIN -->
+<div class="a2a_kit a2a_kit_size_32 a2a_default_style">
+<a class="a2a_dd" href="https://www.addtoany.com/share"></a>
+<a class="a2a_button_facebook"></a>
+<a class="a2a_button_twitter"></a>
+<a class="a2a_button_linkedin"></a>
+<a class="a2a_button_google_plus"></a>
+<a class="a2a_button_email"></a>
+</div>
+<script async src="https://static.addtoany.com/menu/page.js"></script>
+<!-- AddToAny END -->
+</div>
+	
+    <div class="list-blog-padding">
+
+            <p><p>Negli ultimi anni, il <strong>graph machine learning</strong> ha riscosso grande interesse nella communità di ricerca, grazie alla sua capacità di modellare nativamente ogni tipo di informazione espressa sotto forma di un grafo (solo per citare alcuni esempi: amicizie ed interessi sui social network, reti di sensori, citazioni fra articoli, struttura di molecole e proteine...). Tantissimi gli approcci al tema, dai <a href="http://jmlr.csail.mit.edu/papers/volume11/vishwanathan10a/vishwanathan10a.pdf">graph kernel</a> alle "italianissime" <a href="http://www.dii.unisi.it/~franco/Research/GNN.php">graph neural network</a> sviluppate già un decennio fa, arrivando al più recente revival sotto il nome di <strong>geometric deep learning</strong>, ovvero il tentativo di estendere tecniche in voga nel deep learning (es., reti convolutive) per inglobare al loro interno l'informazione contenuta nel grafo stesso. In questo articolo vediamo una breve introduzione a quest'ultimo campo, soffermandoci poi su un modello in particolare, le <strong>graph convolutional network</strong>. Dopo averne discusso l'architettura (più o meno informalmente) concludiamo con un vero caso d'uso (con notebook Jupyter) su un dataset di testi.</p>
+<nav class="table-of-contents minitoc" role="navigation">
+                <span class="toctitle">Overview:</span>
+      
+                                              
+  <ul>
+      
+        
+        
+              <li><a href="#chi-ha-paura-dei-grafi" class="toclink" title="Chi ha paura dei grafi?">Chi ha paura dei grafi?</a></li>
+      
+        
+        
+              <li><a href="#grafi-matrici-di-adiacenza-ed..." class="toclink" title="Grafi, matrici di adiacenza, ed inferenza su grafi">Grafi, matrici di adiacenza, ed inferenza su grafi</a></li>
+      
+        
+        
+              <li><a href="#graph-convolutional-network..." class="toclink" title="Graph convolutional network (informale)">Graph convolutional network (informale)</a></li>
+      
+        
+        
+              <li><a href="#teoria-graph-convolution-e..." class="toclink" title="Teoria: graph convolution e graph Fourier transform">Teoria: graph convolution e graph Fourier transform</a></li>
+      
+        
+        
+              <li><a href="#demo-gcn-per-la-classificazione..." class="toclink" title="Demo: GCN per la classificazione di testi (PyTorch)">Demo: GCN per la classificazione di testi (PyTorch)</a></li>
+      
+    
+  </ul>
+</nav>
+
+
+<h2 id="chi-ha-paura-dei-grafi" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#chi-ha-paura-dei-grafi" title="Permanent link: Chi ha paura dei grafi?" data-icon="#">Chi ha paura dei grafi?</a></h2>
+<div class="notices yellow">
+<p>Non ricordate nulla sui grafi? Niente paura! Ai fini dell'articolo, basta tenere a mente che si tratta di un insieme di nodi collegati tra loro da archi (orientati o meno). Se le immagini a corredo dell'articolo non bastassero e ne volete approfittare per un ripasso, <a href="https://medium.com/basecs/a-gentle-introduction-to-graph-theory-77969829ead8">vi consigliamo questo tutorial</a>!</p>
+</div>
+<p>Per capire l'importanza dei grafi, consideriamo per un istante due delle architetture di deep learning più usate (reti convolutive e reti ricorrenti), per discutere il motivo del loro successo. In entrambi i casi, come vedremo, il vero punto di forza, più che la pura flessibilità, è la loro capacità di saper sfruttare al meglio la conoscenza delle <em>interconnessioni</em> fra i dati in input (quasi sempre spaziali nel primo caso, temporali nel secondo), conoscenza intrinseca nel modo stesso in cui sono costruite. Prendiamo ad esempio un singolo filtro convolutivo in una rete convolutiva:</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/geometric-deep-learning-1/images/filter_small.gif" alt="Filtro convolutivo">
+        </figure>
+<figcaption>Schematica di un filtro convolutivo (fonte: <a href="https://towardsdatascience.com/types-of-convolutions-in-deep-learning-717013397f4d">Paul-Louis Pröve, TowardsDataScience</a>)</figcaption>
+<p>Sono due le assunzioni essenziali codificate in questo filtro:</p>
+<ol>
+<li>in primo luogo, che i dati necessari ad elaborare un singolo pixel (per estrarne una feature) si trovino <em>nei pixel a lui vicini</em> (tipicamente, a due o tre pixel di distanza), mentre i pixel più distanti possano essere ignorati;</li>
+<li>che la <em>feature</em> estratta dalla rete si possa ritrovare invariata sull'intera immagine (motivo per il quale il filtro scorre sull'immagine mantenendo gli stessi parametri).</li>
+</ol>
+<p>Sono queste due assunzioni, ancora più che la discesa al gradiente, a rendere di enorme successo le reti convolutive, permettendo di utilizzare un numero di parametri infinitamente minore rispetto ad una rete interamente connessa. <strong>Dietro di esse si cela, in realtà, un grafo</strong>: infatti, la nozione di "vicinanza" dei pixel (punto 1) equivale a rappresentare l'immagine come un grafo dalla struttura perfettamente regolare:</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/geometric-deep-learning-1/images/GridGraph_701.gif" alt="Grid graph">
+        </figure>
+<figcaption>Grafo a griglia, equivalente alla disposizione dei pixel su un'immagine (fonte: <a href="http://mathworld.wolfram.com/GridGraph.html">Wolfram MathWorld</a>)</figcaption>
+<p>(Tra l'altro, come nota a margine, non sempre questo grafo completamente regolare è la rappresentazione ideale per un'immagine: si veda ad esempio il recente campo del <strong>graph image processing</strong> <sup id="fnref1:fn1"><a href="#fn:fn1" class="footnote-ref">1</a></sup>.)</p>
+<p>Sfruttare questa informazione di vicinanza tra i pixel è il "cuore" di una rete convolutiva, ed un discorso molto simile vale per le reti ricorrenti, che sfruttano invece l'organizzazione temporale del segnale, la quale può essere rappresentata come un grafo ancora più semplice:</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/geometric-deep-learning-1/images/path_graph_rotated.gif" alt="Path graph">
+        </figure>
+<figcaption>Grafo lineare, equivalente alla disposizione degli istanti temporali in un segnale (fonte: <a href="http://mathworld.wolfram.com/GridGraph.html">Wolfram MathWorld</a>)</figcaption>
+<p>Sia i pixel in un'immagine che i campioni in un file audio sono interconnessi in un modo estremamente regolare. Nella maggior parte dei casi descritti nell'introduzione, però, l'informazione contenuta sul grafo a nostra disposizione non è così regolare, con alcuni nodi quasi isolati, altri molto "centrali", ecc. (si pensi ad esempio alle amicizie su un social network). La domanda fondamentale del graph machine learning, quindi, è <strong>come sfruttare questa informazione</strong>, senza sacrificare efficienza o flessibilità delle architetture?</p>
+<p>Ad esempio: <strong>possiamo generalizzare le idee di prima, di località e di invarianza, per progettare reti convolutive che lavorino su grafi generici</strong>? Il seguito di questo articolo tenta di rispondere a questa domanda.</p>
+<h2 id="grafi-matrici-di-adiacenza-ed..." class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#grafi-matrici-di-adiacenza-ed..." title="Permanent link: Grafi, matrici di adiacenza, ed inferenza su grafi" data-icon="#">Grafi, matrici di adiacenza, ed inferenza su grafi</a></h2>
+<p>Consideriamo quindi un generico grafo come quello sotto:</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/geometric-deep-learning-1/images/karate.png" alt="Esempio di grafo">
+        </figure>
+<figcaption>Un esempio di un generico grafo (Karate Kid, da <a href="https://ieeexplore.ieee.org/abstract/document/4358966/">On Modularity Clustering</a>)</figcaption>
+<p>Come prima, ogni nodo nel grafo rappresenta un elemento su cui abbiamo misurato un "segnale" (es., i singoli pixel in un'immagine), e le connessioni fra i nodi rappresentano legami noti fra i vertici (es., vicinanza spaziale, o amicizia su un social network). Di alcuni nodi potremmo poi conoscere delle etichette (i colori nella figura di prima). </p>
+<p>Matematicamente, un grafo può essere rappresentato da una <strong>matrice di adiacenza</strong>, che per ogni nodo specifica la connessione (eventualmente pesata) verso tutti gli altri nodi:</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/geometric-deep-learning-1/images/AdjacencyMatrix_1002.gif" alt="Matrice di adiacenza">
+        </figure>
+<figcaption>Esempi di matrice di adiacenza (fonte: <a href="http://mathworld.wolfram.com/AdjacencyMatrix.html">Wolfram MathWorld</a>)</figcaption>
+<p>Introduciamo qualche simbolo: il grafo su cui lavoreremo ha genericamente <span class="mathjax mathjax--inline">$N$</span> nodi, su ciascuno dei quali è definito un segnale <span class="mathjax mathjax--inline">$\mathbf{x}_n \in \mathbb{R}^C$</span> (dove <span class="mathjax mathjax--inline">$C$</span> è il numero di "canali" del segnale, es., 3 colori per un pixel). Denotiamo con <span class="mathjax mathjax--inline">$\mathbf{X}$</span> la matrice <span class="mathjax mathjax--inline">$N \times C$</span> che colleziona su ogni riga il segnale definito sul rispettivo nodo. Infine, <span class="mathjax mathjax--inline">$\mathbf{A}$</span> sarà la matrice <span class="mathjax mathjax--inline">$N \times N$</span> di adiacenza (come quelle sopra).</p>
+<p>L'<strong>inferenza sul grafo</strong> comprende numerosi task definiti sul grafo stesso tra cui, ad esempio:</p>
+<ol>
+<li>Predire le etichettte per alcuni nodi: si pensi ad esempio ad un grafo stradale, nel quale misuriamo il traffico solo su alcune intersezioni e vogliamo conoscerlo su quelle rimanenti;</li>
+<li>Suddividere i nodi in cluster non noti a priori (unsupervised learning su grafi);</li>
+<li>Classificare l'intero grafo, ad esempio per predire una caratteristica chimica di una determinata proteina. </li>
+</ol>
+<p>Quello che accomuna tutti questi casi è la necessità di una architettura che elabori il segnale prendendo in considerazione la struttura del grafo. Come detto prima, ci concentriamo qui su un modello specifico, le <strong>graph convolutional network</strong> (GCN) <sup id="fnref1:fn2"><a href="#fn:fn2" class="footnote-ref">2</a></sup>.</p>
+<h2 id="graph-convolutional-network..." class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#graph-convolutional-network..." title="Permanent link: Graph convolutional network (informale)" data-icon="#">Graph convolutional network (informale)</a></h2>
+<div class="notices yellow">
+<p>Questa sezione riprende ed elabora un <a href="http://tkipf.github.io/graph-convolutional-networks/">bellissimo articolo introduttivo</a> degli autori delle graph convolutional network. Se volete approfondire, è un ottimo punto di partenza!</p>
+</div>
+<p>Per comprendere il funzionamento delle GCN, ignoriamo per un attimo le connessioni fra i vari nodi. In questo caso, una rete neurale "classica" che operasse su ciascun nodo si comporrebbe di strati del tipo:</p>
+<p class="mathjax mathjax--block">\[
+g(\mathbf{X}) = \text{ReLU}( \mathbf{X}\mathbf{W} )\]</p>
+<p>dove <span class="mathjax mathjax--inline">$W$</span> è la matrice di pesi dello strato e <span class="mathjax mathjax--inline">$\text{ReLU}(s) = \max(0,s)$</span> (o qualsiasi altra funzione di attivazione). Questo schema processa ogni nodo in maniera indipendente, ignorando completamente le connessioni fra di essi, e di conseguenza una quantità potenzialmente molto importante di informazione (come vedremo più sotto nella demo). Purtroppo, sostituire l'operazione di prima con una "convoluzione", come usata nelle classiche reti convolutive, non è banale a causa dell'irregolarità del grafo stesso, in quanto ogni nodo può avere un numero estremamente variabile di vicini.</p>
+<p>Consideriamo però questa semplice variante, dove il cambiamento è evidenziato in rosso:</p>
+<p class="mathjax mathjax--block">\[
+g(\mathbf{X}) = \text{ReLU}( \mathbf{\color{red}A} \mathbf{X}\mathbf{W} )\]</p>
+<p>La nuova matrice <span class="mathjax mathjax--inline">$\mathbf{A}$</span> è proprio la matrice di adiacenza introdotta prima. Possiamo concepire questa operazione come composta di tre parti in successione:</p>
+<ol>
+<li>La prima, uguale a prima, processo il segnale su ciascun nodo in maniera indipendente tramite la moltiplicazione con <span class="mathjax mathjax--inline">$\mathbf{W}$</span>.</li>
+<li>La seconda fase, la moltiplicazione per la matrice di adiacenza, effettua una <em>seconda</em> combinazione lineare, fra i segnali di ogni nodo e dei rispettivi vicini <sup id="fnref1:fn3"><a href="#fn:fn3" class="footnote-ref">3</a></sup>. A differenza della prima fase, i coefficienti di questa combinazione sono fissi.</li>
+<li>La terza fase, nuovamente uguale a prima, applica la nonlinearità scelta sui vari nodi.</li>
+</ol>
+<p><strong>La logica è simile a quella di una rete convolutiva</strong>: l'informazione elaborata da ciascun "filtro" dipende solo dagli immediati vicini del nodo, mentre le stesse operazioni (definite dalla matrice <span class="mathjax mathjax--inline">$\mathbf{W}$</span>) vengono applicate su tutti i nodi del grafo in simultanea. A differenza delle reti convolutive, la seconda operazione non dipende da alcun parametro adattabile, ma in pratica questo non sembra comportare grandi cali di prestazione. Possiamo in effetti combinare più strati di questo tipo, per ottenere architetture che "diffondono" l'informazione sul grafo stesso tramite ripetute moltiplicazioni per <span class="mathjax mathjax--inline">$\mathbf{A}$</span>:</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/geometric-deep-learning-1/images/gcn_web.png" alt="Esempio di grafo">
+        </figure>
+<figcaption>Esempio di graph convolutional network (Fonte: <a href="http://tkipf.github.io/graph-convolutional-networks/">Graph Convolutional Networks</a>.)</figcaption>
+<p>Ad esempio, una rete formata da tre strati di questo tipo, anche senza ottimizzazione, produce una separazione fra i nodi del grafo di prima molto simile alla loro reale categorizzazione:</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/geometric-deep-learning-1/images/karate_emb.png" alt="Esempio di grafo">
+        </figure>
+<figcaption>Embedding dei nodi del grafo sopra con una GCN non allenata (Fonte: <a href="http://tkipf.github.io/graph-convolutional-networks/">Graph Convolutional Networks</a>.)</figcaption>
+<p>Non solo: questo modello ha anche una solida teoria alle spalle, come vediamo nella prossima sezione.</p>
+<h2 id="teoria-graph-convolution-e..." class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#teoria-graph-convolution-e..." title="Permanent link: Teoria: graph convolution e graph Fourier transform" data-icon="#">Teoria: graph convolution e graph Fourier transform</a></h2>
+<div class="notices red">
+<p>Questa sezione è leggermente più tecnica delle altre. Sentitevi liberi di saltarla per passare direttamente al codice!</p>
+</div>
+<p>Un aspetto molto interessante delle GCN è che si legano alla teoria sull'analisi spettrale dei grafi, ed in particolar modo al <strong>graph signal processing</strong> <sup id="fnref1:fn4"><a href="#fn:fn4" class="footnote-ref">4</a></sup>. Questo dona una forte giustificazione teorica ai metodi, oltre ad ispirare tecniche di vario tipo per semplificarne la modellazione.</p>
+<p>Buona parte di questa teoria parte dall'analisi della cosidetta <strong>matrice Laplaciana</strong>, definita come (nel caso di grafi senza direzionalità delle connesioni):</p>
+<p class="mathjax mathjax--block">\[
+\begin{equation}
+\mathbf{L} = \mathbf{D} - \mathbf{A}
+\end{equation}\]</p>
+<p>dove <span class="mathjax mathjax--inline">$\mathbf{D}$</span> è una matrice diagonale contenente sulla diagonale il <em>grado</em> (numero di nodi vicini) di ciascun nodo. L'analisi di questa matrice rivela molte informazioni utili sul segnale, in particolar modo quando consideriamo la sua decomposizione spettrale in autovettori ed autovalori. Tra le varie cose, si può dimostrare che la matrice <span class="mathjax mathjax--inline">$\mathbf{U}$</span> di autovettori definisce una transformazione del segnale molto simile alla classica <a href="https://it.wikipedia.org/wiki/Trasformata_di_Fourier">trasformata di Fourier</a>, chiamata appunto <strong>graph Fourier transform</strong> (consideriamo per semplicità un solo canale):</p>
+<p class="mathjax mathjax--block">\[
+\hat{\mathbf{x}} = \mathbf{U}\mathbf{x}\]</p>
+<p>Nel caso di un segnale temporale, la trasformata di Fourier permette di rappresentarlo tramite una somma pesata di sinusoidi di frequenza crescente, i cui coefficienti vengono detti appunto coefficienti di Fourier; in questo caso, l'equivalente dei coefficienti di Fourier è rappresentato da <span class="mathjax mathjax--inline">$\hat{\mathbf{x}}$</span>, mentre l'equivalente delle "sinusoidi" è dato dagli autovettori, una volta ordinati in base ai loro autovalori:</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/geometric-deep-learning-1/images/gft.png" alt="Esempio di graph Fourier transform">
+        </figure>
+<figcaption>Esempio di graph convolutional network (Fonte: <a href="https://ieeexplore.ieee.org/abstract/document/8347162">Graph Signal Processing: Overview, Challenges, and Applications</a>)</figcaption>
+<p>Nella figura sopra, ad esempio, vengono rappresentati quattro di questi autovettori estratti dalla matrice Laplaciana del grafo, ordinati in base agli autovalori: come si vede, il primo autovettore rappresenta una segnale a frequenza costante sul grafo, mentre i contenuti a "frequenze più alte" tendono ad oscillare maggiormente fra i vicini. L'analisi di autovettori ed autovalori di questa matrice, e la rappresentazione di un segnale come somma di questi contributi, è alla base del graph signal processing. (L'equivalenza tra la trasformata classica e quella su grafi non è però perfetta, e ne esistono definizioni alternative.)</p>
+<p>Per capire la relazione di tutto questo con le GCN, ricordate che una convoluzione (per un segnale definito nel tempo) può essere vista come una moltiplicazione in frequenza. <strong>Una proprietà simile vale anche sui grafi</strong>, considerando appunto la trasformazione di prima come l'equivalente della più classica trasformata di Fourier. Basandoci su questo, un modo teoricamente corretto di definire uno strato convolutivo di una rete neurale su grafi è di eseguire la convoluzione nel dominio spettrale:</p>
+<p class="mathjax mathjax--block">\[
+g(\mathbf{x}) = \text{ReLU}( \mathbf{U}^T\mathbf{\Lambda}\mathbf{U}\mathbf{x} )\]</p>
+<p>dove la matrice diagonale <span class="mathjax mathjax--inline">$\mathbf{\Lambda}$</span> rappresenta l'operazione di filtraggio, mentre la moltiplicazione finale per <span class="mathjax mathjax--inline">$\mathbf{U}^T$</span> riporta il segnale nel dominio originale. Questa idea, originariamente proposta da Bruna et al. nel 2013 <sup id="fnref1:fn5"><a href="#fn:fn5" class="footnote-ref">5</a></sup>, richiede però una doppia moltiplicazione con <span class="mathjax mathjax--inline">$\mathbf{U}$</span>, estremamente costosa, oltre a non possedere l'idea della "località" delle operazioni di filtraggio.</p>
+<p>Buona parte del geometric deep learning si è evoluto cercando di semplificare questa operazione. In particolare, Kipf e Welling <sup id="fnref2:fn2"><a href="#fn:fn2" class="footnote-ref">2</a></sup> dimostrano come il modello che abbiamo visto prima, la GCN, corrisponda a sostituire la moltiplicazione per <span class="mathjax mathjax--inline">$\mathbf{\Lambda}$</span> con un più semplice filtro lineare sugli autovalori della matrice Laplaciana. Se questa (rapidissima) panoramica vi ha interessato, vi rimandiamo a Bronstein et al. <sup id="fnref1:fn6"><a href="#fn:fn6" class="footnote-ref">6</a></sup> per una discussione completa sui vari metodi... perché per noi è ora di passare al codice!</p>
+<h2 id="demo-gcn-per-la-classificazione..." class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#demo-gcn-per-la-classificazione..." title="Permanent link: Demo: GCN per la classificazione di testi (PyTorch)" data-icon="#">Demo: GCN per la classificazione di testi (PyTorch)</a></h2>
+<div class="notices yellow">
+<p>Il codice di accompagnamento di questo articolo, sviluppato in PyTorch, è disponibile <a href="https://colab.research.google.com/drive/18EyozusBSgxa5oUBmlzXrp9fEbPyOUoC">su un notebook Colab</a>. Se non conoscete PyTorch, possiamo ricordarvi <a href="https://iaml.it/blog/alle-prese-con-pytorch-parte-1">i nostri tutorial</a>?</p>
+</div>
+<p>La demo usa l'<a href="https://github.com/tkipf/pygcn">implementazione ufficiale delle GCN</a> in PyTorch. Come caso pratico consideriamo il <a href="https://relational.fit.cvut.cz/dataset/CORA">dataset CORA</a>:</p>
+<ul>
+<li>Il dataset è composto da 2708 pubblicazioni scientifiche da categorizzare in sette macro-argomenti (es., "Neural_Networks").</li>
+<li>Ciascun documento è rappresentato da una bag-of-words di 1433 termini, ovvero, ogni documento è rappresentanto da un vettore di 1433 valori numerici corrispondenti alla frequenza delle rispettive parole nel testo. </li>
+<li>In fase di training, conosciamo la categoria di circa il 5% dei documenti, e vogliamo predirla per il restante 95%. </li>
+<li>Per aiutarci, conosciamo le citazioni fra i vari documenti, che permettono di creare un grafo di adiacenza con 1433 nodi (i documenti) e 5429 connessioni (le citazioni note).</li>
+</ul>
+<p>Ci soffermiamo solo su alcuni aspetti essenziali del codice, lasciando la maggior parte dei dettagli al notebook. Consideriamo la fase di caricamento dei dati:</p>
+<pre><code class="language-python">A, X, y, idx_train, idx_val, idx_test = load_data(path='pygcn/data/cora/')</code></pre>
+<p>Come in ogni problema di classificazione, abbiamo a disposizione la matrice di feature per ciascun input (2708 x 1433), e le corrispettive classi (2708 x 7), oltre ad uno split del dataset. Oltre a questi dati, però, abbiamo a nostra disposizione anche l'informazione sulle citazioni, rappresentata dalla matrice di adiacenza <code>A</code> (2708 x 2708).</p>
+<p>Ignorando la matrice di adiacenza, come suggerito prima, potremmo allenare una rete neurale che lavori solo sulla bag-of-words di ogni documento:</p>
+<pre><code class="language-python">net = nn.Sequential(
+    nn.Linear(1433, 100), 
+    nn.ReLU(), 
+    nn.Linear(100, 7)
+)</code></pre>
+<p>Allenandola con Adam e minimizzando la cross-entropia sui documenti di training, otteniamo però una accuratezza piuttosto deludente del 50%. Vediamo ora parte dell'implementazione dello strato convolutivo definito con il grafo:</p>
+<pre><code class="language-python">class GraphConvolution(Module):
+    """
+    Simple GCN layer, similar to https://arxiv.org/abs/1609.02907
+    """
+    [...]
+
+    def forward(self, input, adj):
+        support = torch.mm(input, self.weight)
+        output = torch.spmm(adj, support)
+        return output + self.bias</code></pre>
+<p>Si noti la semplicità dell'implementazione: l'unica differenza rispetto ad uno strato classico è la seconda moltiplicazione, che introduce la combinazione degli elementi in base all'informazione del grafo (inoltre, la moltiplicazione è effettuata con una routine ottimizzata per matrici sparse, per massimizzarne l'efficienza). </p>
+<p>Semplicemente utilizzando due di questi strati, con la stessa ottimizzazione di prima, raggiungiamo un'accuratezza dell'81%! Non solo: questo lo otteniamo <strong>senza aggiungere parametri aggiuntivi al modello</strong>.</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/geometric-deep-learning-1/images/download.png">
+        </figure>
+<p>Vale la pena, prima di concludere, discutere anche alcuni svantaggi di questo modello. In primo luogo, creare dei batch di dati è ora più complicato di prima, in quanto per ottenere una singola predizione abbiamo bisogno anche dei vicini per il primo strato, dei vicini dei vicini per il secondo, e così via. Per questo, quasi tutte le implementazioni tendono a lavorare sull'intero grafo. Inoltre, l'operazione di <strong>pooling</strong>, così semplice su un'immagine, è qui estremamente complessa, proprio a causa della natura irregolare del grafo.</p>
+<p>Nonostante queste limitazioni, come abbiamo visto in questo semplice esempio, <strong>la capacità di processare nativamente l'informazione contenuta in un grafo risulta di eccezionale valore per un modello predittivo</strong>. Ovviamente, le GCN (ed il geometric deep learning), rappresentano solo uno dei tantissimi modi sviluppati di recente a questo fine: dalle <a href="https://arxiv.org/abs/1710.10903">graph attention networks</a>, alle <a href="https://arxiv.org/abs/1703.04818">neural graph machine</a>, passando per le <a href="https://arxiv.org/pdf/1806.01261.pdf">graph network</a> di Google's DeepMind. Se il tema vi interessa, continuate a seguirci per i nostri prossimi articoli sul graph machine learning!</p>
+<hr />
+<div class="notices blue">
+<p>Se questo articolo vi è piaciuto e volete tenervi aggiornati sulle nostre attività, ricordate che l'<a href="/member">iscrizione all'Italian Association for Machine Learning</a> è gratuita! Potete seguirci anche su <a href="https://www.facebook.com/machinelearningitalia/">Facebook</a> e su <a href="https://www.linkedin.com/company/iaml/">LinkedIn</a>.</p>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn:fn1">
+<p>Cheung, G., Magli, E., Tanaka, Y. and Ng, M.K., 2018. <a href="https://ieeexplore.ieee.org/document/8334407">Graph spectral image processing</a>. Proceedings of the IEEE, 106(5), pp.907-930.&#160;<a href="#fnref1:fn1" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:fn2">
+<p>Kipf, T.N. and Welling, M., 2016. <a href="https://arxiv.org/abs/1609.02907">Semi-supervised classification with graph convolutional networks</a>. arXiv preprint arXiv:1609.02907.&#160;<a href="#fnref1:fn2" rev="footnote" class="footnote-backref">&#8617;</a> <a href="#fnref2:fn2" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:fn3">
+<p>In realtà, al posto della matrice di adiacenza viene utilizzata una sua versione normalizzata per stabilizzare la rete. Questo non modifica la parte principale della discussione.&#160;<a href="#fnref1:fn3" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:fn4">
+<p>Shuman, D.I., Narang, S.K., Frossard, P., Ortega, A. and Vandergheynst, P., 2013. <a href="https://ieeexplore.ieee.org/abstract/document/6494675/">The emerging field of signal processing on graphs: Extending high-dimensional data analysis to networks and other irregular domains</a>. IEEE Signal Processing Magazine, 30(3), pp.83-98.&#160;<a href="#fnref1:fn4" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:fn5">
+<p>Bruna, J., Zaremba, W., Szlam, A. and LeCun, Y., 2013. <a href="https://arxiv.org/abs/1312.6203">Spectral networks and locally connected networks on graphs</a>. arXiv preprint arXiv:1312.6203.&#160;<a href="#fnref1:fn5" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:fn6">
+<p>Bronstein, M.M., Bruna, J., LeCun, Y., Szlam, A. and Vandergheynst, P., 2017. <a href="https://ieeexplore.ieee.org/abstract/document/7974879/">Geometric deep learning: going beyond Euclidean data</a>. IEEE Signal Processing Magazine, 34(4), pp.18-42.&#160;<a href="#fnref1:fn6" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+</ol>
+</div></p>
+            
+    
+        <p class="prev-next">
+                            <a class="button" href="/blog/riprogrammare-reti-neurali"><i class="fa fa-chevron-left"></i> Previous Post</a>
+            
+                            <a class="button" href="/blog/pytorch-preview-jit">Next Post <i class="fa fa-chevron-right"></i></a>
+                    </p>
+    
+    </div>
+</div>
+			</div>
+			<div id="sidebar" class="g-block size-1-3 pure-u-1-3">
+				<div class="sidebar-content">
+    <h4>Search the blog</h4>
+    <input type="text" placeholder="Search..." value="" data-searchsidebar-input="/search/query" />
+<script>
+jQuery(document).ready(function($){
+    var input = $('[data-searchsidebar-input]');
+
+    input.on('keypress', function(event) {
+        if (event.which == 13 && input.val().length > 3) {
+            event.preventDefault();
+            window.location.href = input.data('searchsidebar-input') + ':' + input.val();
+        }
+    });
+});
+</script>
+</div>
+<!--
+<div class="sidebar-content">
+	<h4>Some Text Widget</h4>
+	<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna.</p>
+</div>
+!-->
+<div class="sidebar-content">
+    <h4>Categories</h4>
+    
+
+<ul class="archives">
+        <li>
+        <a href="/blog/category:Tutorials">Tutorials </a> (16)
+    </li>
+        <li>
+        <a href="/blog/category:Discussions">Discussions </a> (12)
+    </li>
+        <li>
+        <a href="/blog/category:Announcements">Announcements </a> (4)
+    </li>
+        <li>
+        <a href="/blog/category:Tutorials%20%28English%29">Tutorials (English) </a> (4)
+    </li>
+        <li>
+        <a href="/blog/category:Articles%27%20summaries">Articles' summaries </a> (3)
+    </li>
+        <li>
+        <a href="/blog/category:Discussions%20%28English%29">Discussions (English) </a> (2)
+    </li>
+        <li>
+        <a href="/blog/category:Focus-on">Focus-on </a> (1)
+    </li>
+        <li>
+        <a href="/blog/category:Reviews">Reviews </a> (1)
+    </li>
+        <li>
+        <a href="/blog/category:Discussion">Discussion </a> (1)
+    </li>
+    </ul>
+</div>
+<div class="sidebar-content">
+    <h4>Archives</h4>
+	<ul class="archives">
+    <li>
+    	<a href="/blog/archives_month:apr_2020">
+        <span class="archive_date">April 2020</span>
+                <span>(1)</span>
+                </a>
+    </li>
+</ul>
+</div>
+<div class="sidebar-content">
+    <h4>Popular Tags</h4>
+    
+
+<ul class="archives">
+        <li>
+        <a href="/blog/tag:deep%20learning">deep learning </a> (11)
+    </li>
+        <li>
+        <a href="/blog/tag:pytorch">pytorch </a> (9)
+    </li>
+        <li>
+        <a href="/blog/tag:reti%20neurali">reti neurali </a> (5)
+    </li>
+        <li>
+        <a href="/blog/tag:google">google </a> (4)
+    </li>
+        <li>
+        <a href="/blog/tag:jit">jit </a> (4)
+    </li>
+        <li>
+        <a href="/blog/tag:tensorflow">tensorflow </a> (4)
+    </li>
+        <li>
+        <a href="/blog/tag:ottimizzazione">ottimizzazione </a> (4)
+    </li>
+        <li>
+        <a href="/blog/tag:rete%20neurale">rete neurale </a> (3)
+    </li>
+        <li>
+        <a href="/blog/tag:time%20series">time series </a> (3)
+    </li>
+        <li>
+        <a href="/blog/tag:keras">keras </a> (3)
+    </li>
+        <li>
+        <a href="/blog/tag:reti%20convolutive">reti convolutive </a> (3)
+    </li>
+        <li>
+        <a href="/blog/tag:pipeline">pipeline </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:sklearn">sklearn </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:autodiff">autodiff </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:automatic%20differentation">automatic differentation </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:reverse-mode">reverse-mode </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:derivate">derivate </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:differenziazione">differenziazione </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:model%20selection">model selection </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:cross%20validation">cross validation </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:c%2B%2B">c++ </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:numpy">numpy </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:vmap">vmap </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:caffe">caffe </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:compiler">compiler </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:jax">jax </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:codemotion">codemotion </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:bias">bias </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:discrimination">discrimination </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:fairness">fairness </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:iaml">iaml </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:database">database </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:iperparametri">iperparametri </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:autograph">autograph </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:head">head </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:multi-task">multi-task </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:learning">learning </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:novit%C3%A0">novità </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:dev%20summit">dev summit </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:custom%20estimator">custom estimator </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:hyperopt">hyperopt </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:goodfellow">goodfellow </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:nlp">nlp </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:dati%20mancanti">dati mancanti </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:transformer">transformer </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:attenzione">attenzione </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:robocop">robocop </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:yolo">yolo </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:object%20detection">object detection </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:bayes">bayes </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:autoencoders">autoencoders </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:variational">variational </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:eager">eager </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:imputazione">imputazione </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:CIFAR">CIFAR </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:word%20embedding">word embedding </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:MNIST">MNIST </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:immagini">immagini </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:classificazione">classificazione </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:kpi">kpi </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:reprogramming">reprogramming </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:adversarial">adversarial </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:browser">browser </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:javascript">javascript </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:reti%20ricorsive">reti ricorsive </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:reti%20ricorrenti">reti ricorrenti </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:ftth">ftth </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:adversarial%20example">adversarial example </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:management">management </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:robotica">robotica </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:ocr">ocr </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:focus">focus </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:iphone">iphone </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:python">python </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:face%20id">face id </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:momento">momento </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:adam">adam </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:neuroscienza">neuroscienza </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:onde%20cerebrali">onde cerebrali </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:torchvision">torchvision </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:latin">latin </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:pretrained">pretrained </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:rete%20convolutiva">rete convolutiva </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:autograd">autograd </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:swish">swish </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:attivazione">attivazione </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:checkpoint">checkpoint </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:tensori">tensori </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:variabili">variabili </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:lineare">lineare </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:regressione">regressione </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:convolutional%20networks">convolutional networks </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:Vatican">Vatican </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:project">project </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:kernel">kernel </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:ICLR">ICLR </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:ipotesi">ipotesi </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:sparsit%C3%A0">sparsità </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:funzionale">funzionale </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:functional">functional </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:adversarial%20attack">adversarial attack </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:kmeans">kmeans </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:analysis">analysis </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:clustering">clustering </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:Google">Google </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:regression">regression </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:JAX">JAX </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:gaussian%20process">gaussian process </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:ensemble">ensemble </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:boosting">boosting </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:gradient">gradient </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:semi-supervised%20learning">semi-supervised learning </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:document%20classification">document classification </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:graphs">graphs </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:variables">variables </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:linear">linear </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:k-NN">k-NN </a> (1)
+    </li>
+    </ul>
+</div>
+<div class="sidebar-content syndicate">
+    <h4>Syndicate</h4>
+    <a class="button" href="/blog.atom"><i class="fa fa-rss-square"></i> Atom 1.0</a>
+    <a class="button" href="/blog.rss"><i class="fa fa-rss-square"></i> RSS</a>
+</div>
+			</div>
+		</div>
+	
+                        <div class="modular-row footer ">
+    <div class="footer-items">
+        <div class="footer-module large">
+		<h4>About</h4>
+                            <p>Italian Association for Machine Learning (C.F. 97949550582)</p>
+            			<p>Write us: info@iaml.it</p>
+        </div>
+        <div class="footer-module"><h4>Address</h4>
+            <p>
+                                    <span><strong>Operational office</strong></span>
+                                    <span>IAML c/o Pi Campus, via Indonesia 23, 00144 Rome</span>
+                                    <span><strong>Legal office</strong></span>
+                                    <span>Via Cassia 964, 00189, Rome</span>
+                            </p>
+        </div>
+        <div class="footer-module"><h4>Quick Links</h4>
+         <ul class="quickmenu">
+                            <li><i class="fa fa-chevron-right"></i><a href="https://iaml.it/home">Home</a></li>
+                            <li><i class="fa fa-chevron-right"></i><a href="https://iaml.it/documents">Documents (Italian)</a></li>
+                    </ul>
+    </div>
+   
+</div>
+<hr>
+<div class="footer-modules">
+    <div class="footer-copyright">
+        Copyright 2018 IAML.IT. All Rights Reserved.
+    </div>
+    <div class="footer-menu">
+    <ul class="othermenu">
+           <li><a href="https://learn.getgrav.org/">Powered by Grav</a></li>
+           <li><a href="https://github.com/getgrav/grav-theme-deliver">Theme (adapted) from Deliver</a></li>
+        </ul>
+    </div>
+</div>
+</div>                    </section>
+        
+    </div>
+    <div class="sb-slidebar sb-left sb-width-thin">
+        <div id="panel">
+        
+<ul class="navigation">
+                                                        <li class="">
+                    <a href="/">
+                                                Home
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/activities">
+                                                Activities
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/supporters">
+                                                Supporters
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/member">
+                                                Become a member
+                    </a>
+                </li>
+                                                                <li class="active">
+                    <a href="/blog">
+                                                Blog
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/governance">
+                                                Governance
+                    </a>
+                </li>
+                                                                                                                                </ul>                   </div>
+    </div>
+        <script src="/user/plugins/simplesearch/js/simplesearch.js" type="text/javascript" ></script>
+
+    <script>
+    $(function () {
+        $(document).ready(function() {
+          $.slidebars({
+            hideControlClasses: true,
+            scrollLock: true
+          });
+        });
+    });
+    </script>
+    </body>
+</html>

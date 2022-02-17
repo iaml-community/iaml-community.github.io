@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Dal k-NN al Transformer in pochi passi (quasi) | Italian Association for Machine Learning</title>
+    <meta content="GravCMS"  />
+<meta content="The Italian Association for Machine Learning (IAML) is a not-for-profit organization with the purpose of promoting knowledge of machine learning in all aspects of the Italian public life, from universities to enterprises and IT professionals."  />
+<meta property="og:title" content="Dal k-NN al Transformer in pochi passi (quasi) | IAML.it"  />
+<meta property="og:image" content="https://iaml.it/blog/dal-knn-al-transformer/header.png"  />
+<meta property="og:url" content="https://iaml.it/blog/dal-knn-al-transformer/"  />
+<meta property="og:description" content="In questo post, vediamo come costruire un meccanismo realistico di attenzione neurale partendo dal k-NN."  />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="icon" type="image/png" href="/user/themes/deliver/images/favicon.png" />
+
+	<!-- Global site tag (gtag.js) - Google Ads: 774709547 --> <script async src="https://www.googletagmanager.com/gtag/js?id=AW-774709547"></script> <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'AW-774709547'); </script> 
+	
+		
+                            		                                                <link href="/user/themes/deliver/css-compiled/nucleus.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css-compiled/template.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/custom.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/toc.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/font-awesome.min.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/facebook/css/facebook.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/facebook/assets/unitegallery/css/unite-gallery.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/facebook/assets/unitegallery/themes/default/ug-theme-default.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/markdown-notices/assets/notices.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/breadcrumbs/css/breadcrumbs.css" type="text/css" rel="stylesheet" />
+<link href="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/events/assets/events.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/form/assets/form-styles.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/mathjax/assets/css/mathjax.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/simplesearch/css/simplesearch.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/highlight/css/zenburn.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/login/css/login.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/slidebars.min.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/slideme.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/socialbuttons/vendor/rrssb/css/rrssb.css" type="text/css" rel="stylesheet" />
+
+
+                                                            <script src="/system/assets/jquery/jquery-2.x.min.js" type="text/javascript" ></script>
+<script src="/user/themes/deliver/js/modernizr.custom.71422.js" type="text/javascript" ></script>
+<script src="/user/plugins/facebook/assets/unitegallery/js/unitegallery.min.js" type="text/javascript" ></script>
+<script src="/user/plugins/facebook/assets/unitegallery/themes/default/ug-theme-default.js" type="text/javascript" ></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.js" type="text/javascript" ></script>
+<script src="/user/plugins/events/assets/events.js" type="text/javascript" ></script>
+<script src="/user/plugins/mathjax/assets/js/mathjax.js" type="text/javascript" ></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript" ></script>
+<script src="/user/plugins/highlight/js/highlight.pack.js" type="text/javascript" ></script>
+<script src="/user/themes/deliver/js/deliver.js" type="text/javascript" ></script>
+<script src="/user/themes/deliver/js/slidebars.min.js" type="text/javascript" ></script>
+<script src="/user/themes/deliver/js/jquery.slideme2.js" type="text/javascript" ></script>
+<script src="/user/plugins/socialbuttons/vendor/rrssb/js/rrssb.min.js" type="text/javascript" ></script>
+
+<script>
+window.addEventListener("load", function(){
+window.cookieconsent.initialise({
+"palette": {
+    "popup": {
+        "background": "#4d4d4d",
+        "text": "#fff"
+    },
+    "button": {
+        "background": "#f1d600",
+        "text": "#000",
+        "border": "#f1d600"
+    }
+},
+"position": "bottom",
+"theme": "block",
+"content": {
+    "message": "This website uses cookies to ensure you get the best experience on our website.",
+    "dismiss": "Got it!",
+    "link": "Learn more",
+    "href": "https://cookiesandyou.com"
+}
+})});
+hljs.initHighlightingOnLoad();
+
+</script>
+
+
+</head>
+<body id="top" class="header-lite fullwidth blogstyling">
+    <div id="sb-site">
+                <header id="header">
+                <div class="logo">
+                    <h3><a href="https://iaml.it"><img src="/user/pages/images/IAML_logo_viola.png" /></a></h3>
+                                            <ul class="social-icons">
+            <li>
+            <a href="https://twitter.com/iaml_it">
+                <i class="fa fa-twitter"></i>            </a>
+        </li>
+            <li>
+            <a href="https://www.linkedin.com/company/iaml/">
+                <i class="fa fa-linkedin"></i>            </a>
+        </li>
+            <li>
+            <a href="https://www.facebook.com/machinelearningitalia/">
+                <i class="fa fa-facebook"></i>            </a>
+        </li>
+            <li>
+            <a href="blog.rss">
+                <i class="fa fa-rss"></i>            </a>
+        </li>
+    </ul>  
+                                    </div>
+                <div id="navbar">
+                                                            
+<ul class="navigation">
+                                                        <li class="">
+                    <a href="/">
+                                                Home
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/activities">
+                                                Activities
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/supporters">
+                                                Supporters
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/member">
+                                                Become a member
+                    </a>
+                </li>
+                                                                <li class="active">
+                    <a href="/blog">
+                                                Blog
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/governance">
+                                                Governance
+                    </a>
+                </li>
+                                                                                                                                </ul>                                                   <form class="search-box">
+    <input type="search" placeholder="Search..." value="" data-search-input="/search/query" />
+    <script>
+    jQuery(document).ready(function($){
+        var input = $('[data-search-input]');
+
+        input.on('keypress', function(event) {
+            if (event.which == 13 && input.val().length > 3) {
+                event.preventDefault();
+                window.location.href = input.data('search-input') + ':' + input.val();
+            }
+        });
+    });
+    </script>
+    <i class="fa fa-search"></i>
+</form>                    <span class="panel-activation sb-toggle-left navbar-left menu-btn fa fa-bars"></span>
+                </div>
+        </header>
+        
+        
+                <section id="body" class="">
+                            
+				<div class="flush-top blog-header blog-header-image" style="background: #B4B093 url(/user/pages/05.blog/blue_header.jpg) no-repeat right;">
+            <h1>Dal k-NN al Transformer in pochi passi (quasi)</h1>
+        </div>
+            
+        
+<div id="breadcrumbs" itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
+                                            <a href="/" itemprop="url"><span itemprop="title">Home</span></a>
+                        <i class="fa fa-angle-right"></i>
+                                                <a href="/blog" itemprop="url"><span itemprop="title">Blog</span></a>
+                        <i class="fa fa-angle-right"></i>
+                                                <span itemprop="title">Dal k-NN al Transformer in pochi passi (quasi)</span>
+                        </div>
+		
+		<div class="blog-content-item g-grid pure-g-r">
+			<div id="item" class="g-block pure-u-2-3">
+			    <div class="list-item">
+
+    <div class="list-blog-header">
+                    <img src="/images/5/0/0/9/6/500961e482a6c3f6df966422112de8312eab5a9c-header.png" />
+        
+                    <h4><a href="/blog/dal-knn-al-transformer">Dal k-NN al Transformer in pochi passi (quasi)</a></h4>
+        
+        <span class="list-blog-date">
+            <i class="fa fa-calendar"></i>
+            25, Jan
+        </span>
+                <span class="list-blog-author">
+            <i class="fa fa-user"></i>
+            Simone Scardapane
+        </span>
+                       <ul class="tags">
+            <i class="fa fa-tag"></i>
+                        <li><a href="/blog/tag:attenzione">attenzione</a></li>
+                        <li><a href="/blog/tag:reti neurali">reti neurali</a></li>
+                        <li><a href="/blog/tag:transformer">transformer</a></li>
+                        <li><a href="/blog/tag:k-NN">k-NN</a></li>
+                    </ul>
+        
+    </div>
+
+	<div>
+	<br />
+	<!-- AddToAny BEGIN -->
+<div class="a2a_kit a2a_kit_size_32 a2a_default_style">
+<a class="a2a_dd" href="https://www.addtoany.com/share"></a>
+<a class="a2a_button_facebook"></a>
+<a class="a2a_button_twitter"></a>
+<a class="a2a_button_linkedin"></a>
+<a class="a2a_button_google_plus"></a>
+<a class="a2a_button_email"></a>
+</div>
+<script async src="https://static.addtoany.com/menu/page.js"></script>
+<!-- AddToAny END -->
+</div>
+	
+    <div class="list-blog-padding">
+
+            <p><p>Uno degli articoli scientifici più influenti dell'ultima decade è sicuramente <em>Attention is All You Need</em>.<sup id="fnref1:att"><a href="#fn:att" class="footnote-ref">1</a></sup> Come da titolo, l'obiettivo dell'articolo era semplice: mostrare come una componente delle reti neurali fino a quel momento di nicchia (<strong>neural attention</strong>, o semplicemente <strong>attenzione</strong> in questo post) bastava da sola a costruire architetture neurali estremamente sofisticate. La famiglia di modelli così ottenuti, i <strong>Transformer</strong>, sono oggi fondamentali in numerosi campi, dal natural language processing<sup id="fnref2:att"><a href="#fn:att" class="footnote-ref">1</a></sup> alle graph neural networks<sup id="fnref1:3"><a href="#fn:3" class="footnote-ref">2</a></sup> ed alla computer vision.<sup id="fnref1:4"><a href="#fn:4" class="footnote-ref">3</a></sup></p>
+<p>Il meccanismo di <strong>attenzione</strong> è però meno misterioso di quanto possa sembrare a prima vista, e lo possiamo ritrovare (seppur in una forma rudimentale) in uno degli algoritmi più usati nel machine learning: il <span class="mathjax mathjax--inline">$k$</span>-nearest neighbours (k-NN)! In questo post, vediamo quindi come costruire un meccanismo realistico di attenzione partendo proprio dal k-NN.</p>
+<h2>Un primo meccanismo d'attenzione</h2>
+<p>Il k-NN è tanto famoso quanto semplice: preso un training set <span class="mathjax mathjax--inline">$(x_i, y_i)$</span> di coppie input/output, ed un elemento <span class="mathjax mathjax--inline">$x$</span> su cui effettuare una predizione, scegliamo gli indici <span class="mathjax mathjax--inline">$\mathcal{N}(x)$</span> dei <span class="mathjax mathjax--inline">$k$</span> input più vicini (simili) a <span class="mathjax mathjax--inline">$x$</span>, e prediciamo la media dei loro rispettivi output:</p>
+<p class="mathjax mathjax--block">$$
+f(x) = \frac{1}{k} \sum_{j \in \mathcal{N}(x)} y_j$$</p>
+<blockquote>
+<p>Varianti per la classificazione considerano altri tipi di aggregazione, ma non sono di interesse qui.</p>
+</blockquote>
+<p>Il k-NN classico assegna ad ogni elemento un peso uniforme, che risulta problematico nel caso di input particolarmente lontani. Una semplice variante (detta <strong>weighted k-NN</strong>) consiste nell'assegnare un peso variabile <span class="mathjax mathjax--inline">$s(x, x_j)$</span> che rappresenta la <em>similarità</em> tra <span class="mathjax mathjax--inline">$x$</span> ed <span class="mathjax mathjax--inline">$x_j$</span>:</p>
+<p class="mathjax mathjax--block">$$
+f(x) =  \sum_{j \in \mathcal{N}(x)} \color{red}{s(x, x_j)} \cdot y_j$$</p>
+<p>A differenza di prima, l'output non è più correttamente normalizzato, in quanto la somma dei pesi non è necessariamente 1. Per rimediare, possiamo includere un termine esplicito di normalizzazione (equivalente alla moltiplicazione per <span class="mathjax mathjax--inline">$\frac{1}{k}$</span> di prima):</p>
+<p class="mathjax mathjax--block">$$
+f(x) =  \color{red}{\frac{1}{\sum_{j \in \mathcal{N}(x)} s(x, x_j)}} \sum_{j \in \mathcal{N}(x)} s(x, x_j) \cdot y_j$$</p>
+<p>Una scelta piuttosto comune per calcolare la similarità è l'inverso della distanza Euclidea:</p>
+<p class="mathjax mathjax--block">$$
+s(x, x_j) = \frac{1}{\lVert x - x_j \rVert}$$</p>
+<p>Una alternativa comune nelle reti neurali è il prodotto scalare:</p>
+<p class="mathjax mathjax--block">$$
+s(x, x_j) = x^Tx_j$$</p>
+<p>Una seconda alternativa comune è l'uso di una funzione softmax per ottenere la normalizzazione. Nell'equazione sopra, questo è equivalente ad usare <span class="mathjax mathjax--inline">$\exp(s(x, x_j))$</span> al posto di <span class="mathjax mathjax--inline">$s(x, x_j)$</span> (con una qualsiasi misura di similarità):</p>
+<p class="mathjax mathjax--block">$$
+f(x) =  \frac{1}{\sum_{j \in \mathcal{N}(x)} \color{red}{\exp(}s(x, x_j)\color{red}{)}} \sum_{j \in \mathcal{N}(x)} \color{red}{\exp(}s(x, x_j)\color{red}{)} \cdot y_j$$</p>
+<p>Dal punto di vista delle reti neurali, quello che abbiamo costruito non è altro che un rudimentale <strong>meccanismo di attenzione</strong>! Nella sua generalità, ed usando la terminologia delle reti neurali, tale meccanismo ci permette di aggregare un insieme di <em>valori</em> (gli output <span class="mathjax mathjax--inline">$y_j$</span> del training set) sulla base di una serie di confronti tra le <em>chiavi</em> (gli input <span class="mathjax mathjax--inline">$x_j$</span> del training set) ed una <em>query</em> di riferimento (il nuovo input <span class="mathjax mathjax--inline">$x$</span> da predire), come mostrato sotto.</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/dal-knn-al-transformer/images/Attenzione.png">
+        </figure>
+<figcaption>Figura 1: Schema semplificato del weighted k-NN visto come meccanismo di attenzione.</figcaption>
+<h2>Introduciamo qualche parametro</h2>
+<p>Una differenza notevole tra un k-NN, seppur pesato, ed una rete neurale, è la mancanza di <strong>parametri allenabili</strong>: una volta fissato il training set e la misura di similarità, le predizioni dell'algoritmo sono determinate senza nessuna procedura di allenamento.</p>
+<p>Il modo più semplice di introdurre dei parametri è di considerare una funzione di similarità allenabile. Nei meccanismi di attenzione più comuni (<strong>dot-product attention</strong>) questo si ottiene semplicemente proiettando la query e le chiavi con una matrice allenabile, e calcolando la similarità tramite il loro prodotto scalare:</p>
+<p class="mathjax mathjax--block">$$
+s(x, x_j) =  {\underbrace{\left( Wx \right)}_{\text{query } q}}^T  \underbrace{\left( Wx_j \right)}_{\text{chiave } k_j}$$</p>
+<p>In pratica, è comune aggiungere anche un termine <span class="mathjax mathjax--inline">$\frac{1}{\sqrt{K}}$</span>, dove <span class="mathjax mathjax--inline">$K$</span> è la dimensione di <span class="mathjax mathjax--inline">$Wx$</span>, per <a href="https://paperswithcode.com/method/scaled">normalizzare la similarità</a>.</p>
+<p>Come apprendere la matrice <span class="mathjax mathjax--inline">$W$</span>? La difficoltà di applicare una discesa al gradiente in questo caso deriva soprattutto dal dover scegliere, ad ogni istante, i <span class="mathjax mathjax--inline">$k$</span> elementi più simili rispetto a <span class="mathjax mathjax--inline">$s(\cdot, \cdot)$</span>, una operazione di cui non è possibile calcolare il gradiente. Nonostante sia possibile approssimarla,<sup id="fnref1:1"><a href="#fn:1" class="footnote-ref">4</a></sup> è ancora più facile ignorare del tutto la scelta dei vicini, e calcolare la media pesata rispetto a <em>tutto il dataset</em>:</p>
+<p class="mathjax mathjax--block">$$
+f(x) = \frac{1}{\color{red}{\sum_{j}} s(x, x_j)} \color{red}{\sum_{j}} s(x, x_j) \cdot y_j$$</p>
+<p>Possiamo ora allenare la matrice minimizzando un qualche tipo di errore, come ad esempio l'errore quadratico medio:</p>
+<p class="mathjax mathjax--block">$$
+L(W) = \sum_i (y_i - f(x_i))^2$$</p>
+<p>Come vedremo nella prossima sezione, l'algoritmo così ottenuto comincia ad essere molto simile ad un meccanismo realistico di attenzione. Per completezza, va menzionato che nel caso del k-NN, l'idea di apprendere una funzione di distanza ha dato vita ad una ampia letteratura.<sup id="fnref1:2"><a href="#fn:2" class="footnote-ref">5</a></sup></p>
+<blockquote>
+<p>Un'altra nota interessante: scegliendo una funzione di similarità a kernel <span class="mathjax mathjax--inline">$s(x, x_j) = \phi(x)^T\phi(x_j)$</span> ricadiamo invece nel mondo dei kernel methods (tra cui, ad esempio, le support vector machine). Una delle linee di ricerca dell'ultimo anno cerca proprio di combinare questi due mondi per migliorare le prestazioni dei Transformer.<sup id="fnref1:5"><a href="#fn:5" class="footnote-ref">6</a></sup></p>
+</blockquote>
+<h2>Un k-NN con rappresentazioni intermedie</h2>
+<p>Cosa manca al nostro algoritmo? Finora, abbiamo usato dei meccanismi allenabili per imparare a pesare correttamente le etichette di input 'simili'. In questo senso, il nostro algoritmo è più simile ad un metodo di <a href="https://en.wikipedia.org/wiki/Label_propagation_algorithm">label propagation</a> (per chi avesse familiarità con i grafi) che ad una rete neurale. Intuitivamente, questo può funzionare solo per input semplici.</p>
+<p>Da un algoritmo neurale, invece, ci aspettiamo la capacità di apprendere una serie di rappresentazioni intermedie sempre più astratte (gli <em>strati nascosti</em> della rete) prima di giungere alla predizione finale.</p>
+<p>Curiosamente, è abbastanza facile modificare il nostro algoritmo per gestire quest'ultima idea. L'idea di fondo è di imparare ad aggregare gli <em>input</em> <span class="mathjax mathjax--inline">$x_j$</span> invece degli <em>output</em> <span class="mathjax mathjax--inline">$y_j$</span>, ottenendo quindi una rappresentazione intermedia come somma pesata degli input di partenza. In questo caso, è più comune costruire le nostre query, chiavi, e valori usando tre diverse matrici di proiezione <span class="mathjax mathjax--inline">$W^{(q)}$</span>, <span class="mathjax mathjax--inline">$W^{(k)}$</span>, e <span class="mathjax mathjax--inline">$W^{(v)}$</span> (mentre prima ne avevamo usata una sola per chiavi e query):</p>
+<p class="mathjax mathjax--block">$$
+\color{red}{q} = W^{(q)}x \,, \,\,\, \color{blue}{k_j} = W^{(k)} x_j \,, \,\,\, \color{green}{v_j} = W^{(v)} x_j$$</p>
+<p>Usiamo quindi questi nuovi valori nella funzione di attenzione di prima:</p>
+<p class="mathjax mathjax--block">$$
+\text{Att}(x, \{x_j\}) = \frac{1}{\sum_{j} s(\color{red}{q}, \color{blue}{k_j})} \sum_{j} s(\color{red}{q}, \color{blue}{k_j}) \cdot \color{green}{v_j}$$</p>
+<p>Il risultato è simile: usiamo i confronti tra la query <span class="mathjax mathjax--inline">$\color{red}{q}$</span> e le chiavi <span class="mathjax mathjax--inline">$\color{blue}{k_j}$</span> per aggregare i valori <span class="mathjax mathjax--inline">$\color{green}{v_j}$</span> a nostra disposizione, con la differenza che in questo caso l'output è una nuova rappresentazione di <span class="mathjax mathjax--inline">$x$</span> e non più una predizione. Aggiungendo una non-linearità e ripetendo questo processo più volte, otteniamo una rete neurale <em>interamente basata su un meccanismo di attenzione</em>! Poiché usiamo gli stessi dati di partenza per generare query, chiavi, e valori, si parla di <strong>self-attention</strong>.</p>
+<h2>Vettorizzare il processo</h2>
+<p>Un aspetto interessante del meccanismo di attenzione è di essere molto semplice da vettorizzare. Supponiamo infatti di voler ottenere le nuove rappresentazioni per l'intero training set, che possiamo scrivere in forma compatta come una unica matrice <span class="mathjax mathjax--inline">$X$</span> in cui l'<span class="mathjax mathjax--inline">$i$</span>-esima riga corrisponde a <span class="mathjax mathjax--inline">$x_i$</span>. Possiamo calcolare le nuove query, valori, e chiavi semplicemente come:</p>
+<p class="mathjax mathjax--block">$$
+\color{red}{Q} = XW^{(q)} \,, \,\,\, \color{blue}{K} = XW^{(k)} \,, \,\,\, \color{green}{V} = XW^{(v)} \,,$$</p>
+<p>dove, a differenza di prima, abbiamo ora varie query (le singole righe di <span class="mathjax mathjax--inline">$Q$</span>), ciascuna corrispondente ad un input. Possiamo quindi riscrivere il meccanismo di attenzione sull'intera matrice <span class="mathjax mathjax--inline">$X$</span> come:</p>
+<p class="mathjax mathjax--block">$$
+\text{Att}(X) = \text{softmax}(\color{red}{Q}\color{blue}{K}^T) \color{green}{V} \,,$$</p>
+<p>dove, per coerenza con quanto fatto di solito nelle reti neurali, abbiamo esplicitato l'uso della softmax. Questa formulazione è così comune da essere ormai presente nella maggior parte dei framework di deep learning (es., <a href="https://pytorch.org/docs/stable/generated/torch.nn.MultiheadAttention.html">in PyTorch</a>), e l'abbiamo riassunta nella figura sotto.</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/dal-knn-al-transformer/images/Auto-attenzione.png">
+        </figure>
+<figcaption>Figura 2: schema del meccanismo di self-attention.</figcaption>
+<p>Possiamo adesso cominciare a costruire reti a più strati aggiungendo una non-linearità <span class="mathjax mathjax--inline">$\phi$</span> (es., una ReLU) tra due componenti di self-attention:</p>
+<p class="mathjax mathjax--block">$$
+H = \text{Att}(\phi(\text{Att}(X))) \,,$$</p>
+<p>ovviamente assumendo che le due componenti abbiano parametri allenabili indipendenti.</p>
+<h2>Graph attention network e transformer</h2>
+<p>In questo post, partendo dal k-NN, abbiamo ottenuto un algoritmo che aggrega tutti gli input del training set per ottenere una predizione tramite meccanismi di self-attention. Per gli appassionati delle graph neural network, quello che abbiamo costruito è in effetti un prototipo molto semplice di una <a href="https://arxiv.org/abs/1710.10903">graph attention network</a>.<sup id="fnref2:3"><a href="#fn:3" class="footnote-ref">2</a></sup> Nel deep learning è comune usare il meccanismo di attenzione per aggregare gli elementi di una sequenza come, ad esempio, i token di una frase nel natural language processing. È proprio in questo contesto che il meccanismo di attenzione ricopre un ruolo fondamentale in quanto è alla base dei <strong>Transformer</strong> di cui parleremo in dettaglio in un altro post.</p>
+<p>Vale la pena fare qualche osservazione conclusiva su quanto ottenuto:</p>
+<ol>
+<li>Formalmente, quello che abbiamo sviluppato è un meccanismo <strong>single-head</strong>. Una variante <strong>multi-head</strong> si ottiene replicando più volte il processo di attenzione in parallelo, e combinando poi i risultati (ci ritorneremo).</li>
+<li>Il dot-product non è l'unico meccanismo di attenzione possibile. <a href="https://paperswithcode.com/methods/category/attention-mechanisms-1">paperswithcode</a> ha una bella overview di alcuni dei meccanismi più comuni proposti in letteratura.</li>
+</ol>
+<p>Nei prossimi articoli, parleremo più nel dettaglio dei Transformer, e dell'implementazione di queste tecniche.</p>
+<h2>Note conclusive</h2>
+<p>Questo articolo è ispirato ad uno dei nuovi capitoli di <a href="http://d2l.ai/chapter_attention-mechanisms/nadaraya-waston.html">Dive into Deep Learning</a>, che considera un setup simile con uno stimatore di Nadaraya-Watson per un problema di regressione. L'autore ringrazia inoltre tutti quelli che hanno voluto esprimere feedback e commenti sull'articolo.</p>
+<hr />
+<p>Se questo articolo ti è piaciuto e vuoi tenerti aggiornato sulle nostre attività, puoi seguirci anche su <a href="https://www.facebook.com/machinelearningitalia/">Facebook</a>, <a href="https://www.linkedin.com/company/18312943/">LinkedIn</a>, <a href="https://twitter.com/iaml_it">Twitter</a>, <a href="http://t.me/iaml_it">Telegram</a>, e <a href="http://iaml.it/discord_invite">Discord</a>.</p>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn:att">
+<p>Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A.N., Kaiser, L. and Polosukhin, I., 2017. <a href="https://arxiv.org/abs/1706.03762">Attention is all you need</a>. NeurIPS.&#160;<a href="#fnref1:att" rev="footnote" class="footnote-backref">&#8617;</a> <a href="#fnref2:att" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:3">
+<p>Veličković, P., Cucurull, G., Casanova, A., Romero, A., Lio, P. and Bengio, Y., 2017. <a href="https://arxiv.org/abs/1710.10903">Graph attention networks</a>. arXiv preprint arXiv:1710.10903.&#160;<a href="#fnref1:3" rev="footnote" class="footnote-backref">&#8617;</a> <a href="#fnref2:3" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:4">
+<p>Dosovitskiy, A., Beyer, L., Kolesnikov, A., Weissenborn, D., Zhai, X., Unterthiner, T., Dehghani, M., Minderer, M., Heigold, G., Gelly, S. and Uszkoreit, J., 2020. <a href="https://arxiv.org/abs/2010.11929">An image is worth 16x16 words: Transformers for image recognition at scale</a>. arXiv preprint arXiv:2010.11929.&#160;<a href="#fnref1:4" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:1">
+<p>Plötz, T. and Roth, S., 2018. <a href="https://papers.nips.cc/paper/2018/file/f0e52b27a7a5d6a1a87373dffa53dbe5-Paper.pdf">Neural nearest neighbors networks</a>. Advances in Neural Information Processing Systems, 31, pp.1087-1098.&#160;<a href="#fnref1:1" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:2">
+<p>Weinberger, K.Q. and Saul, L.K., 2009. <a href="https://jmlr.csail.mit.edu/papers/volume10/weinberger09a/weinberger09a.pdf">Distance metric learning for large margin nearest neighbor classification</a>. Journal of machine learning research, 10(2).&#160;<a href="#fnref1:2" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:5">
+<p>Choromanski, K., Likhosherstov, V., Dohan, D., Song, X., Gane, A., Sarlos, T., Hawkins, P., Davis, J., Mohiuddin, A., Kaiser, L. and Belanger, D., 2020. <a href="https://arxiv.org/abs/2009.14794">Rethinking attention with performers</a>. arXiv preprint arXiv:2009.14794.&#160;<a href="#fnref1:5" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+</ol>
+</div></p>
+            
+    
+        <p class="prev-next">
+                            <a class="button" href="/blog/machine-learning-project-management"><i class="fa fa-chevron-left"></i> Previous Post</a>
+            
+                    </p>
+    
+    </div>
+</div>
+			</div>
+			<div id="sidebar" class="g-block size-1-3 pure-u-1-3">
+				<div class="sidebar-content">
+    <h4>Search the blog</h4>
+    <input type="text" placeholder="Search..." value="" data-searchsidebar-input="/search/query" />
+<script>
+jQuery(document).ready(function($){
+    var input = $('[data-searchsidebar-input]');
+
+    input.on('keypress', function(event) {
+        if (event.which == 13 && input.val().length > 3) {
+            event.preventDefault();
+            window.location.href = input.data('searchsidebar-input') + ':' + input.val();
+        }
+    });
+});
+</script>
+</div>
+<!--
+<div class="sidebar-content">
+	<h4>Some Text Widget</h4>
+	<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna.</p>
+</div>
+!-->
+<div class="sidebar-content">
+    <h4>Categories</h4>
+    
+
+<ul class="archives">
+        <li>
+        <a href="/blog/category:Tutorials">Tutorials </a> (16)
+    </li>
+        <li>
+        <a href="/blog/category:Discussions">Discussions </a> (12)
+    </li>
+        <li>
+        <a href="/blog/category:Announcements">Announcements </a> (4)
+    </li>
+        <li>
+        <a href="/blog/category:Tutorials%20%28English%29">Tutorials (English) </a> (4)
+    </li>
+        <li>
+        <a href="/blog/category:Articles%27%20summaries">Articles' summaries </a> (3)
+    </li>
+        <li>
+        <a href="/blog/category:Discussions%20%28English%29">Discussions (English) </a> (2)
+    </li>
+        <li>
+        <a href="/blog/category:Focus-on">Focus-on </a> (1)
+    </li>
+        <li>
+        <a href="/blog/category:Reviews">Reviews </a> (1)
+    </li>
+        <li>
+        <a href="/blog/category:Discussion">Discussion </a> (1)
+    </li>
+    </ul>
+</div>
+<div class="sidebar-content">
+    <h4>Archives</h4>
+	<ul class="archives">
+    <li>
+    	<a href="/blog/archives_month:jan_2021">
+        <span class="archive_date">January 2021</span>
+                <span>(1)</span>
+                </a>
+    </li>
+</ul>
+</div>
+<div class="sidebar-content">
+    <h4>Popular Tags</h4>
+    
+
+<ul class="archives">
+        <li>
+        <a href="/blog/tag:deep%20learning">deep learning </a> (11)
+    </li>
+        <li>
+        <a href="/blog/tag:pytorch">pytorch </a> (9)
+    </li>
+        <li>
+        <a href="/blog/tag:reti%20neurali">reti neurali </a> (5)
+    </li>
+        <li>
+        <a href="/blog/tag:google">google </a> (4)
+    </li>
+        <li>
+        <a href="/blog/tag:jit">jit </a> (4)
+    </li>
+        <li>
+        <a href="/blog/tag:tensorflow">tensorflow </a> (4)
+    </li>
+        <li>
+        <a href="/blog/tag:ottimizzazione">ottimizzazione </a> (4)
+    </li>
+        <li>
+        <a href="/blog/tag:rete%20neurale">rete neurale </a> (3)
+    </li>
+        <li>
+        <a href="/blog/tag:time%20series">time series </a> (3)
+    </li>
+        <li>
+        <a href="/blog/tag:keras">keras </a> (3)
+    </li>
+        <li>
+        <a href="/blog/tag:reti%20convolutive">reti convolutive </a> (3)
+    </li>
+        <li>
+        <a href="/blog/tag:pipeline">pipeline </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:sklearn">sklearn </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:autodiff">autodiff </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:automatic%20differentation">automatic differentation </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:reverse-mode">reverse-mode </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:derivate">derivate </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:differenziazione">differenziazione </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:model%20selection">model selection </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:cross%20validation">cross validation </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:c%2B%2B">c++ </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:numpy">numpy </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:vmap">vmap </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:caffe">caffe </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:compiler">compiler </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:jax">jax </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:codemotion">codemotion </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:bias">bias </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:discrimination">discrimination </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:fairness">fairness </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:iaml">iaml </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:database">database </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:iperparametri">iperparametri </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:autograph">autograph </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:head">head </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:multi-task">multi-task </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:learning">learning </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:novit%C3%A0">novità </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:dev%20summit">dev summit </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:custom%20estimator">custom estimator </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:hyperopt">hyperopt </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:goodfellow">goodfellow </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:nlp">nlp </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:dati%20mancanti">dati mancanti </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:transformer">transformer </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:attenzione">attenzione </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:robocop">robocop </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:yolo">yolo </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:object%20detection">object detection </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:bayes">bayes </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:autoencoders">autoencoders </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:variational">variational </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:eager">eager </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:imputazione">imputazione </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:CIFAR">CIFAR </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:word%20embedding">word embedding </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:MNIST">MNIST </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:immagini">immagini </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:classificazione">classificazione </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:kpi">kpi </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:reprogramming">reprogramming </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:adversarial">adversarial </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:browser">browser </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:javascript">javascript </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:reti%20ricorsive">reti ricorsive </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:reti%20ricorrenti">reti ricorrenti </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:ftth">ftth </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:adversarial%20example">adversarial example </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:management">management </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:robotica">robotica </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:ocr">ocr </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:focus">focus </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:iphone">iphone </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:python">python </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:face%20id">face id </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:momento">momento </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:adam">adam </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:neuroscienza">neuroscienza </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:onde%20cerebrali">onde cerebrali </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:torchvision">torchvision </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:latin">latin </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:pretrained">pretrained </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:rete%20convolutiva">rete convolutiva </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:autograd">autograd </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:swish">swish </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:attivazione">attivazione </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:checkpoint">checkpoint </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:tensori">tensori </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:variabili">variabili </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:lineare">lineare </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:regressione">regressione </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:convolutional%20networks">convolutional networks </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:Vatican">Vatican </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:project">project </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:kernel">kernel </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:ICLR">ICLR </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:ipotesi">ipotesi </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:sparsit%C3%A0">sparsità </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:funzionale">funzionale </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:functional">functional </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:adversarial%20attack">adversarial attack </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:kmeans">kmeans </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:analysis">analysis </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:clustering">clustering </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:Google">Google </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:regression">regression </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:JAX">JAX </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:gaussian%20process">gaussian process </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:ensemble">ensemble </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:boosting">boosting </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:gradient">gradient </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:semi-supervised%20learning">semi-supervised learning </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:document%20classification">document classification </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:graphs">graphs </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:variables">variables </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:linear">linear </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:k-NN">k-NN </a> (1)
+    </li>
+    </ul>
+</div>
+<div class="sidebar-content syndicate">
+    <h4>Syndicate</h4>
+    <a class="button" href="/blog.atom"><i class="fa fa-rss-square"></i> Atom 1.0</a>
+    <a class="button" href="/blog.rss"><i class="fa fa-rss-square"></i> RSS</a>
+</div>
+			</div>
+		</div>
+	
+                        <div class="modular-row footer ">
+    <div class="footer-items">
+        <div class="footer-module large">
+		<h4>About</h4>
+                            <p>Italian Association for Machine Learning (C.F. 97949550582)</p>
+            			<p>Write us: info@iaml.it</p>
+        </div>
+        <div class="footer-module"><h4>Address</h4>
+            <p>
+                                    <span><strong>Operational office</strong></span>
+                                    <span>IAML c/o Pi Campus, via Indonesia 23, 00144 Rome</span>
+                                    <span><strong>Legal office</strong></span>
+                                    <span>Via Cassia 964, 00189, Rome</span>
+                            </p>
+        </div>
+        <div class="footer-module"><h4>Quick Links</h4>
+         <ul class="quickmenu">
+                            <li><i class="fa fa-chevron-right"></i><a href="https://iaml.it/home">Home</a></li>
+                            <li><i class="fa fa-chevron-right"></i><a href="https://iaml.it/documents">Documents (Italian)</a></li>
+                    </ul>
+    </div>
+   
+</div>
+<hr>
+<div class="footer-modules">
+    <div class="footer-copyright">
+        Copyright 2018 IAML.IT. All Rights Reserved.
+    </div>
+    <div class="footer-menu">
+    <ul class="othermenu">
+           <li><a href="https://learn.getgrav.org/">Powered by Grav</a></li>
+           <li><a href="https://github.com/getgrav/grav-theme-deliver">Theme (adapted) from Deliver</a></li>
+        </ul>
+    </div>
+</div>
+</div>                    </section>
+        
+    </div>
+    <div class="sb-slidebar sb-left sb-width-thin">
+        <div id="panel">
+        
+<ul class="navigation">
+                                                        <li class="">
+                    <a href="/">
+                                                Home
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/activities">
+                                                Activities
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/supporters">
+                                                Supporters
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/member">
+                                                Become a member
+                    </a>
+                </li>
+                                                                <li class="active">
+                    <a href="/blog">
+                                                Blog
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/governance">
+                                                Governance
+                    </a>
+                </li>
+                                                                                                                                </ul>                   </div>
+    </div>
+        <script src="/user/plugins/simplesearch/js/simplesearch.js" type="text/javascript" ></script>
+
+    <script>
+    $(function () {
+        $(document).ready(function() {
+          $.slidebars({
+            hideControlClasses: true,
+            scrollLock: true
+          });
+        });
+    });
+    </script>
+    </body>
+</html>

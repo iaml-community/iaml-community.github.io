@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title>Blog</title>
+        <link>https://iaml.it/blog.rss</link>
+        <description>The blog of the Italian Association for Machine Learning</description>
+        <language>en-us</language>
+        <atom:link href="https://iaml.it/blog.rss" rel="self" type="application/rss+xml"/>
+                        <item>
+            <title>Dal k-NN al Transformer in pochi passi (quasi)</title>
+            <link>https://iaml.it/blog/dal-knn-al-transformer</link>
+            <description>
+                <![CDATA[
+                                <img src="https://iaml.it/images/a/7/6/3/e/a763ed97bb74b5eda65b60cd170315b7f81245e2-header.png" />
+                                <p>Uno degli articoli scientifici pi&ugrave; influenti dell'ultima decade &egrave; sicuramente <em>Attention is All You Need</em>.<sup id="fnref1:att"><a href="#fn:att" class="footnote-ref">1</a></sup> Come da titolo, l'obiettivo dell'articolo era semplice: mostrare come una componente delle reti neurali fino a quel momento di nicchia (<strong>neural attention</strong>, o semplicemente <strong>attenzione</strong> in questo post) bastava da sola a costruire architetture neurali estremamente sofisticate. La famiglia di modelli cos&igrave; ottenuti, i <strong>Transformer</strong>, sono oggi fondamentali in numerosi campi, dal natural langu...</p>
+                ]]>
+            </description>
+            <category>attenzione,reti neurali,transformer,k-NN</category>
+            <guid>https://iaml.it/blog/dal-knn-al-transformer</guid>
+            <pubDate>Mon, 25 Jan 2021 00:00:00 +0100</pubDate>
+        </item>
+                        <item>
+            <title>Machine Learning per il Project Management – un esempio di applicazione sulla costruzione di reti FTTH</title>
+            <link>https://iaml.it/blog/machine-learning-project-management</link>
+            <description>
+                <![CDATA[
+                                <img src="https://iaml.it/images/7/4/8/e/2/748e2f2e83af75609c4196cea320deb8f4756388-5.jpeg" />
+                                <p>In questo breve articolo, mostriamo con un caso pratico alcune delle possibilit&agrave; che offrono gli algoritmi di Machine Learning per il controllo di progetti complessi. </p><p>La teoria classica del <strong>Project Management</strong> prevede che all&rsquo;inizio di ogni progetto sia definita una <em>project charter</em>, all&rsquo;interno della quale sono stabiliti i KPI (di solito variabili continue) che misureranno il grado di successo del progetto. Questi KPI possono essere i tempi di consegna del progetto, oppure valori di tipo...</p>
+                ]]>
+            </description>
+            <category>project,management,kpi,ftth</category>
+            <guid>https://iaml.it/blog/machine-learning-project-management</guid>
+            <pubDate>Mon, 03 Aug 2020 00:00:00 +0200</pubDate>
+        </item>
+                        <item>
+            <title>Breve introduzione al Dynamic Time Warping</title>
+            <link>https://iaml.it/blog/serie-storiche-3-dynamic-time-warping</link>
+            <description>
+                <![CDATA[
+                                <img src="https://iaml.it/images/c/a/1/e/3/ca1e38e0c39cd3bbfc77bb8665ccf0483a86caf5-lmmjyom.png" />
+                                <p>Continuano i nostri articoli dedicati al processamento di serie temporali! Nel <a href="https://iaml.it/blog/serie-storiche-2-sax-encoding">secondo articolo della serie</a> abbiamo visto come confrontare sequenze diverse utilizzando il <strong>SAX Encoding</strong>. Ma se volessimo quantificare la distanza tra due Time Series? A questo scopo, introduciamo un'altra tecnica estremamente utile, il <strong>Dynamic Time Warping</strong> (DTW).</p><nav class="table-of-contents minitoc" role="navigation">
+                <span class="toctitle">Overview:</span>
+      
+                                                          
+  <ul>
+      
+        
+        
+              <li><a href="#dynamic-time-warping" class="toclink" title="Dynamic Time Warping">Dynamic T</a>...</li></ul></nav>
+                ]]>
+            </description>
+            <category>time series</category>
+            <guid>https://iaml.it/blog/serie-storiche-3-dynamic-time-warping</guid>
+            <pubDate>Thu, 18 Jun 2020 00:00:00 +0200</pubDate>
+        </item>
+                        <item>
+            <title>Individuare pattern con il SAX encoding</title>
+            <link>https://iaml.it/blog/serie-storiche-2-sax-encoding</link>
+            <description>
+                <![CDATA[
+                                <img src="https://iaml.it/images/c/b/e/5/6/cbe563ac2573feb2c6d6ed5d25ff9e81a34c2e1e-image1.png" />
+                                <p>Il <a href="http://www.cs.ucr.edu/~eamonn/SAX.htm">Symbolic Aggregate approXimation</a> (SAX) encoding &egrave; un metodo per semplificare le serie storiche. &Egrave; stato inventato da Eamonn Keogh e Jessica Lin nel 2002. SAX &egrave; un modo di trasformare una serie temporale in una sequenza di simboli. L'idea di base &egrave; che ogni simbolo rappresenta un intervallo. Questa tecnica permette di condurre una <em>dimensionality reduction</em> sulle serie storiche, quindi possiamo considerarlo un metodo non supervisionato.</p><p>Bisogna evidenziare che il SAX &egrave; una tecnica molto r...</p>
+                ]]>
+            </description>
+            <category>time series</category>
+            <guid>https://iaml.it/blog/serie-storiche-2-sax-encoding</guid>
+            <pubDate>Fri, 24 Apr 2020 00:00:00 +0200</pubDate>
+        </item>
+                        <item>
+            <title>Trattare i valori mancanti nelle serie storiche</title>
+            <link>https://iaml.it/blog/serie-storiche-1-dati-mancanti</link>
+            <description>
+                <![CDATA[
+                                <img src="https://iaml.it/images/5/3/8/d/8/538d836e5a1c49ca5b3967e0c275c5cdf9ddc315-image1.png" />
+                                <p>Il trattamento e l'imputazione dei valori mancanti (missing values) sono due step molto delicati per ogni progetto di data science. Nonostante esistano diverse strategie per l'imputazione, tutte possono portare a errori perch&egrave; si sta introducendo un dato <strong>"artificiale"</strong>.</p><blockquote>
+<p>Un consiglio che viene dato spesso &egrave;, in fase di imputazione di valori mancanti, creare per ogni feature che si sta trattando una nuova variabile booleana "<em>nomeFeature_isMissing</em>" per tracciare quali valori sono reali e qua...</p></blockquote>
+                ]]>
+            </description>
+            <category>time series,dati mancanti,imputazione</category>
+            <guid>https://iaml.it/blog/serie-storiche-1-dati-mancanti</guid>
+            <pubDate>Wed, 01 Apr 2020 00:00:00 +0200</pubDate>
+        </item>
+                        <item>
+            <title>Infinite training with infinite networks</title>
+            <link>https://iaml.it/blog/infinite-neural-networks</link>
+            <description>
+                <![CDATA[
+                                <img src="https://iaml.it/images/5/7/f/d/c/57fdcd7444aa368ecb4e3a365a129d0c064d992f-ntfigure.png" />
+                                <p>What happens to a neural network when its size goes to infinity? Despite the strangeness of the question, the answer turns out to be a fascinating one: the network converges to a so-called <strong>Gaussian Process</strong> (GP). In this article we overview some recent, notable results exploring the connections between the two, most importantly the <strong>neural tangent kernel</strong> (NTK). We also introduce a <a href="https://github.com/google/neural-tangents">JAX library</a>, Neural Tangents, to <em>compute</em> the predictions of such an infinite neural network in the general cas...</p>
+                ]]>
+            </description>
+            <category>gaussian process,JAX,Google,kernel</category>
+            <guid>https://iaml.it/blog/infinite-neural-networks</guid>
+            <pubDate>Thu, 20 Feb 2020 00:00:00 +0100</pubDate>
+        </item>
+                        <item>
+            <title>Deep learning: un problema di ottimizzazione</title>
+            <link>https://iaml.it/blog/deep-learning-ottimizzazione</link>
+            <description>
+                <![CDATA[
+                                <img src="https://iaml.it/images/f/3/4/a/c/f34acbfce18b0a56eef0dc4e1297572256459f81-nonconvexsgd.jpeg" />
+                                <p>Il concetto di ottimizzazione gioca un ruolo chiave quando si parla di machine learning e deep learning in particolare. Lo scopo principale degli algoritmi di deep learning &egrave; quello di costruire un modello di ottimizzazione che, tramite un processo iterativo, minimizzi o massimizzi una funzione obiettivo <span class="mathjax mathjax--inline">$J(\theta)$</span> denominata anche <strong>loss function</strong> o <strong>cost function</strong>.</p><p>I pi&ugrave; popolari metodi di ottimizzazione possono essere suddivisi in due categorie: metodi di ottimizzazione <em>del primo ordine</em>,...</p>
+                ]]>
+            </description>
+            <category>ottimizzazione,deep learning,adam,momento</category>
+            <guid>https://iaml.it/blog/deep-learning-ottimizzazione</guid>
+            <pubDate>Mon, 09 Dec 2019 00:00:00 +0100</pubDate>
+        </item>
+                        <item>
+            <title>YOLO - You Only Look Once</title>
+            <link>https://iaml.it/blog/yolo-you-only-look-once</link>
+            <description>
+                <![CDATA[
+                                <img src="https://iaml.it/images/9/3/b/b/e/93bbe4a445a565458da9ada5b993411900418962-v0bqorv.jpeg" />
+                                <p>In questo articolo viene descritto l'algoritmo <a href="https://pjreddie.com/darknet/yolo/">YOLO</a> per Object Detection. Ne vengono definite le caratteristiche fondamentali facendo qualche riferimento ai progressi che si sono conseguiti nella varie versioni rilasciate.</p><p></p><nav class="table-of-contents minitoc" role="navigation">
+                <span class="toctitle">Overview:</span>
+      
+                                                                                                                            
+  <ul>
+      
+        
+        
+              <li><a href="#vivo-o-morto" class="toclink" title="Vivo o morto ...">Vivo o morto ...</a></li>
+      
+        
+        
+              <li><a href="#bersaglio" class="toclink" title="Bersaglio!">Bersagli</a>...</li></ul></nav>
+                ]]>
+            </description>
+            <category>object detection,yolo,robocop</category>
+            <guid>https://iaml.it/blog/yolo-you-only-look-once</guid>
+            <pubDate>Fri, 20 Sep 2019 00:00:00 +0200</pubDate>
+        </item>
+                        <item>
+            <title>Allenare una rete neurale è come vincere alla lotteria?</title>
+            <link>https://iaml.it/blog/lottery-ticket-hypothesis</link>
+            <description>
+                <![CDATA[
+                                <img src="https://iaml.it/images/c/1/6/3/a/c163aa00b3acc2b15bde79ede7239a21563f6c83-lotterytickethypothesis.png" />
+                                <p>Un mese fa si &egrave; conclusa la settima edizione della <strong>International Conference on Learning Representations</strong> (ICLR), una delle conferenze pi&ugrave; prestigiose dedicate al mondo del deep learning. Come ogni edizione, grande interesse hanno destato i <em>best paper award</em>, elogi scelti da un <a href="https://iclr.cc/Conferences/2019/Awards">comitato di prestigio</a> per premiare articoli di particolare interesse o dal notevole impatto scientifico tra gli oltre <a href="https://medium.com/syncedreview/iclr-2019-mila-microsoft-and-mit-share-best-paper-honours-440675d5773e">1500</a> sottomessi alla conferenza.</p><p></p><p>Due gli articoli premiati quest'anno. <strong><a href="https://arxiv.org/pdf/1810.09536.pdf">Ordered Neurons: Integ</a>...</strong></p>
+                ]]>
+            </description>
+            <category>reti neurali,sparsità,ipotesi,ICLR</category>
+            <guid>https://iaml.it/blog/lottery-ticket-hypothesis</guid>
+            <pubDate>Tue, 18 Jun 2019 00:00:00 +0200</pubDate>
+        </item>
+                        <item>
+            <title>Launching the IAML Tech Evenings with Pi Campus</title>
+            <link>https://iaml.it/blog/iaml-tech-evenings</link>
+            <description>
+                <![CDATA[
+                                <img src="https://iaml.it/images/b/4/a/3/5/b4a3512973266f0b1c8b6982feef7974ca683034-5956796522334443134082582178150341558665216n.png" />
+                                <p>We are happy to announce the <strong>IAML tech talks</strong>, a series of lectures co-organized and sponsored with <a href="https://picampus.it">Pi Campus</a>, to promote discussion on topics of wide significance and societal impact, and bringing together researchers, professionals, and policy makers to discuss the future of machine learning in Italy.</p><p>For our first event, on May 30th, we will host <a href="https://csilviavr.github.io/">Silvia Chiappa</a> from DeepMind, who is also a member of our advisory board, to discuss about fairness in machine learning and its wide importan...</p>
+                ]]>
+            </description>
+            <category></category>
+            <guid>https://iaml.it/blog/iaml-tech-evenings</guid>
+            <pubDate>Wed, 15 May 2019 00:00:00 +0200</pubDate>
+        </item>
+            </channel>
+</rss>

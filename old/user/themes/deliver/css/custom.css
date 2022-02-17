@@ -1,0 +1,193 @@
+.callout {
+	color: #2a2a2a !important;
+	font-size: 1.1rem;
+	font-weight: 500;
+}
+
+.bottom {
+	color: #2a2a2a !important;
+	font-size: 1.1rem;
+	font-weight: 500;
+}
+
+.logo h3 {
+	font-family: "novecento_sans_widedemibold", "Helvetica", "Tahoma", "Geneva", "Arial", sans-serif
+}
+
+.callout {
+	background-color: white;
+	text-align: justify;
+}
+
+.callout  h2{
+	background-color: white;
+	text-align: center !important;
+	padding-bottom: 0rem;
+	padding-top: 0rem;
+}
+
+.footer {
+	padding-top: 1rem;
+	padding-bottom: rem;
+}
+
+.footer-items {
+	margin-top: 0px !important;
+}
+
+.footer h4 {
+	margin-bottom: 0px !important;
+}
+
+.footer p {
+	margin-top: 0px;
+	margin-bottom: 0px;
+	padding-top: 0px;
+	padding-bottom: 0px;
+}
+
+.footer .footer-module {
+        width: 30% !important; 
+}
+
+.footer .footer-module.large {
+        width: 40% !important; 
+}
+
+.footer hr {
+	margin: 0.5rem 0; 
+}
+
+.bottom.borderbottom  hr {
+	padding-top: 0rem !important;
+}
+
+.contact {
+	padding-top: 1rem;
+	padding-bottom: 1rem;
+}
+
+.notices {
+    padding: 1px 30px 1px 30px !important;
+    margin: 15px 0;
+}
+
+.team .members  {
+	width: 75% !important;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.team .members .member {
+	width: 100% !important;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.team .members .g-block{
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+.team {
+	padding: 2rem 4em 0em 4em !important;
+}
+
+#privacy {
+	width: auto;
+	margin-left: 0.5em;
+	margin-right: 0.5em;
+}
+
+#newsletter-yes {
+	width: auto;
+}
+
+#newsletter-no {
+	width: auto;
+}
+
+.radio {
+	margin-left: 0.5em;
+	margin-right: 0.5em;
+}
+
+form .button{
+	margin-top: 1rem;
+}
+
+.event-summary {
+	margin-top: 1rem !important;
+}
+
+.list-blog-padding img  {
+	display: block;
+	margin: 0 auto;
+}
+
+.list-blog-padding {
+	color: #2a2a2a;
+	font-size: 1.1rem;
+	font-weight: 500;
+}
+
+figcaption {
+	text-align: center;
+	font-weight: bold;
+}
+
+.header-image #body .flush-top {
+    margin-top: -15.5rem;
+    padding-top: 13rem;
+}
+
+.showcase {
+	padding-bottom: 6rem !important;
+}
+
+.footer .footer-module {
+    float: left; 
+}
+
+
+.grow {
+	margin: auto;
+	width: 100%;
+	text-align: center;
+}
+
+/* Five columns side by side */
+.gcolumn {
+    width: 18.0%;
+	min-width: 250px;
+    margin-bottom: 16px;
+    padding: 0 8px;
+	display: inline-block;
+}
+
+/* Display the columns below each other instead of side by side on small screens */
+@media screen and (max-width: 650px) {
+   .gcolumn {
+        width: 100%;
+        display: block;
+    }
+}
+
+/* Add some shadows to create a card effect */
+.gcard {
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+}
+
+/* Some left and right padding inside the container */
+.gcontainer {
+    padding: 0 16px;
+}
+
+/* Clear floats */
+.gcontainer::after, .grow::after {
+    content: "";
+    clear: both;
+    display: table;
+}

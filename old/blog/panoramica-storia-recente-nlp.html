@@ -1,0 +1,1350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Una panoramica della storia recente del NLP | Italian Association for Machine Learning</title>
+    <meta content="GravCMS"  />
+<meta content="The Italian Association for Machine Learning (IAML) is a not-for-profit organization with the purpose of promoting knowledge of machine learning in all aspects of the Italian public life, from universities to enterprises and IT professionals."  />
+<meta property="og:title" content="Una panoramica della storia recente del NLP | IAML.it"  />
+<meta property="og:image" content="https://iaml.it/blog/panoramica-storia-recente-nlp/images/FvjcZTc.png"  />
+<meta property="og:url" content="https://iaml.it/blog/panoramica-storia-recente-nlp/"  />
+<meta property="og:description" content="Questo articolo passa in rassegna i principali sviluppi nel Natural Language Processing (NLP) relativi ai metodi basati su reti neurali."  />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="icon" type="image/png" href="../user/themes/deliver/images/favicon.png" />
+
+	<!-- Global site tag (gtag.js) - Google Ads: 774709547 --> <script async src="https://www.googletagmanager.com/gtag/js?id=AW-774709547"></script> <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'AW-774709547'); </script> 
+	
+		
+                            		                                                <link href="../user/themes/deliver/css-compiled/nucleus.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css-compiled/template.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css/custom.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css/toc.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css/font-awesome.min.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/facebook/css/facebook.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/facebook/assets/unitegallery/css/unite-gallery.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/facebook/assets/unitegallery/themes/default/ug-theme-default.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/markdown-notices/assets/notices.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/breadcrumbs/css/breadcrumbs.css" type="text/css" rel="stylesheet" />
+<link href="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/events/assets/events.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/form/assets/form-styles.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/mathjax/assets/css/mathjax.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/simplesearch/css/simplesearch.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/highlight/css/zenburn.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/login/css/login.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css/slidebars.min.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css/slideme.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/socialbuttons/vendor/rrssb/css/rrssb.css" type="text/css" rel="stylesheet" />
+
+
+                                                            <script src="../system/assets/jquery/jquery-2.x.min.js" type="text/javascript" ></script>
+<script src="../user/themes/deliver/js/modernizr.custom.71422.js" type="text/javascript" ></script>
+<script src="../user/plugins/facebook/assets/unitegallery/js/unitegallery.min.js" type="text/javascript" ></script>
+<script src="../user/plugins/facebook/assets/unitegallery/themes/default/ug-theme-default.js" type="text/javascript" ></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.js" type="text/javascript" ></script>
+<script src="../user/plugins/events/assets/events.js" type="text/javascript" ></script>
+<script src="../user/plugins/mathjax/assets/js/mathjax.js" type="text/javascript" ></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript" ></script>
+<script src="../user/plugins/highlight/js/highlight.pack.js" type="text/javascript" ></script>
+<script src="../user/themes/deliver/js/deliver.js" type="text/javascript" ></script>
+<script src="../user/themes/deliver/js/slidebars.min.js" type="text/javascript" ></script>
+<script src="../user/themes/deliver/js/jquery.slideme2.js" type="text/javascript" ></script>
+<script src="../user/plugins/socialbuttons/vendor/rrssb/js/rrssb.min.js" type="text/javascript" ></script>
+
+<script>
+window.addEventListener("load", function(){
+window.cookieconsent.initialise({
+"palette": {
+    "popup": {
+        "background": "#4d4d4d",
+        "text": "#fff"
+    },
+    "button": {
+        "background": "#f1d600",
+        "text": "#000",
+        "border": "#f1d600"
+    }
+},
+"position": "bottom",
+"theme": "block",
+"content": {
+    "message": "This website uses cookies to ensure you get the best experience on our website.",
+    "dismiss": "Got it!",
+    "link": "Learn more",
+    "href": "https://cookiesandyou.com"
+}
+})});
+hljs.initHighlightingOnLoad();
+
+</script>
+
+
+</head>
+<body id="top" class="header-lite fullwidth blogstyling">
+    <div id="sb-site">
+                <header id="header">
+                <div class="logo">
+                    <h3><a href="../index.html"><img src="../user/pages/images/IAML_logo_viola.png" /></a></h3>
+                                            <ul class="social-icons">
+            <li>
+            <a href="https://twitter.com/iaml_it">
+                <i class="fa fa-twitter"></i>            </a>
+        </li>
+            <li>
+            <a href="https://www.linkedin.com/company/iaml/">
+                <i class="fa fa-linkedin"></i>            </a>
+        </li>
+            <li>
+            <a href="https://www.facebook.com/machinelearningitalia/">
+                <i class="fa fa-facebook"></i>            </a>
+        </li>
+            <li>
+            <a href="blog.rss">
+                <i class="fa fa-rss"></i>            </a>
+        </li>
+    </ul>  
+                                    </div>
+                <div id="navbar">
+                                                            
+<ul class="navigation">
+                                                        <li class="">
+                    <a href="../index.html">
+                                                Home
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../activities">
+                                                Activities
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../supporters.html">
+                                                Supporters
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../member.html">
+                                                Become a member
+                    </a>
+                </li>
+                                                                <li class="active">
+                    <a href="../blog">
+                                                Blog
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../governance.html">
+                                                Governance
+                    </a>
+                </li>
+                                                                                                                                </ul>                                                   <form class="search-box">
+    <input type="search" placeholder="Search..." value="" data-search-input="/search/query" />
+    <script>
+    jQuery(document).ready(function($){
+        var input = $('[data-search-input]');
+
+        input.on('keypress', function(event) {
+            if (event.which == 13 && input.val().length > 3) {
+                event.preventDefault();
+                window.location.href = input.data('search-input') + ':' + input.val();
+            }
+        });
+    });
+    </script>
+    <i class="fa fa-search"></i>
+</form>                    <span class="panel-activation sb-toggle-left navbar-left menu-btn fa fa-bars"></span>
+                </div>
+        </header>
+        
+        
+                <section id="body" class="">
+                            
+				<div class="flush-top blog-header blog-header-image" style="background: #B4B093 url(/user/pages/05.blog/blue_header.jpg) no-repeat right;">
+            <h1>Una panoramica della storia recente del NLP</h1>
+        </div>
+            
+        
+<div id="breadcrumbs" itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
+                                            <a href="../index.html" itemprop="url"><span itemprop="title">Home</span></a>
+                        <i class="fa fa-angle-right"></i>
+                                                <a href="../blog" itemprop="url"><span itemprop="title">Blog</span></a>
+                        <i class="fa fa-angle-right"></i>
+                                                <span itemprop="title">Una panoramica della storia recente del NLP</span>
+                        </div>
+		
+		<div class="blog-content-item g-grid pure-g-r">
+			<div id="item" class="g-block pure-u-2-3">
+			    <div class="list-item">
+
+    <div class="list-blog-header">
+                    <img src="../images/e/b/a/2/2/eba22995b1a8233f815c4c291cb646492bb3f76c-ousblmu.png" />
+        
+                    <h4><a href="panoramica-storia-recente-nlp.html">Una panoramica della storia recente del NLP</a></h4>
+        
+        <span class="list-blog-date">
+            <i class="fa fa-calendar"></i>
+            02, Jan
+        </span>
+                <span class="list-blog-author">
+            <i class="fa fa-user"></i>
+            Sebastian Ruder / trad. Luca Palmieri
+        </span>
+                       <ul class="tags">
+            <i class="fa fa-tag"></i>
+                        <li><a href="tagnlp.html">nlp</a></li>
+                        <li><a href="tagreti neurali.html">reti neurali</a></li>
+                        <li><a href="tagword embedding.html">word embedding</a></li>
+                        <li><a href="tagreti convolutive.html">reti convolutive</a></li>
+                        <li><a href="tagreti ricorrenti.html">reti ricorrenti</a></li>
+                        <li><a href="tagreti ricorsive.html">reti ricorsive</a></li>
+                    </ul>
+        
+    </div>
+
+	<div>
+	<br />
+	<!-- AddToAny BEGIN -->
+<div class="a2a_kit a2a_kit_size_32 a2a_default_style">
+<a class="a2a_dd" href="https://www.addtoany.com/share"></a>
+<a class="a2a_button_facebook"></a>
+<a class="a2a_button_twitter"></a>
+<a class="a2a_button_linkedin"></a>
+<a class="a2a_button_google_plus"></a>
+<a class="a2a_button_email"></a>
+</div>
+<script async src="https://static.addtoany.com/menu/page.js"></script>
+<!-- AddToAny END -->
+</div>
+	
+    <div class="list-blog-padding">
+
+            <p><p>Questo articolo passa in rassegna i principali sviluppi nel Natural Language Processing (NLP) relativi ai metodi basati su reti neurali.</p>
+<p></p>
+<div class="notices yellow">
+<p>Questa panoramica è apparsa per la prima volta su <a href="http://blog.aylien.com/a-review-of-the-recent-history-of-natural-language-processing/">AYLIEN</a> a cura di <a href="http://ruder.io/">Sebastian Ruder</a>. La traduzione (autorizzata) è a cura di <a href="https://www.lpalmieri.com/">Luca Palmieri</a>.</p>
+</div>
+<p>Questo articolo è il primo di una serie di due. Entrambi nascono come un ampliamento della sessione organizzata da me e <a href="http://www.kamperh.com/">Herman Kamper</a> a <a href="http://www.deeplearningindaba.com/">Deep Learning Indaba 2018</a> sulle frontiere del Natural Language Processing (<a href="https://www.slideshare.net/SebastianRuder/frontiers-of-natural-language-processing">slides</a>). Questa parte si concentra sui recenti progressi in ambito NLP con metodi basati su reti neurali. La seconda parte metterà l'accento sui principali problemi aperti.</p>
+<p><strong>Attenzione</strong>: questo articolo cerca di condensare circa 15 anni di ricerche in 8 conquiste fondamentali, le più importanti ad oggi, pertanto omette molti altri importanti sviluppi nel settore. In particolare, presta maggiormente attenzione ai nuovi approcci basati su reti neurali, rischiando di dare la falsa impressione che non siano stati sviluppati altri metodi di rilievo nello stesso lasso temporale.
+Oltretutto, molti dei modelli neurali presentati si basano su progressi importanti non collegati alle reti neurali, pubblicati nello stesso periodo. Nella sezione finale richiamiamo i lavori che hanno avuto la maggior influenza sullo sviluppo dei metodi successivi.</p>
+<nav class="table-of-contents minitoc" role="navigation">
+                <span class="toctitle">Overview:</span>
+      
+                                                                                                                      
+  <ul>
+      
+        
+        
+              <li><a href="#2001-neural-language-models" class="toclink" title="2001 - Neural Language Models">2001 - Neural Language Models</a></li>
+      
+        
+        
+              <li><a href="#2008-multi-task-learning" class="toclink" title="2008 - Multi-task learning">2008 - Multi-task learning</a></li>
+      
+        
+        
+              <li><a href="#2008-word-embeddings" class="toclink" title="2008 - Word Embeddings">2008 - Word Embeddings</a></li>
+      
+        
+        
+              <li><a href="#2013-neural-networks-for-nlp" class="toclink" title="2013 - Neural Networks for NLP">2013 - Neural Networks for NLP</a></li>
+      
+                      <li><ul>
+          
+        
+              <li><a href="#reti-neurali-ricorrenti" class="toclink" title="Reti neurali ricorrenti">Reti neurali ricorrenti</a></li>
+      
+        
+        
+              <li><a href="#reti-neurali-convoluzionali" class="toclink" title="Reti neurali convoluzionali">Reti neurali convoluzionali</a></li>
+      
+        
+        
+              <li><a href="#reti-neurali-ricorsive" class="toclink" title="Reti neurali ricorsive">Reti neurali ricorsive</a></li>
+      
+                      </ul></li>
+          
+        
+              <li><a href="#2014-sequence-to-sequence-models" class="toclink" title="2014 - Sequence-to-sequence models">2014 - Sequence-to-sequence models</a></li>
+      
+        
+        
+              <li><a href="#2015-attention" class="toclink" title="2015 - Attention">2015 - Attention</a></li>
+      
+        
+        
+              <li><a href="#2015-memory-based-networks" class="toclink" title="2015 - Memory-based networks">2015 - Memory-based networks</a></li>
+      
+        
+        
+              <li><a href="#2018-pretrained-language-models" class="toclink" title="2018 - Pretrained language models">2018 - Pretrained language models</a></li>
+      
+        
+        
+              <li><a href="#altri-contributi-importanti" class="toclink" title="Altri contributi importanti">Altri contributi importanti</a></li>
+      
+                      <li><ul>
+          
+        
+              <li><a href="#rappresentazioni-basate-sui..." class="toclink" title="Rappresentazioni basate sui caratteri">Rappresentazioni basate sui caratteri</a></li>
+      
+        
+        
+              <li><a href="#apprendimento-antagonistico" class="toclink" title="Apprendimento antagonistico">Apprendimento antagonistico</a></li>
+      
+        
+        
+              <li><a href="#apprendimento-per-rinforzo" class="toclink" title="Apprendimento per rinforzo">Apprendimento per rinforzo</a></li>
+      
+                      </ul></li>
+          
+        
+              <li><a href="#contributi-non-neurali..." class="toclink" title="Contributi non neurali essenziali">Contributi non neurali essenziali</a></li>
+      
+        
+        
+              <li><a href="#bibliografia" class="toclink" title="Bibliografia:">Bibliografia:</a></li>
+      
+    
+  </ul>
+</nav>
+
+
+<p><a id="2001---Neural-Language-Models"></a></p>
+<h2 id="2001-neural-language-models" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#2001-neural-language-models" title="Permanent link: 2001 - Neural Language Models" data-icon="#">2001 - Neural Language Models</a></h2>
+<p>Un modello linguistico (<em>language model</em>) cerca di predire la prossima parola in un testo sulla base delle parole precedenti. É molto probabilmente il compito più semplice in ambito linguistico computazionale con dirette applicazioni pratiche, come le tastiere intelligenti, i suggerimenti per le risposte alle email (Kannan et al. 2016<sup id="fnref1:smart-email-reply"><a href="#fn:smart-email-reply" class="footnote-ref">1</a></sup>), il controllo ortografico, ecc.
+Non sorprende, pertanto, che lo sviluppo di modelli linguistici sia da tempo un settore di ricerca molto attivo. </p>
+<p>Gli approcci classici si basano sugli <a href="https://it.wikipedia.org/wiki/N-gramma">n-grammi</a> e usano tecniche di regolarizzazione per gestire gli n-grammi mancanti (Kneser &amp; Ney, 1995<sup id="fnref1:missing-n-grams"><a href="#fn:missing-n-grams" class="footnote-ref">2</a></sup>).
+Il primo modello linguistico neurale (<em>neural language model</em>) viene proposto da Bengio et al.<sup id="fnref1:first-neural-language-model"><a href="#fn:first-neural-language-model" class="footnote-ref">3</a></sup> nel 2001. É una rete neurale con flusso in avanti (<em>feed-forward</em>) - l'architettura è mostrata in Figura 1.</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/panoramica-storia-recente-nlp/images/13C5MXN.png" alt="Figura 1">
+        </figure>
+<figcaption>Figura 1: una rete neurale a flusso in avanti (architettura da Bengio et al., 2001).</figcaption>
+<p>Questo modello usa come input la rappresentazione vettoriale delle <span class="mathjax mathjax--inline">$n$</span> parole precedenti, che viene recuperata da una tabella di riferimento <span class="mathjax mathjax--inline">$C$</span>.</p>
+<p>Oggi questi vettori sono conosciuti con il nome di <em>word embedding</em>.  I vettori di embedding vengono concatenati e utilizzati come input dello strato nascosto della rete (<em>hidden layer</em>), il cui output è poi consumato da una funzione <a href="https://it.wikipedia.org/wiki/Funzione_softmax">softmax</a>. Per ulteriori dettagli sul modello fate riferimento a questo <a href="http://ruder.io/word-embeddings-1/index.html#classicneurallanguagemodel">articolo</a>.</p>
+<p>Recentemente le reti neurali con flusso in avanti sono state sostituite, per la modellizzazione linguistica, dalle reti neurali ricorrenti (RNNs; Mikolov et al., 2010<sup id="fnref1:rnn"><a href="#fn:rnn" class="footnote-ref">4</a></sup>) e dalle reti neurali con lunga memoria a breve termine (<em><strong>L</strong>ong <strong>S</strong>hort-<strong>T</strong>erm <strong>M</strong>emory</em> - LSTM; Graves, 2013<sup id="fnref1:LSTM"><a href="#fn:LSTM" class="footnote-ref">5</a></sup>).</p>
+<p>Negli ultimi anni sono stati proposti molti nuovi modelli linguistici che estendono il modello classico di LSTM (una panoramica è offerta da questa <a href="http://nlpprogress.com/english/language_modeling.html">pagina</a>). Nonostante questi sviluppi, le LSTM classiche rimangono un ottimo modello di riferimento (Melis et al., 2018<sup id="fnref1:LSTM-baseline"><a href="#fn:LSTM-baseline" class="footnote-ref">6</a></sup>). Persino le reti neurali a flusso in avanti di Bengio et al. risultano competitive, in alcuni scenari, rispetto a modelli più sofiscati: quest'ultimi, infatti, tipicamente tendono ad imparare a considerare solo le parole più recenti (Daniluk et al., 2017<sup id="fnref1:ff-baseline"><a href="#fn:ff-baseline" class="footnote-ref">7</a></sup>). Capire meglio quali informazioni sono catturate da questi modelli è pertanto un'area di ricerca attiva (Kuncoro et al., 2018<sup id="fnref1:introspection-1"><a href="#fn:introspection-1" class="footnote-ref">8</a></sup>; Blevins et al., 2018<sup id="fnref1:introspection-2"><a href="#fn:introspection-2" class="footnote-ref">9</a></sup>).</p>
+<p>La modellizzazione linguistica è generalmente l'applicazione di riferimento per le reti neurali ricorrenti ed è riuscita a catturare l'immaginazione di studiosi, ingegneri ed appassionati: moltissimi furono esposti al problema per la prima volta tramite il <a href="http://karpathy.github.io/2015/05/21/rnn-effectiveness/">blog post</a> di Andrej Karpathy. La modellizzazione linguistica è una forma di apprendimento non supervisionato (<em>unsupervised learning</em>), che Yann LeCun chiama anche apprendimento predittivo (<em>predictive learning</em>), da lui citato come uno dei prerequisiti per lo sviluppo del buon senso (<a href="http://ruder.io/highlights-nips-2016/#generalartificialintelligence">qui</a> la sua slide della <em>torta a strati</em> presentata a NIPS 2016). L'aspetto più sorpredente dei modelli linguistici è probabilmente la loro semplicità; nonostante questo, sono al centro di molti dei progressi successivi che tratteremo in questo articolo:</p>
+<ul>
+<li><strong>Word embeddings</strong>: lo scopo di <em>word2vec</em> è la semplificazione della modellizzazione linguistica;</li>
+<li><strong>Modelli sequence-to-sequence</strong>: generano una sequenza di output (per esempio, una frase in francese) predicendo una parola alla volta a partire da una sequenza di parole di input (per esempio, la <em>stessa</em> frase in inglese);</li>
+<li><strong>Modelli pre-allenati</strong>: sfruttano le <em>rappresentazioni</em> apprese dai modelli linguistici per portare a termine altri compiti, un meccanismo chiamato <em>transfer learning</em>. Ciò significa che molti dei più importanti passi in avanti fatti di recente in ambito NLP si riducono ad una qualche forma di modellizzazione linguistica. Per arrivare a "capire" veramente il linguaggio naturale, tuttavia, probabilmente non sarà sufficiente l'apprendimento a partire dal testo in forma grezza - avremo bisogno di nuovi metodi e di nuovi modelli.</li>
+</ul>
+<p><a id="2008---Multi-task-learning"></a></p>
+<h2 id="2008-multi-task-learning" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#2008-multi-task-learning" title="Permanent link: 2008 - Multi-task learning" data-icon="#">2008 - Multi-task learning</a></h2>
+<p>L'apprendimento multi-task (<em>multi-task learning</em>) è un approccio metodologico generale che permette a più modelli, allenati a risolvere mansioni differenti ma correlate, di utilizzare o <em>condividere</em> un certo numero di parametri. </p>
+<p>Nel caso delle reti neurali è sufficiente riutizzare gli stessi pesi per più strati della rete. L'idea dell'apprendimento multi-task è stata proposta per la prima volta nel 1993 da Rich Caruana<sup id="fnref1:multi-task"><a href="#fn:multi-task" class="footnote-ref">10</a></sup> e fu applicata al problema del <a href="https://www.youtube.com/watch?v=xTyv_A8155c">road-following</a> e alla diagnosi della polmonite (Caruana, 1998<sup id="fnref1:road-pneumonia"><a href="#fn:road-pneumonia" class="footnote-ref">11</a></sup>). Intuitivamente, l'apprendimento multi-task spinge i modelli ad imparare rappresentazioni che risultino utilizzabili per più scopi. Una caratteristica particolarmente utile in varie situazioni, ad esempio:</p>
+<ul>
+<li>per l'apprendimento di rappresentazioni <em>robuste</em> (con un buon potenziale di generalizzazione) di caratteristiche e peculiarità di "basso livello" presenti nei dati;</li>
+<li>per spingere un modello a concentrarsi su un sottoinsieme dell'input a sua disposizione;</li>
+<li>quando i dati scarseggiano.  </li>
+</ul>
+<div class="notices blue">
+<p>Per una panoramica più esaustiva sull'apprendimento multi-task fate riferimento a questo <a href="http://ruder.io/multi-task/">articolo</a>.</p>
+</div>
+<p>L'apprendimento multi-mansione fu applicato per la prima volta alle reti neurali per il NLP nel 2018 da Collobert e Weston<sup id="fnref1:neural-multi-task-1"><a href="#fn:neural-multi-task-1" class="footnote-ref">12</a></sup><sup id="fnref1:neural-multi-task-2"><a href="#fn:neural-multi-task-2" class="footnote-ref">13</a></sup>. Nella loro architettura, due modelli allenati a svolgere mansioni differenti condividono la stessa tabella di riferimento (detta <em>matrice dei word embedding</em>), come mostrato in Figura 2.</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/panoramica-storia-recente-nlp/images/ouSbLMU.png" alt="Figura 2">
+        </figure>
+<figcaption>Figura 2: Condivisione della matrice dei word embedding (Collobert &amp; Weston, 2008; Collobert et al., 2011).</figcaption>
+<p>La condivisione dei word embedding permette ai modelli di collaborare e condividere informazioni di basso livello attraverso la matrice stessa, che generalmente contiene la maggior parte dei parametri in un modello neurale per il NLP. L'articolo di Collobert e Weston pubblicato nel 2008 si è rivelato influente al di là del loro utilizzo nell'apprendimento multi-task. Hanno aperto la strada a idee come il pre-allenamento dei word embedding e l'uso di reti neurali convoluzionali (CNN) per dati testuali, pratiche che sono state adottate dal resto della comunità solo negli ultimi anni. L'articolo ha ottenuto il riconoscimento <a href="https://research.fb.com/facebook-researchers-win-test-of-time-award-at-icml-2018/"><strong>test-of-time</strong> award a ICML 2018</a> (la presentazione data in occasione della premiazione contestualizza l'articolo - <a href="https://www.facebook.com/722677142/posts/10155393881507143/">video</a>).</p>
+<p>L'apprendimento multi-task è oggi utilizzato per moltissime applicazioni in ambito NLP - il ricorso a mansioni ausiliarie (create ad-hoc per il problema che si sta studiando o pre-esistenti) è un'utilissima aggiunta alla nostra cassetta degli attrezzi. Per una panoramica sulle possibili mansioni ausiliarie, fate riferimento a questo <a href="http://ruder.io/multi-task-learning-nlp/">articolo</a>. La condivisione dei parametri è generalmente pre-determinata dall'architettura del modello, ma diverse strategie di condivisione possono essere apprese durante il processo di ottimizzazione (Ruder et al., 2017)<sup id="fnref1:dynamic-sharing"><a href="#fn:dynamic-sharing" class="footnote-ref">14</a></sup>. I modelli vengono sempre più spesso valutati su numerosi task differenti per stabilirne la capacità di generalizzazione, pertanto l'apprendimento multi-task si sta rivelando sempre più importante e nuovi benchmark sono stati proposti specificamente per misurare i progressi su questa tipologia di problemi (Wang et al., 2018<sup id="fnref1:multi-task-benchmark-1"><a href="#fn:multi-task-benchmark-1" class="footnote-ref">15</a></sup>; McCann et al., 2018<sup id="fnref1:multi-task-benchmark-2"><a href="#fn:multi-task-benchmark-2" class="footnote-ref">16</a></sup>).</p>
+<p><a id="2008---Word-Embeddings"></a></p>
+<h2 id="2008-word-embeddings" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#2008-word-embeddings" title="Permanent link: 2008 - Word Embeddings" data-icon="#">2008 - Word Embeddings</a></h2>
+<p>L'utilizzo di rappresentazioni vettoriali sparse per il testo, le cosidette "borse di parole" (<em><a href="https://en.wikipedia.org/wiki/Bag-of-words_model">bag of words</a></em>), ha una lunga storia in ambito NLP.
+Rappresentazioni vettoriali dense, i word embedding, sono state invece utilizzate sin dal 2001, come abbiamo visto precedentemente. La principale innovazione in materia è stata proposta nel 2013 da Mikolov et al.<sup id="fnref1:word2vec-1"><a href="#fn:word2vec-1" class="footnote-ref">17</a></sup><sup id="fnref1:word2vec-2"><a href="#fn:word2vec-2" class="footnote-ref">18</a></sup>: rimuovere lo strato nascosto ed approssimare la funzione obiettivo per rendere l'apprendimento dei word embedding più efficiente. Sebbene queste modifiche siano di per sé piuttosto elementari, hanno permesso - grazie all'efficiente implementazione in word2vec - l'apprendimento di word embedding su larga scala.</p>
+<p>Word2vec esiste in due varianti, presentate in Figura 3: borsa di parole continua (<em><strong>C</strong>ontinuous <strong>B</strong>ag-<strong>O</strong>f-<strong>W</strong>ords</em> - CBOW) ed n-gramma mancante (<em>skip-gram</em>). Differiscono nell'obiettivo: nel caso della borsa di parole continua, si cerca di predire la parola corrente sulla base delle parole circostanti (il contesto), mentre l'n-gramma mancante, data la parola corrente, cerca di predirne il contesto.</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/panoramica-storia-recente-nlp/images/GgzTDNQ.png" alt="Figura 3">
+        </figure>
+<figcaption>Figura 3: borsa di parole continua ed n-gramma mancante (Mikolov et al., 2013a; 2013b).</figcaption>
+<p>Gli embedding di word2vec non sono concettualmente differenti da quelli appresi con una rete neurale a flusso in avanti; tuttavia, l'efficienza del modello permette di apprendere embedding a partire da corpus testuali estremamente imponenti, riuscendo così a catturare meglio certe relazioni tra le parole, come il genere, il tempo verbale o il rapporto paese-capitale, come si può osservare in Figura 4.</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/panoramica-storia-recente-nlp/images/jQbIjth.png" alt="Figura 4">
+        </figure>
+<figcaption>Figura 4: relazioni catturate da word2vec.</figcaption>
+<p>Queste relazioni lineari e il loro significato hanno suscitato il forte interesse iniziale verso i word embedding e molti studi ne hanno approfondito l'origine (Arora et al., 2016<sup id="fnref1:we-1"><a href="#fn:we-1" class="footnote-ref">19</a></sup>; Mimno &amp; Thompson, 2017<sup id="fnref1:we-2"><a href="#fn:we-2" class="footnote-ref">20</a></sup>; Antoniak &amp; Mimno, 2018<sup id="fnref1:we-3"><a href="#fn:we-3" class="footnote-ref">21</a></sup>; Wendlandt et al., 2018<sup id="fnref1:we-4"><a href="#fn:we-4" class="footnote-ref">22</a></sup>). I word embedding, tuttavia, hanno consolidato la loro posizione di primo piano nel mondo del NLP grazie ai miglioramenti nelle prestazioni ottenuti grazie all'utilizzo di embedding pre-allenati per l'inizializzazione di modelli neurali<sup id="fnref1:we-downstream"><a href="#fn:we-downstream" class="footnote-ref">23</a></sup>.</p>
+<p>Sebbene le relazioni catturate da word2vec risultino particolarmente intuitive, quasi magiche, studi successivi hanno mostrato che non c'é nulla di intrinsecamente speciale in word2vec: word embedding possono essere appresi utilizzando la fattorizzazione matriciale (Pennington et al, 2014<sup id="fnref1:we-matrix-factorization-1"><a href="#fn:we-matrix-factorization-1" class="footnote-ref">24</a></sup>; Levy &amp; Goldberg, 2014<sup id="fnref1:we-matrix-factorization-2"><a href="#fn:we-matrix-factorization-2" class="footnote-ref">25</a></sup>) e, se propriamente calibrati, i metodi classici di fattorizzazione come <a href="https://it.wikipedia.org/wiki/Decomposizione_ai_valori_singolari">SVD</a> e <a href="https://en.wikipedia.org/wiki/Latent_semantic_analysis">LSA</a> ottengono risultati simili (Levy et al., 2015<sup id="fnref1:we-matrix-factorization-3"><a href="#fn:we-matrix-factorization-3" class="footnote-ref">26</a></sup>).</p>
+<p>Da quel punto in poi, molto lavoro è stato dedicato all'esplorazione dei diversi aspetti dei word embedding (come testimoniato <a href="https://scholar.google.de/scholar?hl=en&as_sdt=0%2C5&q=distributed%20representations%20of%20words%20and%20phrases&btnG=">dall'impressionante numero di citazioni dell'articolo originale</a>). Fate riferimento a questo <a href="http://ruder.io/word-embeddings-2017/">articolo</a> per alcune tendenze e direzioni future. Nonostante i numerosi sviluppi che si sono susseguiti, word2vec è ad oggi ancora una scelta molto popolare. La portata di word2vec trascende il suo utilizzo per rappresentare singole parole: la tecnica dell'n-gramma mancante con campionamento negativo (<em>negative sampling</em>), una funzione obiettivo molto conveniente per apprendere embedding sfruttando il contesto locale, è stato utilizzata per imparare rappresentazioni di intere frasi (Mikolov &amp; Le, 2014<sup id="fnref1:sentence-embedding-1"><a href="#fn:sentence-embedding-1" class="footnote-ref">27</a></sup>; Kiros et al., 2015<sup id="fnref1:sentence-embedding-2"><a href="#fn:sentence-embedding-2" class="footnote-ref">28</a></sup>), - e, trascendendo i confini del NLP - di reti (Grover &amp; Leskovec, 2016<sup id="fnref1:network-embedding"><a href="#fn:network-embedding" class="footnote-ref">29</a></sup>) e sequenze biologiche (Asgari &amp; Mofrad, 2015<sup id="fnref1:bio-embedding"><a href="#fn:bio-embedding" class="footnote-ref">30</a></sup>), tra le altre cose.</p>
+<p>Una direzione di ricerca particolarmente eccitante è il tentativo di proiettare word embedding di lingue diverse nello stesso spazio vettoriale così da permettere il trasferimento gratuito (<em>zero-shot</em>) di quanto appreso da una lingua all'altra. Sta diventando sempre più fattibile l'apprendimento di una buona funzione di proiezione in modo completamente non supervisionato (almeno per lingue simili tra loro) (Conneau et al., 2018<sup id="fnref1:cross-lingual-1"><a href="#fn:cross-lingual-1" class="footnote-ref">31</a></sup>; Artetxe et al., 2018<sup id="fnref1:cross-lingual-2"><a href="#fn:cross-lingual-2" class="footnote-ref">32</a></sup>; Søgaard et al., 2018<sup id="fnref1:cross-lingual-3"><a href="#fn:cross-lingual-3" class="footnote-ref">33</a></sup>), aprendo così la strada per applicazioni che abbiano a che fare con lingue con poche risorse disponibili e per modelli di traduzione automatica non supervisionata (Lample et al., 2018<sup id="fnref1:unsupervised-machine-translation-1"><a href="#fn:unsupervised-machine-translation-1" class="footnote-ref">34</a></sup>; Artetxe et al., 2018<sup id="fnref1:unsupervised-machine-translation-2"><a href="#fn:unsupervised-machine-translation-2" class="footnote-ref">35</a></sup>). Ruder et al., 2018<sup id="fnref1:cross-lingual-view"><a href="#fn:cross-lingual-view" class="footnote-ref">36</a></sup>, offre una panoramica di questa branca.</p>
+<p><a id="2013---Neural-Networks-for-NLP"></a></p>
+<h2 id="2013-neural-networks-for-nlp" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#2013-neural-networks-for-nlp" title="Permanent link: 2013 - Neural Networks for NLP" data-icon="#">2013 - Neural Networks for NLP</a></h2>
+<p>Il 2013 e il 2014 sono stati gli anni che hanno segnato l'inizio della diffusione delle reti neurali per il NLP. Tre tipologie di reti hanno dominato la scena: ricorrenti, convoluzionali e ricorsive.</p>
+<h3 id="reti-neurali-ricorrenti" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#reti-neurali-ricorrenti" title="Permanent link: Reti neurali ricorrenti" data-icon="#">Reti neurali ricorrenti</a></h3>
+<p>Le reti neurali ricorrenti (RNNs) sono una scelta ovvia quando si ha che fare con sequenze di input dinamiche, la quotidianità in ambito NLP. Le RNN "pure" (Elman, 1990<sup id="fnref1:vanilla-rnn"><a href="#fn:vanilla-rnn" class="footnote-ref">37</a></sup>) sono state rapidamente rimpiazzate dalle LSTM (Hochreiter &amp; Schmidhuber, 1997<sup id="fnref1:LSTM-first"><a href="#fn:LSTM-first" class="footnote-ref">38</a></sup>), che si sono dimostrare più resistenti al <a href="https://en.wikipedia.org/wiki/Vanishing_gradient_problem">problema dell'esplosione e della scomparsa del gradiente</a>. Prima del 2013, le RNN erano considerate difficili da allenare; <a href="https://www.cs.utoronto.ca/~ilya/pubs/ilya_sutskever_phd_thesis.pdf">la tesi di dottorato di Ilya Sutskever</a>, tuttavia, contribuì significativamente ad intaccare questo pregiudizio. Una visualizzazione di un'unità LSTM è riportata in Figura 5. Una LSTM bidirezionale (Graves et al., 2013<sup id="fnref1:bi-LSTM"><a href="#fn:bi-LSTM" class="footnote-ref">39</a></sup>) è tipicamente utilizzata per sfruttare sia il contesto a sinistra che il contesto a destra della parola corrente.</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/panoramica-storia-recente-nlp/images/ej32O49.png" alt="Figura 5">
+        </figure>
+<figcaption>Figura 5: una rete LSTM (fonte: <a href="https://colah.github.io/posts/2015-08-Understanding-LSTMs/">Chris Olah</a>)</figcaption>
+<h3 id="reti-neurali-convoluzionali" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#reti-neurali-convoluzionali" title="Permanent link: Reti neurali convoluzionali" data-icon="#">Reti neurali convoluzionali</a></h3>
+<p>Le reti neurali convoluzionali (CNN) sono ampiamente utilizzate per sistemi di visione artificiale (<em>computer vision</em>), ma hanno fatto la loro comparsa anche in ambito linguistico (Kalchbrenner et al., 2014<sup id="fnref1:CNN-NLP-1"><a href="#fn:CNN-NLP-1" class="footnote-ref">40</a></sup>; Kim et al., 2014<sup id="fnref1:CNN-NLP-2"><a href="#fn:CNN-NLP-2" class="footnote-ref">41</a></sup>). Una rete neurale convoluzionale per il testo opera esclusivamente su due dimensioni, dato che i filtri devono muoversi solo rispetto all'asse temporale. La Figura 6 mostra una tipica CNN usata per il NLP.</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/panoramica-storia-recente-nlp/images/JHBt4GB.png" alt="Figura 6">
+        </figure>
+<figcaption>Figura 6: una rete neurale convoluzionale per il testo (Kim, 2014).</figcaption>
+<p>Le reti convoluzionali presentano alcuni vantaggi in termini di performance: sono più parallelizzabili delle reti ricorrenti, visto che lo stato della rete ad ogni passo dipende unicamente dal contesto locale (attraverso l'operatore di convoluzione) anziché dall'insieme degli stati passati, come nelle RNN. Per ovviare al problema del contesto è possibile ampliare il campo di ricezione delle CNN utilizzando un operatore di convoluzione dilatato (Kalchbrenner et al., 2016<sup id="fnref1:dilated-convolution"><a href="#fn:dilated-convolution" class="footnote-ref">42</a></sup>). CNN e LSTM possono inoltre essere combinate e impilate (Wang et al., 2016<sup id="fnref1:CNN+LSTM-1"><a href="#fn:CNN+LSTM-1" class="footnote-ref">43</a></sup>) e l'operazione di convoluzione può essere usata per velocizzare le LSTM (Bradbury et al., 2017<sup id="fnref1:CNN+LSTM-2"><a href="#fn:CNN+LSTM-2" class="footnote-ref">44</a></sup>).</p>
+<h3 id="reti-neurali-ricorsive" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#reti-neurali-ricorsive" title="Permanent link: Reti neurali ricorsive" data-icon="#">Reti neurali ricorsive</a></h3>
+<p>Sia le RNN che le CNN approcciano il linguaggio come una sequenza di parole. Da un punto di vista linguistico, tuttavia, il linguaggio è <a href="https://en.wikipedia.org/wiki/Chomsky_hierarchy">intrinsicamente gerarchico</a>: le parole sono utilizzate per comporre frasi e proposizioni più complesse, che possono a loro volta essere combinate ricorsivamente sottostando a un certo insieme di regole. L'idea di trattare le sequenze come alberi, anziché liste di parole, ha dato la luce alla reti neurali ricorsive (Socher et al., 2013<sup id="fnref1:recursive-NN"><a href="#fn:recursive-NN" class="footnote-ref">45</a></sup>), di cui potete vedere un esempio in Figura 7.</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/panoramica-storia-recente-nlp/images/7iYv0bH.png" alt="Figura 7">
+        </figure>
+<figcaption>Figura 7: una rete neurale ricorsiva (Socher et al., 2013).</figcaption>
+<p>Le reti neurali ricorsive costruiscono la rappresentazione di una sequenza dal basso verso l'alto, mentre le RNN consumano la sequenza da sinistra verso destra o da destra verso sinistra. In corrispondenza di ogni nodo dell'albero viene calcolata una nuova rappresentazione componendo la rappresentazione di ciascuno dei nodi figli. È possibile, tuttavia, interpretare un albero come la prescrizione di un diverso ordine di computazione per una RNN, pertanto le LSTM sono state naturalmente estese agli alberi (Tai et al., 2015<sup id="fnref1:tree-LSTM"><a href="#fn:tree-LSTM" class="footnote-ref">46</a></sup>).</p>
+<p>RNN e LSTM non sono gli unici modelli che possono essere adattati per lavorare con strutture gerarchiche. I word embedding possono essere appresi non solo a partire dal contesto locale, bensì utilizzando il contesto grammaticale (Levy &amp; Goldberg, 2014<sup id="fnref1:grammar-based-we"><a href="#fn:grammar-based-we" class="footnote-ref">47</a></sup>); i modelli linguistici possono generare parole in base ad una pila sintattica (Dyer et al., 2016<sup id="fnref1:syntactic-stack"><a href="#fn:syntactic-stack" class="footnote-ref">48</a></sup>); le reti neurali grafo-convoluzionali possono lavorare con gli alberi (Bastings et al., 2017<sup id="fnref1:graph-CNN"><a href="#fn:graph-CNN" class="footnote-ref">49</a></sup>).</p>
+<p><a id="2014---Sequence-to-sequence-models"></a></p>
+<h2 id="2014-sequence-to-sequence-models" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#2014-sequence-to-sequence-models" title="Permanent link: 2014 - Sequence-to-sequence models" data-icon="#">2014 - Sequence-to-sequence models</a></h2>
+<p>Nel 2014 Sutskever et al.<sup id="fnref1:seq2seq"><a href="#fn:seq2seq" class="footnote-ref">50</a></sup> hanno proposto l'apprendimento sequence-to-sequence, una metodologia per generare una sequenza a partire da un'altra sequenza utilizzando una rete neurale. Nel loro modello, una rete neurale codificatrice (<em>encoder</em>) consuma una sequenza un simbolo alla volta e ne comprime l'informazione in una rappresentazione vettoriale; dopodiché una rete neurale decodificatrice (<em>decoder</em>) predice la sequenza finale, un simbolo alla volta, a partire dall'output della rete codificatrice, utilizzando come input anche l'ultimo simbolo generato (vedi Figura 8).</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/panoramica-storia-recente-nlp/images/sRIYGFp.png" alt="Figura 8">
+        </figure>
+<figcaption>Figura 8: un modello sequence-to-sequence.</figcaption>
+<p>La traduzione automatica si è rivelata l'applicazione perfetta per questa metodologia. Nel 2016 Google ha annunciato di aver iniziato a sostituire il suo monolitico sistema di traduzione automatica, basato sulle frasi come unità di lavoro, con modelli neurali (Wu et al., 2016<sup id="fnref1:google-MT"><a href="#fn:google-MT" class="footnote-ref">51</a></sup>). Stando a quanto dichiarato da <a href="https://www.oreilly.com/ideas/what-machine-learning-means-for-software-development">Jeff Dean</a>, questo ha permesso di rimpiazzare circa 500'000 righe di codice con una rete neurale esprimibile in sole 500 righe di codice.</p>
+<p>Questa metodologia, grazie alla sua flessibilità, è ora il metodo di riferimento per le mansioni generative in ambito linguistico, con diversi modelli a ricoprire il ruolo di codificatore/decodificatore. É importante sottolineare che il modello decodificatore può generare una frase a partire da qualunque rappresentazione, non necessariamente generata da una sequenza testuale. Questo permette, ad esempio, la generazione di un sottotitolo a partire da un immagine (Vinyals et al., 2015<sup id="fnref1:image2caption"><a href="#fn:image2caption" class="footnote-ref">52</a></sup>) (vedi Figura 9), di testo a partire da una tabella (Labret et al., 2016<sup id="fnref1:table2text"><a href="#fn:table2text" class="footnote-ref">53</a></sup>) o di una descrizione a partire da una modifica di codice sorgente (Loyola et al., 2017<sup id="fnref1:code2desc"><a href="#fn:code2desc" class="footnote-ref">54</a></sup>).</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/panoramica-storia-recente-nlp/images/FvjcZTc.png" alt="Figura 9">
+        </figure>
+<figcaption>Figura 9: generazione di un sottotitolo a partire da un'immagine.</figcaption>
+<p>L'apprendimento sequence-to-sequence può anche essere utilizzato per mansioni che prevedono un output strutturato, un caso piuttosto frequente in ambito NLP. Per semplicita', la rete può produrre un output linearizzato (vedi Figura 10). Si è osservato che le reti riescono a lavorare con successo con questa tecnica su problemi di analisi sintattica (Vinyals et al, 2015<sup id="fnref1:analisi-sintattica"><a href="#fn:analisi-sintattica" class="footnote-ref">55</a></sup>) o riconoscimento di entità nominali (<em><strong>N</strong>amed <strong>E</strong>ntity <strong>R</strong>ecognition</em>) (Gillick et al., 2016<sup id="fnref1:NER"><a href="#fn:NER" class="footnote-ref">56</a></sup>), giusto per citare alcuni esempi, a patto che sia disponibile un dataset di dimensioni sufficienti.</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/panoramica-storia-recente-nlp/images/kxkSV25.png" alt="Figura 10">
+        </figure>
+<figcaption>Figura 10: linearizzazione di un albero sintattico (Vinyals et al, 2015).</figcaption>
+<p>I codificatori per input sequenziali e i decodificatori sono tipicamente basati su reti neurali ricorrenti, ma si possono impiegare anche altre tipologie di modelli. Nuove architteture emergono tendenzialmente nel lavoro sulla traduzione automatica, che funge da piastra di Petri per i modelli sequence-to-sequence. Sviluppi recenti includono le LSTM profonde (Wu et al., 2016<sup id="fnref1:deep-LSTM"><a href="#fn:deep-LSTM" class="footnote-ref">57</a></sup>), i codificatori convoluzionali (Kalchbrenner et al., 2016<sup id="fnref1:cnn-encoder-1"><a href="#fn:cnn-encoder-1" class="footnote-ref">58</a></sup>; Gehring et al., 2017<sup id="fnref1:cnn-encoder-2"><a href="#fn:cnn-encoder-2" class="footnote-ref">59</a></sup>), il <em>Transformer</em> (Vaswani et al., 2017<sup id="fnref1:transformer"><a href="#fn:transformer" class="footnote-ref">60</a></sup>), di cui parleremo nella prossima sezione, e una combinazione di una LSTM e di un Transformer (Chen et al., 2018<sup id="fnref1:transformer+LSTM"><a href="#fn:transformer+LSTM" class="footnote-ref">61</a></sup>).</p>
+<p><a id="2015---Attention"></a></p>
+<h2 id="2015-attention" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#2015-attention" title="Permanent link: 2015 - Attention" data-icon="#">2015 - Attention</a></h2>
+<p>L'attenzione (<em>Attention</em>) (Bahdanau et al., 2015<sup id="fnref1:attention"><a href="#fn:attention" class="footnote-ref">62</a></sup>) è una delle principali innovazioni per la traduzione automatica basata su reti neurali (<strong>N</strong>eural <strong>M</strong>achine <strong>Translation</strong>, NMT), l'idea chiave che ha permesso alle reti di superare i modelli di traduzione classici. L'ostacolo principale per l'apprendimento sequence-to-sequence è il dover comprimere tutta l'informazione contenuta nella sequenza originale in un vettore di dimensione prefissata. L'attenzione allevia questo problema, permettendo al decodificatore di guardare nuovamente la lista degli stati nascosti corrispondenti alla sequenza originale, la cui media pesata viene usata come input dal decodificatore in aggiunta alla rappresentazione vettoriale compressa, come si può vedere in Figura 11.</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/panoramica-storia-recente-nlp/images/KlcgG3w.png" alt="Figura 11">
+        </figure>
+<figcaption>Figura 11: Attenzione (Bahdanau et al., 2015).</figcaption>
+<p>Esistono diverse forme di attenzione (Luong et al., 2015<sup id="fnref1:several-attention"><a href="#fn:several-attention" class="footnote-ref">63</a></sup>). Fate riferimento a questo <a href="http://ruder.io/deep-learning-nlp-best-practices/index.html#attention">articolo</a> per una breve panoramica. L'attenzione è una tecnica ampliamente applicabile e potenzialmente utile per ogni mansione che richiede di prendere decisioni sulla base di un sottoinsieme dell'input. É stata utilizzata per l'analisi sintattica (Vinyals et al., 2015<sup id="fnref1:attention-analisi-sintattica"><a href="#fn:attention-analisi-sintattica" class="footnote-ref">64</a></sup>), per la comprensione di un testo scritto (Hermann et al., 2015<sup id="fnref1:attention-reading"><a href="#fn:attention-reading" class="footnote-ref">65</a></sup>) e per l'apprendimento one-shot (Vinyals et al., 2016<sup id="fnref1:attention-one-shot"><a href="#fn:attention-one-shot" class="footnote-ref">66</a></sup>), tra le altre cose. L'input non deve necessariamente essere una sequenza, ma può essere costituito da varie rappresentazioni, come nel caso del sottotitolamento di immagini (Xu et al., 2015<sup id="fnref1:attention-captioning"><a href="#fn:attention-captioning" class="footnote-ref">67</a></sup>), riportato in Figura 12. Un interessante effetto collaterale dell'attenzione è la possibilità di osservare, sebbene in modo superficiale, i meccanismi di funzionamento interni al modello: l'attenzione rende visibile quali parti dell'input si sono rivelate importanti per un certo output, grazie ai pesi applicati per ottenere la media della sequenza in entrata.</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/panoramica-storia-recente-nlp/images/zeXfyWH.png" alt="Figura 12">
+        </figure>
+<figcaption>Figura 12: attenzione visiva in un modello per il sottotitolamento delle immagini. La figura sulla destra ci mostra a cosa sta facendo attenzione il modello per produrre la parola "frisbee" in output (Xu et al., 2015).</figcaption>
+<p>L'attenzione non è necessariamente limitata alla sequenza di input. Meccanismi di auto-attenzione possono essere utilizzati sulle parole circostanti in una frase o in un documento per produrre rappresentazioni che tengano maggiormente in considerazione il contesto della parola da rappresentare. L'uso di più strati con meccanismi di auto-attenzione è al centro dell'architettura del Transformer (Vaswani et al., 2017<sup id="fnref1:attention-transformer"><a href="#fn:attention-transformer" class="footnote-ref">68</a></sup>), il modello che rappresenta lo stato dell'arte per la traduzione automatica con reti neurali.</p>
+<p><a id="2015---Memory-based-networks"></a></p>
+<h2 id="2015-memory-based-networks" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#2015-memory-based-networks" title="Permanent link: 2015 - Memory-based networks" data-icon="#">2015 - Memory-based networks</a></h2>
+<p>L'attenzione può essere interpretata come una forma di memoria sfocata (<em>fuzzy memory</em>), dove il ricordo consiste nella lista dei precedenti stati nascosti, delegando al modello la scelta di cosa utilizzare tra quanto disponibile. Per una discussione più dettagliata del legame tra attenzione e memoria, fate riferimento a questo <a href="http://www.wildml.com/2016/01/attention-and-memory-in-deep-learning-and-nlp/">articolo</a>. Molti modelli con un meccanismo di memorizzazione più esplicito sono stati proposti nel corso degli anni. Abbiamo le Neural Turing Machines (Graves et al., 2014<sup id="fnref1:neural-turing-machines"><a href="#fn:neural-turing-machines" class="footnote-ref">69</a></sup>), le Memory Networks (Weston et al., 2015<sup id="fnref1:memory-networks"><a href="#fn:memory-networks" class="footnote-ref">70</a></sup>) e le End-to-end Memory Networks (Sukhbaatar et al., 2015<sup id="fnref1:end-to-end-memory-networks"><a href="#fn:end-to-end-memory-networks" class="footnote-ref">71</a></sup>), le Dynamic Memory Networks (Kumar et al., 2015<sup id="fnref1:dynamic-memory-networks"><a href="#fn:dynamic-memory-networks" class="footnote-ref">72</a></sup>), il Neural Differentiable Computer (Graves et al., 2016<sup id="fnref1:neural-differentiable-computer"><a href="#fn:neural-differentiable-computer" class="footnote-ref">73</a></sup>), le Recurrent Entity Network (Henaff et al., 2017<sup id="fnref1:recurrent-entity-network"><a href="#fn:recurrent-entity-network" class="footnote-ref">74</a></sup>).</p>
+<p>Il metodo di accesso alla memoria è spesso legato ad una misura di somiglianza con lo stato corrente, come nel caso dell'attenzione, ed è tipicamente permesso sia leggere che scrivere dalla/sulla memoria stessa. I diversi modelli differiscono nell'implementazione e nell'utilizzo della memoria a loro disposizione. Per esempio, le End-to-end Memory Networks consumano l'input più volte, aggiornando di volta in volta la memoria, così da produrre la predizione in più fasi. Le Neural Turing Machines, invece, permettono di accedere alla memoria anche in base alla posizione: questo permette l'apprendimento di semplici routine informatiche, come un algoritmo di ordinamento. I modelli basati sulla memoria sono tipicamente utilizzati per mansioni dove si presume che la capacità di ricordare certe informazioni per periodi di tempo sufficientemente lunghi porti ad un miglioramento delle performance, come nel caso della modellizzazione linguistica o della comprensione di un testo scritto. Il concetto di memoria è molto versatile: una base di conoscenza (<em><a href="https://it.wikipedia.org/wiki/Base_di_conoscenza">knowledge base</a></em>) o una tabella possono essere utilizzate come memoria, ma la memoria stessa può anche essere popolata in funzione dell'intero input o di un suo particolare sottoinsieme. </p>
+<p><a id="2018---Pretrained-language-models"></a></p>
+<h2 id="2018-pretrained-language-models" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#2018-pretrained-language-models" title="Permanent link: 2018 - Pretrained language models" data-icon="#">2018 - Pretrained language models</a></h2>
+<p>I word embedding pre-allenati non risentono del contesto e vengono utilizzati unicamente per inizializzare i pesi del primo strato in una rete neurale. Negli ultimi mesi, vari ricercatori hanno utilizzato mansioni supervisionate per preallenare delle reti neurali (Conneau et al., 2017<sup id="fnref1:pretrain-1"><a href="#fn:pretrain-1" class="footnote-ref">75</a></sup>; McCann et al., 2017<sup id="fnref1:pretrain-2"><a href="#fn:pretrain-2" class="footnote-ref">76</a></sup>; Subramanian et al., 2018<sup id="fnref1:pretrain-3"><a href="#fn:pretrain-3" class="footnote-ref">77</a></sup>). I modelli linguistici, invece, non hanno bisogno di dati annotati: l'apprendimento può quindi sfruttare tutti i dati disponibili, fino a miliardi di parole, così da approcciare facilmente nuovi domini o nuove lingue. I modelli linguistici pre-allenati sono stati proposti per la prima volta nel 2015 (Dai &amp; Le, 2015<sup id="fnref1:pretrain-first"><a href="#fn:pretrain-first" class="footnote-ref">78</a></sup>); solo recentemente ne è stata dimostrata l'utilità per uno spettro piuttosto variegato di mansioni. Gli embedding appresi da un modello linguistico possono essere utilizzati per arricchire l'input consumato da un altro modello (Peters et al., 2018<sup id="fnref1:we-as-features"><a href="#fn:we-as-features" class="footnote-ref">79</a></sup>) o lo stesso modello linguistico può essere calibrato per svolgere direttamente una mansione di interesse (Ramachandran et al., 2017<sup id="fnref1:lm-fine-tuning-1"><a href="#fn:lm-fine-tuning-1" class="footnote-ref">80</a></sup>; Howard &amp; Ruder, 2018<sup id="fnref1:lm-fine-tuning-2"><a href="#fn:lm-fine-tuning-2" class="footnote-ref">81</a></sup>). L'uso di embedding provenienti da modelli linguistici porta ad un miglioramento significativo delle performance rispetto all'attuale stato dell'arte in numerose mansioni, come riportato in Figura 13.</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/panoramica-storia-recente-nlp/images/xLeqhCX.png" alt="Figura 13">
+        </figure>
+<figcaption>Figura 13: miglioramenti ottenuti utilizzando embedding appresi da un modello linguistico rispetto al precedente stato dell'arte in varie mansioni (Peters et al., 2018).</figcaption>
+<p>Sono necessari molti meno dati per costruire un modello dedito ad una certa mansione se si utilizza un modello linguistico pre-allenato come punto di partenza. Visto che i modelli linguistici non hanno bisogno di dati annotati sono particolarmente utili per lo studio di lingue per cui non risultano disponibili dataset annotati di dimensione considerevole. Per maggiori informazioni sul potenziale dei modelli linguistici pre-allenati, fate riferimento a questo <a href="https://thegradient.pub/nlp-imagenet/">articolo</a>.</p>
+<p><a id="Other-milestones"></a></p>
+<h2 id="altri-contributi-importanti" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#altri-contributi-importanti" title="Permanent link: Altri contributi importanti" data-icon="#">Altri contributi importanti</a></h2>
+<p>Alcuni sviluppi si sono rivelati meno pervasivi di quelli menzionati fino ad ora, ma la portata e l'impatto di questi studi sono tutt'altro che trascurabili.</p>
+<h3 id="rappresentazioni-basate-sui..." class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#rappresentazioni-basate-sui..." title="Permanent link: Rappresentazioni basate sui caratteri" data-icon="#">Rappresentazioni basate sui caratteri</a></h3>
+<p>É piuttosto comune, oggi come oggi, usare una rete neurale convoluzionale o una LSTM con una sequenza di singoli caratteri come input per ottenere una rappresentazione di ogni carattere, specialmente quando si ha a che fare con lingue particolarmente ricche dal punto di vista morfologico, con task in cui la morfologia racchiude informazioni rilevanti o nei casi in cui molte parole risultino sconosciute. L'uso di rappresentazioni basate sui caratteri fu introdotto per l'analisi grammaticale (Ling et al., 2015<sup id="fnref1:char-analisi-grammaticale"><a href="#fn:char-analisi-grammaticale" class="footnote-ref">82</a></sup>) e l'analisi delle dipendenze (Ballesteros et al., 2015<sup id="fnref1:char-analisi-dipendenze"><a href="#fn:char-analisi-dipendenze" class="footnote-ref">83</a></sup>). Divennero una componente di primo piano nei modelli per l'annotazione di sequenze (Lample et al., 2016<sup id="fnref1:seq-labelling-1"><a href="#fn:seq-labelling-1" class="footnote-ref">84</a></sup>; Plank et al., 2016<sup id="fnref1:seq-labelling-2"><a href="#fn:seq-labelling-2" class="footnote-ref">85</a></sup>) e la modellizzazione linguistica (Kim et al., 2016<sup id="fnref1:char-lm"><a href="#fn:char-lm" class="footnote-ref">86</a></sup>). Le rappresentazioni basate sui caratteri alleviano i costi associati all'utilizzo di enormi dizionari dalla capienza prefissata, aprendo così la strada ad applicazioni come architetture neurali per la traduzione automatica interamente basate sulla sequenza di caratteri del testo da tradurre (Ling et al., 2016<sup id="fnref1:char-nmt-1"><a href="#fn:char-nmt-1" class="footnote-ref">87</a></sup>; Lee et al., 2017<sup id="fnref1:char-nmt-2"><a href="#fn:char-nmt-2" class="footnote-ref">88</a></sup>).</p>
+<h3 id="apprendimento-antagonistico" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#apprendimento-antagonistico" title="Permanent link: Apprendimento antagonistico" data-icon="#">Apprendimento antagonistico</a></h3>
+<p>I metodi antagonistici (<em>adversarial</em>) hanno conquistato terreno rapidamente nel mondo dell'apprendimento automatico e li ritroviamo in diverse forme anche in ambito NLP. Gli esempi antagonistici (<em>adversarial examples</em>) sono sempre più utilizzati non solo come strumento per testare i modelli e individuare gli scenari che li mettono in difficoltà, bensì come tecnica di irrobustimento dei modelli stessi (Jia &amp; Liang, 2017<sup id="fnref1:adv-examples"><a href="#fn:adv-examples" class="footnote-ref">89</a></sup>). L'apprendimento antagonistico virtuale, ossia perturbazioni del caso peggiore (Miyato et al., 2017<sup id="fnref1:worst-case-perturbation-1"><a href="#fn:worst-case-perturbation-1" class="footnote-ref">90</a></sup>; Yasunaga et al., 2018<sup id="fnref1:worst-case-perturbation-2"><a href="#fn:worst-case-perturbation-2" class="footnote-ref">91</a></sup>) e domain-adversarial losses (Ganin et al., 2016<sup id="fnref1:domain-adv-losses-1"><a href="#fn:domain-adv-losses-1" class="footnote-ref">92</a></sup>; Kim et al., 2017<sup id="fnref1:domain-adv-losses-2"><a href="#fn:domain-adv-losses-2" class="footnote-ref">93</a></sup>), è un utile bacino di tecniche per regolarizzare e irrobustire i modelli. Le reti generative antagonistiche (<em><strong>G</strong>enerative <strong>A</strong>dversarial <strong>N</strong>etwork</em>, <em>GAN</em>) risultano ancora poco efficaci per la produzione di esempi di linguaggio naturale (Semeniuta et al., 2018<sup id="fnref1:gan"><a href="#fn:gan" class="footnote-ref">94</a></sup>), ma tornano utili per allineare due distribuzioni (Conneau et al., 2018<sup id="fnref1:distribution-matching"><a href="#fn:distribution-matching" class="footnote-ref">95</a></sup>), per citarne un'applicazione.</p>
+<h3 id="apprendimento-per-rinforzo" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#apprendimento-per-rinforzo" title="Permanent link: Apprendimento per rinforzo" data-icon="#">Apprendimento per rinforzo</a></h3>
+<p>L'apprendimento per rinforzo (<em>reinforcement learning</em>) si è rivelato utile per mansioni che presentano una dipendenza temporale, come la selezione dei dati durante la fase di allenamento (Fang et al., 2017<sup id="fnref1:data-selection-1"><a href="#fn:data-selection-1" class="footnote-ref">96</a></sup>; Wu et al., 2018<sup id="fnref1:data-selection-2"><a href="#fn:data-selection-2" class="footnote-ref">97</a></sup>) e la modellizzazione di dialoghi (Liu et al., 2018<sup id="fnref1:dialogue-modelling"><a href="#fn:dialogue-modelling" class="footnote-ref">98</a></sup>). É piuttosto efficace anche per l'ottimizzazione diretta di una metrica non differenziabile, come <a href="https://en.wikipedia.org/wiki/ROUGE_(metric)">ROUGE</a> o <a href="https://en.wikipedia.org/wiki/BLEU">BLEU</a>: non si è più costretti a ricorrere a metriche ausiliarie differenziabili come l'entropia incrociata (<em>cross-entropy</em>) per la scrittura di riassunti (Paulus et al., 2018<sup id="fnref1:non-diff-metrics-1"><a href="#fn:non-diff-metrics-1" class="footnote-ref">99</a></sup>; Celikyilmaz et al., 2018<sup id="fnref1:non-diff-metrics-2"><a href="#fn:non-diff-metrics-2" class="footnote-ref">100</a></sup>) e la traduzione automatica (Ranzato et al., 2016<sup id="fnref1:non-diff-metrics-3"><a href="#fn:non-diff-metrics-3" class="footnote-ref">101</a></sup>). Allo stesso modo l'apprendimento per rinforzo inverso può tornare utile in contesti in cui la ricompensa (<em>reward</em>) è troppo complessa per essere specificata analiticamente, come nel caso della narrazione per immagini (Wang et al., 2018<sup id="fnref1:visual-storytelling"><a href="#fn:visual-storytelling" class="footnote-ref">102</a></sup>).</p>
+<p><a id="Non-neural-milestones"></a></p>
+<h2 id="contributi-non-neurali..." class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#contributi-non-neurali..." title="Permanent link: Contributi non neurali essenziali" data-icon="#">Contributi non neurali essenziali</a></h2>
+<p>Il progetto <a href="https://framenet.icsi.berkeley.edu/fndrupal/">FrameNet</a> (Baker et al., 1998<sup id="fnref1:framenet"><a href="#fn:framenet" class="footnote-ref">103</a></sup>) fu presentato per la prima volta nel 1998: diede inizio alla tecnica di <a href="https://en.wikipedia.org/wiki/Semantic_role_labeling">annotazione del ruolo semantico</a> (<em>semantic role labelling</em>), una forma superficiale di analisi semantica tuttora oggetto di ricerca attiva. Sin dai primi anni 2000, in concomitanza con la Conference on Natural Language Learning (CoNLL), sono stati organizzati degli <em>shared tasks</em> per focalizzare l'attenzione della comunità di ricerca su alcune mansioni di interesse: segmentazione (<em>chunking</em>) (Tjong Kim Sang et al., 2000<sup id="fnref1:chunking"><a href="#fn:chunking" class="footnote-ref">104</a></sup>), riconoscimento di entità nominali (Tjong Kim Sang et al., 2003<sup id="fnref1:other-ner"><a href="#fn:other-ner" class="footnote-ref">105</a></sup>), analisi delle dipendenze (Buchholz et al., 2006<sup id="fnref1:other-dependency-parsing"><a href="#fn:other-dependency-parsing" class="footnote-ref">106</a></sup>), giusto per citarne alcuni. Molti dei dataset rilasciati da CoNLL per queste mansioni sono ancora oggi uno standard di riferimento per valutare le performance dei nuovi modelli.</p>
+<p>Nel 2001 furono introdotti i conditional random fields (CRF; Lafferty et al., 2001<sup id="fnref1:CRF"><a href="#fn:CRF" class="footnote-ref">107</a></sup>), una delle famiglie più importanti di metodi per l'annotazione di sequenze di dati: hanno vinto il <a href="https://www.ml.cmu.edu/news/news-archive/2011-2015/2011/june/icml-test-time-award-2011.html">riconoscimento test-of-time award a ICML 2011</a>. Uno strato CRF è una componente fondamentale di vari modelli d'avanguardia per mansioni in cui le annotazioni hanno una complessa rete di inter-dipendenze, come nel caso del riconoscimento di entità nominali (Lample et al., 2016<sup id="fnref1:ner-CRF"><a href="#fn:ner-CRF" class="footnote-ref">108</a></sup>).</p>
+<p>Nel 2002 fu proposta BLEU (<em><strong>B</strong>i<strong>L</strong>ingual <strong>E</strong>valuation <strong>U</strong>nderstudy</em>, Papineni et al., 2002<sup id="fnref1:BLEU"><a href="#fn:BLEU" class="footnote-ref">109</a></sup>), una metrica che ha permesso ai sistemi di traduzione automatica di crescere e rimane tutt'oggi la misura di riferimento per valutarne le performance. Nello stesso anno fu introdotto il percettrone strutturato (<em>structured perceptron</em>) (Collins, 2002<sup id="fnref1:structured-perceptron"><a href="#fn:structured-perceptron" class="footnote-ref">110</a></sup>), gettando così le basi per la ricerca nel campo della percezione di dati strutturati. Nella stessa conferenza fu introdotta l'analisi del sentimento (<em>sentiment analysis</em>), una delle mansioni più popolari e più studiate in NLP (Pang et al., 2002<sup id="fnref1:sentiment-analysis"><a href="#fn:sentiment-analysis" class="footnote-ref">111</a></sup>). Tutti e tre gli articoli hanno vinto il <a href="https://naacl2018.wordpress.com/2018/03/22/test-of-time-award-papers/">riconoscimento test-of-time award a NAACL 2018</a>.</p>
+<p>Il 2003 ha assistito all'introduzione della <em>latent Dirichlet allocation</em> (LDA; Blei et al., 2003<sup id="fnref1:LDA"><a href="#fn:LDA" class="footnote-ref">112</a></sup>), una delle tecniche più utilizzate per l'apprendimento automatico, tuttora la procedura standard per l'analisi dei temi caratteristici di un testo (<em>topic modelling</em>). Nel 2004 furono sviluppati nuovi metodi <em>max-margin</em> (Taskar et al., 2004a<sup id="fnref1:max-margin-1"><a href="#fn:max-margin-1" class="footnote-ref">113</a></sup>; 2004b<sup id="fnref1:max-margin-2"><a href="#fn:max-margin-2" class="footnote-ref">114</a></sup>), rivelatisi più efficaci delle SVM nel catturare le correlazioni nei dati strutturati.</p>
+<p>Nel 2006 fu rilasciato OntoNotes (Hovy et al., 2006<sup id="fnref1:OntoNotes"><a href="#fn:OntoNotes" class="footnote-ref">115</a></sup>), un sostanzioso corpus multilingua con annotazioni multiple e un alto livello di consenso tra gli annotatori. OntoNotes è stato usato per l'allenamento e la valutazione di modelli per diverse mansioni, come l'analisi delle dipendenze e la <em>coreference resolution</em>. Nel 2008 Milne e Witten (2008<sup id="fnref1:wikipedia"><a href="#fn:wikipedia" class="footnote-ref">116</a></sup>) illustrarono come Wikipedia poteva essere sfruttata per potenziare i metodi di apprendimento automatico. Ad oggi, Wikipedia è una delle risorse più utili per l'addestramento di modelli di apprendimento automatico, una miniera d'oro per un vastissimo numero di mansioni diverse.</p>
+<p>Nel 2009 fu avanzata l'idea della <em>distant supervision</em> (Mintz et al., 2009<sup id="fnref1:distant-supervision"><a href="#fn:distant-supervision" class="footnote-ref">117</a></sup>): sfrutta l'informazione contenuta in strategie euristiche o in basi di conoscenza già disponibili per generare configurazioni (non del tutto esatte) che possono essere utilizzate per estrarre esempi annotati da grossi corpus. La <em>distant supervision</em> è stata utilizzata estensivamente ed è una tecnica piuttosto comune per l'estrazione di relazioni, di informazioni e l'analisi del sentimento, per citarne alcune applicazioni.</p>
+<hr />
+<div class="notices yellow">
+<p>Se questo articolo ti è piaciuto e vuoi tenerti aggiornato sulle nostre attività, ricordati che l'<a href="../member.html">iscrizione all'Italian Association for Machine Learning</a> è gratuita! Puoi seguirci anche su <a href="https://www.facebook.com/machinelearningitalia/">Facebook</a>, <a href="https://www.linkedin.com/company/iaml/">LinkedIn</a>, e <a href="https://twitter.com/iaml_it">Twitter</a>.</p>
+</div>
+<hr />
+<h2 id="bibliografia" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#bibliografia" title="Permanent link: Bibliografia:" data-icon="#">Bibliografia:</a></h2>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn:smart-email-reply">
+<p>Kannan, A., Kurach, K., Ravi, S., Kaufmann, T., Tomkins, A., Miklos, B., ... &amp; Ramavajjala, V. (2016, August). Smart reply: Automated response suggestion for email. In Proceedings of the 22nd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining (pp. 955-964). ACM.&#160;<a href="#fnref1:smart-email-reply" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:missing-n-grams">
+<p>Kneser, R., &amp; Ney, H. (1995, May). Improved backing-off for m-gram language modeling. In icassp (Vol. 1, p. 181e4).&#160;<a href="#fnref1:missing-n-grams" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:first-neural-language-model">
+<p>Bengio, Y., Ducharme, R., &amp; Vincent, P. (2001). Proceedings of NIPS.&#160;<a href="#fnref1:first-neural-language-model" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:rnn">
+<p>Mikolov, T., Karafiát, M., Burget, L., Černocký, J., &amp; Khudanpur, S. (2010). Recurrent neural network based language model. In Eleventh Annual Conference of the International Speech Communication Association.&#160;<a href="#fnref1:rnn" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:LSTM">
+<p>Graves, A. (2013). Generating sequences with recurrent neural networks. arXiv preprint arXiv:1308.0850.&#160;<a href="#fnref1:LSTM" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:LSTM-baseline">
+<p>Melis, G., Dyer, C., &amp; Blunsom, P. (2018). On the State of the Art of Evaluation in Neural Language Models. In Proceedings of ICLR 2018.&#160;<a href="#fnref1:LSTM-baseline" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:ff-baseline">
+<p>Daniluk, M., Rocktäschel, T., Weibl, J., &amp; Riedel, S. (2017). Frustratingly Short Attention Spans in Neural Language Modeling. In Proceedings of ICLR 2017.&#160;<a href="#fnref1:ff-baseline" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:introspection-1">
+<p>Kuncoro, A., Dyer, C., Hale, J., Yogatama, D., Clark, S., &amp; Blunsom, P. (2018). LSTMs Can Learn Syntax-Sensitive Dependencies Well, But Modeling Structure Makes Them Better. In Proceedings of ACL 2018 (pp. 1–11). Retrieved from http://aclweb.org/anthology/P18-1132&#160;<a href="#fnref1:introspection-1" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:introspection-2">
+<p>Blevins, T., Levy, O., &amp; Zettlemoyer, L. (2018). Deep RNNs Encode Soft Hierarchical Syntax. In Proceedings of ACL 2018. Retrieved from http://arxiv.org/abs/1805.04218&#160;<a href="#fnref1:introspection-2" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:multi-task">
+<p>Caruana, R. (1993). Multitask learning: A knowledge-based source of inductive bias. In Proceedings of the Tenth International Conference on Machine Learning.&#160;<a href="#fnref1:multi-task" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:road-pneumonia">
+<p>Caruana, R. (1998). Multitask Learning. Autonomous Agents and Multi-Agent Systems, 27(1), 95–133.&#160;<a href="#fnref1:road-pneumonia" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:neural-multi-task-1">
+<p>Collobert, R., &amp; Weston, J. (2008). A unified architecture for natural language processing. In Proceedings of the 25th International Conference on Machine Learning (pp. 160–167).&#160;<a href="#fnref1:neural-multi-task-1" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:neural-multi-task-2">
+<p>Collobert, R., Weston, J., Bottou, L., Karlen, M., Kavukcuoglu, K., &amp; Kuksa, P. (2011). Natural Language Processing (almost) from Scratch. Journal of Machine Learning Research, 12(Aug), 2493–2537. Retrieved from http://arxiv.org/abs/1103.0398.&#160;<a href="#fnref1:neural-multi-task-2" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:dynamic-sharing">
+<p>Ruder, S., Bingel, J., Augenstein, I., &amp; Søgaard, A. (2017). Learning what to share between loosely related tasks. ArXiv Preprint ArXiv:1705.08142. Retrieved from http://arxiv.org/abs/1705.08142&#160;<a href="#fnref1:dynamic-sharing" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:multi-task-benchmark-1">
+<p>Wang, A., Singh, A., Michael, J., Hill, F., Levy, O., &amp; Bowman, S. R. (2018). GLUE: A Multi-Task Benchmark and Analysis Platform for Natural Language Understanding.&#160;<a href="#fnref1:multi-task-benchmark-1" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:multi-task-benchmark-2">
+<p>McCann, B., Keskar, N. S., Xiong, C., &amp; Socher, R. (2018). The Natural Language Decathlon: Multitask Learning as Question Answering.&#160;<a href="#fnref1:multi-task-benchmark-2" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:word2vec-1">
+<p>Mikolov, T., Corrado, G., Chen, K., &amp; Dean, J. (2013). Efficient Estimation of Word Representations in Vector Space. Proceedings of the International Conference on Learning Representations (ICLR 2013).&#160;<a href="#fnref1:word2vec-1" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:word2vec-2">
+<p>Mikolov, T., Chen, K., Corrado, G., &amp; Dean, J. (2013). Distributed Representations of Words and Phrases and their Compositionality. In Advances in Neural Information Processing Systems.&#160;<a href="#fnref1:word2vec-2" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:we-1">
+<p>Arora, S., Li, Y., Liang, Y., Ma, T., &amp; Risteski, A. (2016). A Latent Variable Model Approach to PMI-based Word Embeddings. TACL, 4, 385–399.&#160;<a href="#fnref1:we-1" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:we-2">
+<p>Mimno, D., &amp; Thompson, L. (2017). The strange geometry of skip-gram with negative sampling. In Proceedings of the 2017 Conference on Empirical Methods in Natural Language Processing (pp. 2863–2868).&#160;<a href="#fnref1:we-2" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:we-3">
+<p>Antoniak, M., &amp; Mimno, D. (2018). Evaluating the Stability of Embedding-based Word Similarities. Transactions of the Association for Computational Linguistics, 6, 107–119.&#160;<a href="#fnref1:we-3" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:we-4">
+<p>Wendlandt, L., Kummerfeld, J. K., &amp; Mihalcea, R. (2018). Factors Influencing the Surprising Instability of Word Embeddings. In Proceedings of NAACL-HLT 2018.&#160;<a href="#fnref1:we-4" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:we-downstream">
+<p>Kim, Y. (2014). Convolutional Neural Networks for Sentence Classification. Proceedings of the Conference on Empirical Methods in Natural Language Processing, 1746–1751. Retrieved from http://arxiv.org/abs/1408.5882&#160;<a href="#fnref1:we-downstream" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:we-matrix-factorization-1">
+<p>Pennington, J., Socher, R., &amp; Manning, C. D. (2014). Glove: Global Vectors for Word Representation. Proceedings of the 2014 Conference on Empirical Methods in Natural Language Processing, 1532–1543.&#160;<a href="#fnref1:we-matrix-factorization-1" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:we-matrix-factorization-2">
+<p>Levy, O., &amp; Goldberg, Y. (2014). Neural Word Embedding as Implicit Matrix Factorization. Advances in Neural Information Processing Systems (NIPS), 2177–2185. Retrieved from http://papers.nips.cc/paper/5477-neural-word-embedding-as-implicit-matrix-factorization&#160;<a href="#fnref1:we-matrix-factorization-2" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:we-matrix-factorization-3">
+<p>Levy, O., Goldberg, Y., &amp; Dagan, I. (2015). Improving Distributional Similarity with Lessons Learned from Word Embeddings. Transactions of the Association for Computational Linguistics, 3, 211–225. Retrieved from https://tacl2013.cs.columbia.edu/ojs/index.php/tacl/article/view/570&#160;<a href="#fnref1:we-matrix-factorization-3" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:sentence-embedding-1">
+<p>Le, Q. V., &amp; Mikolov, T. (2014). Distributed Representations of Sentences and Documents. International Conference on Machine Learning - ICML 2014, 32, 1188–1196. Retrieved from http://arxiv.org/abs/1405.4053&#160;<a href="#fnref1:sentence-embedding-1" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:sentence-embedding-2">
+<p>Kiros, R., Zhu, Y., Salakhutdinov, R., Zemel, R. S., Torralba, A., Urtasun, R., &amp; Fidler, S. (2015). Skip-Thought Vectors. In Proceedings of NIPS 2015. Retrieved from http://arxiv.org/abs/1506.06726&#160;<a href="#fnref1:sentence-embedding-2" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:network-embedding">
+<p>Grover, A., &amp; Leskovec, J. (2016, August). node2vec: Scalable feature learning for networks. In Proceedings of the 22nd ACM SIGKDD international conference on Knowledge discovery and data mining (pp. 855-864). ACM.&#160;<a href="#fnref1:network-embedding" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:bio-embedding">
+<p>Asgari, E., &amp; Mofrad, M. R. (2015). Continuous distributed representation of biological sequences for deep proteomics and genomics. PloS one, 10(11), e0141287.&#160;<a href="#fnref1:bio-embedding" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:cross-lingual-1">
+<p>Conneau, A., Lample, G., Ranzato, M., Denoyer, L., &amp; Jégou, H. (2018). Word Translation Without Parallel Data. In Proceedings of ICLR 2018. Retrieved from http://arxiv.org/abs/1710.04087&#160;<a href="#fnref1:cross-lingual-1" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:cross-lingual-2">
+<p>Artetxe, M., Labaka, G., &amp; Agirre, E. (2018). A robust self-learning method for fully unsupervised cross-lingual mappings of word embeddings. In Proceedings of ACL 2018.&#160;<a href="#fnref1:cross-lingual-2" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:cross-lingual-3">
+<p>Søgaard, A., Ruder, S., &amp; Vulić, I. (2018). On the Limitations of Unsupervised Bilingual Dictionary Induction. In Proceedings of ACL 2018.&#160;<a href="#fnref1:cross-lingual-3" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:unsupervised-machine-translation-1">
+<p>Lample, G., Denoyer, L., &amp; Ranzato, M. (2018). Unsupervised Machine Translation Using Monolingual Corpora Only. In Proceedings of ICLR 2018.&#160;<a href="#fnref1:unsupervised-machine-translation-1" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:unsupervised-machine-translation-2">
+<p>Artetxe, M., Labaka, G., Agirre, E., &amp; Cho, K. (2018). Unsupervised Neural Machine Translation. In Proceedings of ICLR 2018. Retrieved from http://arxiv.org/abs/1710.11041&#160;<a href="#fnref1:unsupervised-machine-translation-2" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:cross-lingual-view">
+<p>Ruder, S., Vulić, I., &amp; Søgaard, A. (2018). A Survey of Cross-lingual Word Embedding Models. To be published in Journal of Artificial Intelligence Research. Retrieved from http://arxiv.org/abs/1706.04902&#160;<a href="#fnref1:cross-lingual-view" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:vanilla-rnn">
+<p>Elman, J. L. (1990). Finding structure in time. Cognitive science, 14(2), 179-211.&#160;<a href="#fnref1:vanilla-rnn" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:LSTM-first">
+<p>Hochreiter, S., &amp; Schmidhuber, J. (1997). Long short-term memory. Neural computation, 9(8), 1735-1780.&#160;<a href="#fnref1:LSTM-first" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:bi-LSTM">
+<p>Graves, A., Jaitly, N., &amp; Mohamed, A. R. (2013, December). Hybrid speech recognition with deep bidirectional LSTM. In Automatic Speech Recognition and Understanding (ASRU), 2013 IEEE Workshop on (pp. 273-278). IEEE.&#160;<a href="#fnref1:bi-LSTM" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:CNN-NLP-1">
+<p>Kalchbrenner, N., Grefenstette, E., &amp; Blunsom, P. (2014). A Convolutional Neural Network for Modelling Sentences. In Proceedings of the 52nd Annual Meeting of the Association for Computational Linguistics (pp. 655–665). Retrieved from http://arxiv.org/abs/1404.2188&#160;<a href="#fnref1:CNN-NLP-1" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:CNN-NLP-2">
+<p>Kim, Y. (2014). Convolutional Neural Networks for Sentence Classification. Proceedings of the Conference on Empirical Methods in Natural Language Processing, 1746–1751. Retrieved from http://arxiv.org/abs/1408.5882&#160;<a href="#fnref1:CNN-NLP-2" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:dilated-convolution">
+<p>Kalchbrenner, N., Espeholt, L., Simonyan, K., Oord, A. van den, Graves, A., &amp; Kavukcuoglu, K. (2016). Neural Machine Translation in Linear Time. ArXiv Preprint ArXiv: Retrieved from http://arxiv.org/abs/1610.10099&#160;<a href="#fnref1:dilated-convolution" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:CNN+LSTM-1">
+<p>Wang, J., Yu, L., Lai, K. R., &amp; Zhang, X. (2016). Dimensional Sentiment Analysis Using a Regional CNN-LSTM Model. Proceedings of the 54th Annual Meeting of the Association for Computational Linguistics (ACL 2016), 225–230.&#160;<a href="#fnref1:CNN+LSTM-1" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:CNN+LSTM-2">
+<p>Bradbury, J., Merity, S., Xiong, C., &amp; Socher, R. (2017). Quasi-Recurrent Neural Networks. In ICLR 2017. Retrieved from http://arxiv.org/abs/1611.01576&#160;<a href="#fnref1:CNN+LSTM-2" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:recursive-NN">
+<p>Socher, R., Perelygin, A., &amp; Wu, J. (2013). Recursive deep models for semantic compositionality over a sentiment treebank. Proceedings of the 2013 Conference on Empirical Methods in Natural Language Processing, 1631–1642.&#160;<a href="#fnref1:recursive-NN" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:tree-LSTM">
+<p>Tai, K. S., Socher, R., &amp; Manning, C. D. (2015). Improved Semantic Representations From Tree-Structured Long Short-Term Memory Networks. Acl-2015, 1556–1566.&#160;<a href="#fnref1:tree-LSTM" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:grammar-based-we">
+<p>Levy, O., &amp; Goldberg, Y. (2014). Dependency-Based Word Embeddings. In Proceedings of the 52nd Annual Meeting of the Association for Computational Linguistics (Short Papers) (pp. 302–308). https://doi.org/10.3115/v1/P14-2050&#160;<a href="#fnref1:grammar-based-we" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:syntactic-stack">
+<p>Dyer, C., Kuncoro, A., Ballesteros, M., &amp; Smith, N. A. (2016). Recurrent Neural Network Grammars. In NAACL. Retrieved from http://arxiv.org/abs/1602.07776&#160;<a href="#fnref1:syntactic-stack" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:graph-CNN">
+<p>Bastings, J., Titov, I., Aziz, W., Marcheggiani, D., &amp; Sima’an, K. (2017). Graph Convolutional Encoders for Syntax-aware Neural Machine Translation. In Proceedings of the 2017 Conference on Empirical Methods in Natural Language Processing.&#160;<a href="#fnref1:graph-CNN" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:seq2seq">
+<p>Sutskever, I., Vinyals, O., &amp; Le, Q. V. (2014). Sequence to sequence learning with neural networks. In Advances in Neural Information Processing Systems.&#160;<a href="#fnref1:seq2seq" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:google-MT">
+<p>Wu, Y., Schuster, M., Chen, Z., Le, Q. V, Norouzi, M., Macherey, W., … Dean, J. (2016). Google’s Neural Machine Translation System: Bridging the Gap between Human and Machine Translation. ArXiv Preprint ArXiv:1609.08144.&#160;<a href="#fnref1:google-MT" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:image2caption">
+<p>Vinyals, O., Toshev, A., Bengio, S., &amp; Erhan, D. (2015). Show and tell: A neural image caption generator. In Proceedings of the IEEE conference on computer vision and pattern recognition (pp. 3156-3164).&#160;<a href="#fnref1:image2caption" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:table2text">
+<p>Lebret, R., Grangier, D., &amp; Auli, M. (2016). Generating Text from Structured Data with Application to the Biography Domain. Proceedings of the 2016 Conference on Empirical Methods in Natural Language Processing. Retrieved from http://arxiv.org/abs/1603.07771&#160;<a href="#fnref1:table2text" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:code2desc">
+<p>Loyola, P., Marrese-Taylor, E., &amp; Matsuo, Y. (2017). A Neural Architecture for Generating Natural Language Descriptions from Source Code Changes. In ACL 2017. Retrieved from http://arxiv.org/abs/1704.04856&#160;<a href="#fnref1:code2desc" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:analisi-sintattica">
+<p>Vinyals, O., Kaiser, L., Koo, T., Petrov, S., Sutskever, I., &amp; Hinton, G. (2015). Grammar as a Foreign Language. Advances in Neural Information Processing Systems.&#160;<a href="#fnref1:analisi-sintattica" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:NER">
+<p>Gillick, D., Brunk, C., Vinyals, O., &amp; Subramanya, A. (2016). Multilingual Language Processing From Bytes. In NAACL (pp. 1296–1306). Retrieved from http://arxiv.org/abs/1512.00103&#160;<a href="#fnref1:NER" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:deep-LSTM">
+<p>Wu, Y., Schuster, M., Chen, Z., Le, Q. V, Norouzi, M., Macherey, W., … Dean, J. (2016). Google’s Neural Machine Translation System: Bridging the Gap between Human and Machine Translation. ArXiv Preprint ArXiv:1609.08144.&#160;<a href="#fnref1:deep-LSTM" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:cnn-encoder-1">
+<p>Kalchbrenner, N., Espeholt, L., Simonyan, K., Oord, A. van den, Graves, A., &amp; Kavukcuoglu, K. (2016). Neural Machine Translation in Linear Time. ArXiv Preprint ArXiv: Retrieved from http://arxiv.org/abs/1610.10099&#160;<a href="#fnref1:cnn-encoder-1" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:cnn-encoder-2">
+<p>Gehring, J., Auli, M., Grangier, D., Yarats, D., &amp; Dauphin, Y. N. (2017). Convolutional Sequence to Sequence Learning. ArXiv Preprint ArXiv:1705.03122. Retrieved from http://arxiv.org/abs/1705.03122&#160;<a href="#fnref1:cnn-encoder-2" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:transformer">
+<p>Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A. N., … Polosukhin, I. (2017). Attention Is All You Need. In Advances in Neural Information Processing Systems.&#160;<a href="#fnref1:transformer" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:transformer+LSTM">
+<p>Chen, M. X., Foster, G., &amp; Parmar, N. (2018). The Best of Both Worlds: Combining Recent Advances in Neural Machine Translation. In Proceedings of ACL 2018.&#160;<a href="#fnref1:transformer+LSTM" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:attention">
+<p>Bahdanau, D., Cho, K., &amp; Bengio, Y. (2015). Neural Machine Translation by Jointly Learning to Align and Translate. In ICLR 2015.&#160;<a href="#fnref1:attention" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:several-attention">
+<p>Luong, M.-T., Pham, H., &amp; Manning, C. D. (2015). Effective Approaches to Attention-based Neural Machine Translation. In Proceedings of EMNLP 2015. Retrieved from http://arxiv.org/abs/1508.04025&#160;<a href="#fnref1:several-attention" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:attention-analisi-sintattica">
+<p>Vinyals, O., Kaiser, L., Koo, T., Petrov, S., Sutskever, I., &amp; Hinton, G. (2015). Grammar as a Foreign Language. Advances in Neural Information Processing Systems.&#160;<a href="#fnref1:attention-analisi-sintattica" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:attention-reading">
+<p>Hermann, K. M., Kočiský, T., Grefenstette, E., Espeholt, L., Kay, W., Suleyman, M., &amp; Blunsom, P. (2015). Teaching Machines to Read and Comprehend. Advances in Neural Information Processing Systems. Retrieved from http://arxiv.org/abs/1506.03340v1&#160;<a href="#fnref1:attention-reading" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:attention-one-shot">
+<p>Vinyals, O., Blundell, C., Lillicrap, T., Kavukcuoglu, K., &amp; Wierstra, D. (2016). Matching Networks for One Shot Learning. In Advances in Neural Information Processing Systems 29 (NIPS 2016). Retrieved from http://arxiv.org/abs/1606.04080&#160;<a href="#fnref1:attention-one-shot" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:attention-captioning">
+<p>Xu, K., Courville, A., Zemel, R. S., &amp; Bengio, Y. (2015). Show, Attend and Tell: Neural Image Caption Generation with Visual Attention. In Proceedings of ICML 2015.&#160;<a href="#fnref1:attention-captioning" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:attention-transformer">
+<p>Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A. N., … Polosukhin, I. (2017). Attention Is All You Need. In Advances in Neural Information Processing Systems.&#160;<a href="#fnref1:attention-transformer" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:neural-turing-machines">
+<p>Graves, A., Wayne, G., &amp; Danihelka, I. (2014). Neural turing machines. arXiv preprint arXiv:1410.5401.&#160;<a href="#fnref1:neural-turing-machines" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:memory-networks">
+<p>Weston, J., Chopra, S., &amp; Bordes, A. (2015). Memory Networks. In Proceedings of ICLR 2015.&#160;<a href="#fnref1:memory-networks" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:end-to-end-memory-networks">
+<p>Sukhbaatar, S., Szlam, A., Weston, J., &amp; Fergus, R. (2015). End-To-End Memory Networks. In Proceedings of NIPS 2015. Retrieved from http://arxiv.org/abs/1503.08895&#160;<a href="#fnref1:end-to-end-memory-networks" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:dynamic-memory-networks">
+<p>Kumar, A., Irsoy, O., Ondruska, P., Iyyer, M., Bradbury, J., Gulrajani, I., ... &amp; Socher, R. (2016, June). Ask me anything: Dynamic memory networks for natural language processing. In International Conference on Machine Learning (pp. 1378-1387).&#160;<a href="#fnref1:dynamic-memory-networks" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:neural-differentiable-computer">
+<p>Graves, A., Wayne, G., Reynolds, M., Harley, T., Danihelka, I., Grabska-Barwińska, A., … Hassabis, D. (2016). Hybrid computing using a neural network with dynamic external memory. Nature.&#160;<a href="#fnref1:neural-differentiable-computer" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:recurrent-entity-network">
+<p>Henaff, M., Weston, J., Szlam, A., Bordes, A., &amp; LeCun, Y. (2017). Tracking the World State with Recurrent Entity Networks. In Proceedings of ICLR 2017.&#160;<a href="#fnref1:recurrent-entity-network" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:pretrain-1">
+<p>Conneau, A., Kiela, D., Schwenk, H., Barrault, L., &amp; Bordes, A. (2017). Supervised Learning of Universal Sentence Representations from Natural Language Inference Data. In Proceedings of the 2017 Conference on Empirical Methods in Natural Language Processing.&#160;<a href="#fnref1:pretrain-1" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:pretrain-2">
+<p>McCann, B., Bradbury, J., Xiong, C., &amp; Socher, R. (2017). Learned in Translation: Contextualized Word Vectors. In Advances in Neural Information Processing Systems.&#160;<a href="#fnref1:pretrain-2" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:pretrain-3">
+<p>Subramanian, S., Trischler, A., Bengio, Y., &amp; Pal, C. J. (2018). Learning General Purpose Distributed Sentence Representations via Large Scale Multi-task Learning. In Proceedings of ICLR 2018.&#160;<a href="#fnref1:pretrain-3" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:pretrain-first">
+<p>Dai, A. M., &amp; Le, Q. V. (2015). Semi-supervised Sequence Learning. Advances in Neural Information Processing Systems (NIPS ’15). Retrieved from http://arxiv.org/abs/1511.01432&#160;<a href="#fnref1:pretrain-first" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:we-as-features">
+<p>Peters, M. E., Neumann, M., Iyyer, M., Gardner, M., Clark, C., Lee, K., &amp; Zettlemoyer, L. (2018). Deep contextualized word representations. In Proceedings of NAACL-HLT 2018.&#160;<a href="#fnref1:we-as-features" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:lm-fine-tuning-1">
+<p>Ramachandran, P., Liu, P. J., &amp; Le, Q. V. (2017). Unsupervised Pretraining for Sequence to Sequence Learning. In Proceedings of EMNLP 2017.&#160;<a href="#fnref1:lm-fine-tuning-1" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:lm-fine-tuning-2">
+<p>Howard, J., &amp; Ruder, S. (2018). Universal Language Model Fine-tuning for Text Classification. In Proceedings of ACL 2018. Retrieved from http://arxiv.org/abs/1801.06146&#160;<a href="#fnref1:lm-fine-tuning-2" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:char-analisi-grammaticale">
+<p>Ling, W., Luis, T., Marujo, L., Astudillo, R. F., Amir, S., Dyer, C., … Trancoso, I. (2015). Finding Function in Form: Compositional Character Models for Open Vocabulary Word Representation. In Proceedings of EMNLP 2015 (pp. 1520–1530).&#160;<a href="#fnref1:char-analisi-grammaticale" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:char-analisi-dipendenze">
+<p>Ballesteros, M., Dyer, C., &amp; Smith, N. A. (2015). Improved Transition-Based Parsing by Modeling Characters instead of Words with LSTMs. In Proceedings of EMNLP 2015.&#160;<a href="#fnref1:char-analisi-dipendenze" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:seq-labelling-1">
+<p>Lample, G., Ballesteros, M., Subramanian, S., Kawakami, K., &amp; Dyer, C. (2016). Neural Architectures for Named Entity Recognition. In NAACL-HLT 2016.&#160;<a href="#fnref1:seq-labelling-1" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:seq-labelling-2">
+<p>Plank, B., Søgaard, A., &amp; Goldberg, Y. (2016). Multilingual Part-of-Speech Tagging with Bidirectional Long Short-Term Memory Models and Auxiliary Loss. In Proceedings of the 54th Annual Meeting of the Association for Computational Linguistics.&#160;<a href="#fnref1:seq-labelling-2" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:char-lm">
+<p>Kim, Y., Jernite, Y., Sontag, D., &amp; Rush, A. M. (2016). Character-Aware Neural Language Models. In Proceedings of AAAI 2016&#160;<a href="#fnref1:char-lm" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:char-nmt-1">
+<p>Ling, W., Trancoso, I., Dyer, C., &amp; Black, A. (2016). Character-based Neural Machine Translation. In ICLR. Retrieved from http://arxiv.org/abs/1511.04586&#160;<a href="#fnref1:char-nmt-1" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:char-nmt-2">
+<p>Lee, J., Cho, K., &amp; Bengio, Y. (2017). Fully Character-Level Neural Machine Translation without Explicit Segmentation. In Transactions of the Association for Computational Linguistics.&#160;<a href="#fnref1:char-nmt-2" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:adv-examples">
+<p>Jia, R., &amp; Liang, P. (2017). Adversarial Examples for Evaluating Reading Comprehension Systems. In Proceedings of the 2017 Conference on Empirical Methods in Natural Language Processing.&#160;<a href="#fnref1:adv-examples" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:worst-case-perturbation-1">
+<p>Miyato, T., Dai, A. M., &amp; Goodfellow, I. (2017). Adversarial Training Methods for Semi-supervised Text Classification. In Proceedings of ICLR 2017.&#160;<a href="#fnref1:worst-case-perturbation-1" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:worst-case-perturbation-2">
+<p>Yasunaga, M., Kasai, J., &amp; Radev, D. (2018). Robust Multilingual Part-of-Speech Tagging via Adversarial Training. In Proceedings of NAACL 2018. Retrieved from http://arxiv.org/abs/1711.04903&#160;<a href="#fnref1:worst-case-perturbation-2" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:domain-adv-losses-1">
+<p>Ganin, Y., Ustinova, E., Ajakan, H., Germain, P., Larochelle, H., Laviolette, F., … Lempitsky, V. (2016). Domain-Adversarial Training of Neural Networks. Journal of Machine Learning Research, 17.&#160;<a href="#fnref1:domain-adv-losses-1" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:domain-adv-losses-2">
+<p>Kim, Y., Stratos, K., &amp; Kim, D. (2017). Adversarial Adaptation of Synthetic or Stale Data. In Proceedings of ACL (pp. 1297–1307).&#160;<a href="#fnref1:domain-adv-losses-2" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:gan">
+<p>Semeniuta, S., Severyn, A., &amp; Gelly, S. (2018). On Accurate Evaluation of GANs for Language Generation. Retrieved from http://arxiv.org/abs/1806.04936&#160;<a href="#fnref1:gan" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:distribution-matching">
+<p>Conneau, A., Lample, G., Ranzato, M., Denoyer, L., &amp; Jégou, H. (2018). Word Translation Without Parallel Data. In Proceedings of ICLR 2018. Retrieved from http://arxiv.org/abs/1710.04087&#160;<a href="#fnref1:distribution-matching" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:data-selection-1">
+<p>Fang, M., Li, Y., &amp; Cohn, T. (2017). Learning how to Active Learn: A Deep Reinforcement Learning Approach. In Proceedings of the 2017 Conference on Empirical Methods in Natural Language Processing. Retrieved from https://arxiv.org/pdf/1708.02383v1.pdf&#160;<a href="#fnref1:data-selection-1" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:data-selection-2">
+<p>Wu, J., Li, L., &amp; Wang, W. Y. (2018). Reinforced Co-Training. In Proceedings of NAACL-HLT 2018.&#160;<a href="#fnref1:data-selection-2" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:dialogue-modelling">
+<p>Liu, B., Tür, G., Hakkani-Tür, D., Shah, P., &amp; Heck, L. (2018). Dialogue Learning with Human Teaching and Feedback in End-to-End Trainable Task-Oriented Dialogue Systems. In Proceedings of NAACL-HLT 2018.&#160;<a href="#fnref1:dialogue-modelling" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:non-diff-metrics-1">
+<p>Paulus, R., Xiong, C., &amp; Socher, R. (2018). A deep reinforced model for abstractive summarization. In Proceedings of ICLR 2018.&#160;<a href="#fnref1:non-diff-metrics-1" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:non-diff-metrics-2">
+<p>Celikyilmaz, A., Bosselut, A., He, X., &amp; Choi, Y. (2018). Deep communicating agents for abstractive summarization. In Proceedings of NAACL-HLT 2018.&#160;<a href="#fnref1:non-diff-metrics-2" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:non-diff-metrics-3">
+<p>Ranzato, M. A., Chopra, S., Auli, M., &amp; Zaremba, W. (2016). Sequence level training with recurrent neural networks. In Proceedings of ICLR 2016.&#160;<a href="#fnref1:non-diff-metrics-3" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:visual-storytelling">
+<p>Wang, X., Chen, W., Wang, Y.-F., &amp; Wang, W. Y. (2018). No Metrics Are Perfect: Adversarial Reward Learning for Visual Storytelling. In Proceedings of ACL 2018. Retrieved from http://arxiv.org/abs/1804.09160&#160;<a href="#fnref1:visual-storytelling" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:framenet">
+<p>Baker, C. F., Fillmore, C. J., &amp; Lowe, J. B. (1998, August). The berkeley framenet project. In Proceedings of the 17th international conference on Computational linguistics-Volume 1 (pp. 86-90). Association for Computational Linguistics.&#160;<a href="#fnref1:framenet" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:chunking">
+<p>Tjong Kim Sang, E. F., &amp; Buchholz, S. (2000, September). Introduction to the CoNLL-2000 shared task: Chunking. In Proceedings of the 2nd workshop on Learning language in logic and the 4th conference on Computational natural language learning-Volume 7 (pp. 127-132). Association for Computational Linguistics.&#160;<a href="#fnref1:chunking" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:other-ner">
+<p>Tjong Kim Sang, E. F., &amp; De Meulder, F. (2003, May). Introduction to the CoNLL-2003 shared task: Language-independent named entity recognition. In Proceedings of the seventh conference on Natural language learning at HLT-NAACL 2003-Volume 4 (pp. 142-147). Association for Computational Linguistics.&#160;<a href="#fnref1:other-ner" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:other-dependency-parsing">
+<p>Buchholz, S., &amp; Marsi, E. (2006, June). CoNLL-X shared task on multilingual dependency parsing. In Proceedings of the tenth conference on computational natural language learning (pp. 149-164). Association for Computational Linguistics.&#160;<a href="#fnref1:other-dependency-parsing" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:CRF">
+<p>Lafferty, J., McCallum, A., &amp; Pereira, F. C. (2001). Conditional random fields: Probabilistic models for segmenting and labeling sequence data.&#160;<a href="#fnref1:CRF" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:ner-CRF">
+<p>Lample, G., Ballesteros, M., Subramanian, S., Kawakami, K., &amp; Dyer, C. (2016). Neural Architectures for Named Entity Recognition. In NAACL-HLT 2016.&#160;<a href="#fnref1:ner-CRF" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:BLEU">
+<p>Papineni, K., Roukos, S., Ward, T., &amp; Zhu, W. J. (2002, July). BLEU: a method for automatic evaluation of machine translation. In Proceedings of the 40th annual meeting on association for computational linguistics (pp. 311-318). Association for Computational Linguistics.&#160;<a href="#fnref1:BLEU" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:structured-perceptron">
+<p>Collins, M. (2002, July). Discriminative training methods for hidden markov models: Theory and experiments with perceptron algorithms. In Proceedings of the ACL-02 conference on Empirical methods in natural language processing-Volume 10 (pp. 1-8). Association for Computational Linguistics.&#160;<a href="#fnref1:structured-perceptron" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:sentiment-analysis">
+<p>Pang, B., Lee, L., &amp; Vaithyanathan, S. (2002, July). Thumbs up?: sentiment classification using machine learning techniques. In Proceedings of the ACL-02 conference on Empirical methods in natural language processing-Volume 10 (pp. 79-86). Association for Computational Linguistics.&#160;<a href="#fnref1:sentiment-analysis" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:LDA">
+<p>Blei, D. M., Ng, A. Y., &amp; Jordan, M. I. (2003). Latent dirichlet allocation. Journal of machine Learning research, 3(Jan), 993-1022.&#160;<a href="#fnref1:LDA" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:max-margin-1">
+<p>Taskar, B., Guestrin, C., &amp; Koller, D. (2004). Max-margin Markov networks. In Advances in neural information processing systems (pp. 25-32).&#160;<a href="#fnref1:max-margin-1" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:max-margin-2">
+<p>Taskar, B., Klein, D., Collins, M., Koller, D., &amp; Manning, C. (2004). Max-margin parsing. In Proceedings of the 2004 Conference on Empirical Methods in Natural Language Processing.&#160;<a href="#fnref1:max-margin-2" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:OntoNotes">
+<p>Hovy, E., Marcus, M., Palmer, M., Ramshaw, L., &amp; Weischedel, R. (2006, June). OntoNotes: the 90% solution. In Proceedings of the human language technology conference of the NAACL, Companion Volume: Short Papers (pp. 57-60). Association for Computational Linguistics.&#160;<a href="#fnref1:OntoNotes" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:wikipedia">
+<p>Milne, D., &amp; Witten, I. H. (2008, October). Learning to link with wikipedia. In Proceedings of the 17th ACM conference on Information and knowledge management (pp. 509-518). ACM.&#160;<a href="#fnref1:wikipedia" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:distant-supervision">
+<p>Mintz, M., Bills, S., Snow, R., &amp; Jurafsky, D. (2009, August). Distant supervision for relation extraction without labeled data. In Proceedings of the Joint Conference of the 47th Annual Meeting of the ACL and the 4th International Joint Conference on Natural Language Processing of the AFNLP: Volume 2-Volume 2 (pp. 1003-1011). Association for Computational Linguistics.&#160;<a href="#fnref1:distant-supervision" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+</ol>
+</div></p>
+            
+    
+        <p class="prev-next">
+                            <a class="button" href="jax-intro.html"><i class="fa fa-chevron-left"></i> Previous Post</a>
+            
+                            <a class="button" href="jax-intro-english.html">Next Post <i class="fa fa-chevron-right"></i></a>
+                    </p>
+    
+    </div>
+</div>
+			</div>
+			<div id="sidebar" class="g-block size-1-3 pure-u-1-3">
+				<div class="sidebar-content">
+    <h4>Search the blog</h4>
+    <input type="text" placeholder="Search..." value="" data-searchsidebar-input="/search/query" />
+<script>
+jQuery(document).ready(function($){
+    var input = $('[data-searchsidebar-input]');
+
+    input.on('keypress', function(event) {
+        if (event.which == 13 && input.val().length > 3) {
+            event.preventDefault();
+            window.location.href = input.data('searchsidebar-input') + ':' + input.val();
+        }
+    });
+});
+</script>
+</div>
+<!--
+<div class="sidebar-content">
+	<h4>Some Text Widget</h4>
+	<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna.</p>
+</div>
+!-->
+<div class="sidebar-content">
+    <h4>Categories</h4>
+    
+
+<ul class="archives">
+        <li>
+        <a href="categoryTutorials.html">Tutorials </a> (16)
+    </li>
+        <li>
+        <a href="categoryDiscussions.html">Discussions </a> (12)
+    </li>
+        <li>
+        <a href="categoryAnnouncements.html">Announcements </a> (4)
+    </li>
+        <li>
+        <a href="categoryTutorials (English).html">Tutorials (English) </a> (4)
+    </li>
+        <li>
+        <a href="categoryArticles' summaries.html">Articles' summaries </a> (3)
+    </li>
+        <li>
+        <a href="categoryDiscussions (English).html">Discussions (English) </a> (2)
+    </li>
+        <li>
+        <a href="categoryFocus-on.html">Focus-on </a> (1)
+    </li>
+        <li>
+        <a href="categoryReviews.html">Reviews </a> (1)
+    </li>
+        <li>
+        <a href="categoryDiscussion.html">Discussion </a> (1)
+    </li>
+    </ul>
+</div>
+<div class="sidebar-content">
+    <h4>Archives</h4>
+	<ul class="archives">
+    <li>
+    	<a href="archives_monthapr_2020.html">
+        <span class="archive_date">April 2020</span>
+                <span>(1)</span>
+                </a>
+    </li>
+</ul>
+</div>
+<div class="sidebar-content">
+    <h4>Popular Tags</h4>
+    
+
+<ul class="archives">
+        <li>
+        <a href="tagdeep learning.html">deep learning </a> (11)
+    </li>
+        <li>
+        <a href="tagpytorch.html">pytorch </a> (9)
+    </li>
+        <li>
+        <a href="tagreti neurali.html">reti neurali </a> (5)
+    </li>
+        <li>
+        <a href="taggoogle.html">google </a> (4)
+    </li>
+        <li>
+        <a href="tagjit.html">jit </a> (4)
+    </li>
+        <li>
+        <a href="tagtensorflow.html">tensorflow </a> (4)
+    </li>
+        <li>
+        <a href="tagottimizzazione.html">ottimizzazione </a> (4)
+    </li>
+        <li>
+        <a href="tagrete neurale.html">rete neurale </a> (3)
+    </li>
+        <li>
+        <a href="tagtime series.html">time series </a> (3)
+    </li>
+        <li>
+        <a href="tagkeras.html">keras </a> (3)
+    </li>
+        <li>
+        <a href="tagreti convolutive.html">reti convolutive </a> (3)
+    </li>
+        <li>
+        <a href="tagpipeline.html">pipeline </a> (2)
+    </li>
+        <li>
+        <a href="tagsklearn.html">sklearn </a> (2)
+    </li>
+        <li>
+        <a href="tagautodiff.html">autodiff </a> (2)
+    </li>
+        <li>
+        <a href="tagautomatic differentation.html">automatic differentation </a> (2)
+    </li>
+        <li>
+        <a href="tagreverse-mode.html">reverse-mode </a> (2)
+    </li>
+        <li>
+        <a href="tagderivate.html">derivate </a> (2)
+    </li>
+        <li>
+        <a href="tagdifferenziazione.html">differenziazione </a> (2)
+    </li>
+        <li>
+        <a href="tagmodel selection.html">model selection </a> (2)
+    </li>
+        <li>
+        <a href="tagcross validation.html">cross validation </a> (2)
+    </li>
+        <li>
+        <a href="tagc++.html">c++ </a> (2)
+    </li>
+        <li>
+        <a href="tagnumpy.html">numpy </a> (2)
+    </li>
+        <li>
+        <a href="tagvmap.html">vmap </a> (2)
+    </li>
+        <li>
+        <a href="tagcaffe.html">caffe </a> (2)
+    </li>
+        <li>
+        <a href="tagcompiler.html">compiler </a> (2)
+    </li>
+        <li>
+        <a href="tagjax.html">jax </a> (2)
+    </li>
+        <li>
+        <a href="tagcodemotion.html">codemotion </a> (1)
+    </li>
+        <li>
+        <a href="tagbias.html">bias </a> (1)
+    </li>
+        <li>
+        <a href="tagdiscrimination.html">discrimination </a> (1)
+    </li>
+        <li>
+        <a href="tagfairness.html">fairness </a> (1)
+    </li>
+        <li>
+        <a href="tagiaml.html">iaml </a> (1)
+    </li>
+        <li>
+        <a href="tagdatabase.html">database </a> (1)
+    </li>
+        <li>
+        <a href="tagiperparametri.html">iperparametri </a> (1)
+    </li>
+        <li>
+        <a href="tagautograph.html">autograph </a> (1)
+    </li>
+        <li>
+        <a href="taghead.html">head </a> (1)
+    </li>
+        <li>
+        <a href="tagmulti-task.html">multi-task </a> (1)
+    </li>
+        <li>
+        <a href="taglearning.html">learning </a> (1)
+    </li>
+        <li>
+        <a href="tagnovità.html">novità </a> (1)
+    </li>
+        <li>
+        <a href="tagdev summit.html">dev summit </a> (1)
+    </li>
+        <li>
+        <a href="tagcustom estimator.html">custom estimator </a> (1)
+    </li>
+        <li>
+        <a href="taghyperopt.html">hyperopt </a> (1)
+    </li>
+        <li>
+        <a href="taggoodfellow.html">goodfellow </a> (1)
+    </li>
+        <li>
+        <a href="tagnlp.html">nlp </a> (1)
+    </li>
+        <li>
+        <a href="tagdati mancanti.html">dati mancanti </a> (1)
+    </li>
+        <li>
+        <a href="tagtransformer.html">transformer </a> (1)
+    </li>
+        <li>
+        <a href="tagattenzione.html">attenzione </a> (1)
+    </li>
+        <li>
+        <a href="tagrobocop.html">robocop </a> (1)
+    </li>
+        <li>
+        <a href="tagyolo.html">yolo </a> (1)
+    </li>
+        <li>
+        <a href="tagobject detection.html">object detection </a> (1)
+    </li>
+        <li>
+        <a href="tagbayes.html">bayes </a> (1)
+    </li>
+        <li>
+        <a href="tagautoencoders.html">autoencoders </a> (1)
+    </li>
+        <li>
+        <a href="tagvariational.html">variational </a> (1)
+    </li>
+        <li>
+        <a href="tageager.html">eager </a> (1)
+    </li>
+        <li>
+        <a href="tagimputazione.html">imputazione </a> (1)
+    </li>
+        <li>
+        <a href="tagCIFAR.html">CIFAR </a> (1)
+    </li>
+        <li>
+        <a href="tagword embedding.html">word embedding </a> (1)
+    </li>
+        <li>
+        <a href="tagMNIST.html">MNIST </a> (1)
+    </li>
+        <li>
+        <a href="tagimmagini.html">immagini </a> (1)
+    </li>
+        <li>
+        <a href="tagclassificazione.html">classificazione </a> (1)
+    </li>
+        <li>
+        <a href="tagkpi.html">kpi </a> (1)
+    </li>
+        <li>
+        <a href="tagreprogramming.html">reprogramming </a> (1)
+    </li>
+        <li>
+        <a href="tagadversarial.html">adversarial </a> (1)
+    </li>
+        <li>
+        <a href="tagbrowser.html">browser </a> (1)
+    </li>
+        <li>
+        <a href="tagjavascript.html">javascript </a> (1)
+    </li>
+        <li>
+        <a href="tagreti ricorsive.html">reti ricorsive </a> (1)
+    </li>
+        <li>
+        <a href="tagreti ricorrenti.html">reti ricorrenti </a> (1)
+    </li>
+        <li>
+        <a href="tagftth.html">ftth </a> (1)
+    </li>
+        <li>
+        <a href="tagadversarial example.html">adversarial example </a> (1)
+    </li>
+        <li>
+        <a href="tagmanagement.html">management </a> (1)
+    </li>
+        <li>
+        <a href="tagrobotica.html">robotica </a> (1)
+    </li>
+        <li>
+        <a href="tagocr.html">ocr </a> (1)
+    </li>
+        <li>
+        <a href="tagfocus.html">focus </a> (1)
+    </li>
+        <li>
+        <a href="tagiphone.html">iphone </a> (1)
+    </li>
+        <li>
+        <a href="tagpython.html">python </a> (1)
+    </li>
+        <li>
+        <a href="tagface id.html">face id </a> (1)
+    </li>
+        <li>
+        <a href="tagmomento.html">momento </a> (1)
+    </li>
+        <li>
+        <a href="tagadam.html">adam </a> (1)
+    </li>
+        <li>
+        <a href="tagneuroscienza.html">neuroscienza </a> (1)
+    </li>
+        <li>
+        <a href="tagonde cerebrali.html">onde cerebrali </a> (1)
+    </li>
+        <li>
+        <a href="tagtorchvision.html">torchvision </a> (1)
+    </li>
+        <li>
+        <a href="taglatin.html">latin </a> (1)
+    </li>
+        <li>
+        <a href="tagpretrained.html">pretrained </a> (1)
+    </li>
+        <li>
+        <a href="tagrete convolutiva.html">rete convolutiva </a> (1)
+    </li>
+        <li>
+        <a href="tagautograd.html">autograd </a> (1)
+    </li>
+        <li>
+        <a href="tagswish.html">swish </a> (1)
+    </li>
+        <li>
+        <a href="tagattivazione.html">attivazione </a> (1)
+    </li>
+        <li>
+        <a href="tagcheckpoint.html">checkpoint </a> (1)
+    </li>
+        <li>
+        <a href="tagtensori.html">tensori </a> (1)
+    </li>
+        <li>
+        <a href="tagvariabili.html">variabili </a> (1)
+    </li>
+        <li>
+        <a href="taglineare.html">lineare </a> (1)
+    </li>
+        <li>
+        <a href="tagregressione.html">regressione </a> (1)
+    </li>
+        <li>
+        <a href="tagconvolutional networks.html">convolutional networks </a> (1)
+    </li>
+        <li>
+        <a href="tagVatican.html">Vatican </a> (1)
+    </li>
+        <li>
+        <a href="tagproject.html">project </a> (1)
+    </li>
+        <li>
+        <a href="tagkernel.html">kernel </a> (1)
+    </li>
+        <li>
+        <a href="tagICLR.html">ICLR </a> (1)
+    </li>
+        <li>
+        <a href="tagipotesi.html">ipotesi </a> (1)
+    </li>
+        <li>
+        <a href="tagsparsità.html">sparsità </a> (1)
+    </li>
+        <li>
+        <a href="tagfunzionale.html">funzionale </a> (1)
+    </li>
+        <li>
+        <a href="tagfunctional.html">functional </a> (1)
+    </li>
+        <li>
+        <a href="tagadversarial attack.html">adversarial attack </a> (1)
+    </li>
+        <li>
+        <a href="tagkmeans.html">kmeans </a> (1)
+    </li>
+        <li>
+        <a href="taganalysis.html">analysis </a> (1)
+    </li>
+        <li>
+        <a href="tagclustering.html">clustering </a> (1)
+    </li>
+        <li>
+        <a href="tagGoogle.html">Google </a> (1)
+    </li>
+        <li>
+        <a href="tagregression.html">regression </a> (1)
+    </li>
+        <li>
+        <a href="tagJAX.html">JAX </a> (1)
+    </li>
+        <li>
+        <a href="taggaussian process.html">gaussian process </a> (1)
+    </li>
+        <li>
+        <a href="tagensemble.html">ensemble </a> (1)
+    </li>
+        <li>
+        <a href="tagboosting.html">boosting </a> (1)
+    </li>
+        <li>
+        <a href="taggradient.html">gradient </a> (1)
+    </li>
+        <li>
+        <a href="tagsemi-supervised learning.html">semi-supervised learning </a> (1)
+    </li>
+        <li>
+        <a href="tagdocument classification.html">document classification </a> (1)
+    </li>
+        <li>
+        <a href="taggraphs.html">graphs </a> (1)
+    </li>
+        <li>
+        <a href="tagvariables.html">variables </a> (1)
+    </li>
+        <li>
+        <a href="taglinear.html">linear </a> (1)
+    </li>
+        <li>
+        <a href="tagk-NN.html">k-NN </a> (1)
+    </li>
+    </ul>
+</div>
+<div class="sidebar-content syndicate">
+    <h4>Syndicate</h4>
+    <a class="button" href="../blog.atom"><i class="fa fa-rss-square"></i> Atom 1.0</a>
+    <a class="button" href="../blog.rss"><i class="fa fa-rss-square"></i> RSS</a>
+</div>
+			</div>
+		</div>
+	
+                        <div class="modular-row footer ">
+    <div class="footer-items">
+        <div class="footer-module large">
+		<h4>About</h4>
+                            <p>Italian Association for Machine Learning (C.F. 97949550582)</p>
+            			<p>Write us: info@iaml.it</p>
+        </div>
+        <div class="footer-module"><h4>Address</h4>
+            <p>
+                                    <span><strong>Operational office</strong></span>
+                                    <span>IAML c/o Pi Campus, via Indonesia 23, 00144 Rome</span>
+                                    <span><strong>Legal office</strong></span>
+                                    <span>Via Cassia 964, 00189, Rome</span>
+                            </p>
+        </div>
+        <div class="footer-module"><h4>Quick Links</h4>
+         <ul class="quickmenu">
+                            <li><i class="fa fa-chevron-right"></i><a href="../home">Home</a></li>
+                            <li><i class="fa fa-chevron-right"></i><a href="https://iaml.it/documents">Documents (Italian)</a></li>
+                    </ul>
+    </div>
+   
+</div>
+<hr>
+<div class="footer-modules">
+    <div class="footer-copyright">
+        Copyright 2018 IAML.IT. All Rights Reserved.
+    </div>
+    <div class="footer-menu">
+    <ul class="othermenu">
+           <li><a href="https://learn.getgrav.org/">Powered by Grav</a></li>
+           <li><a href="https://github.com/getgrav/grav-theme-deliver">Theme (adapted) from Deliver</a></li>
+        </ul>
+    </div>
+</div>
+</div>                    </section>
+        
+    </div>
+    <div class="sb-slidebar sb-left sb-width-thin">
+        <div id="panel">
+        
+<ul class="navigation">
+                                                        <li class="">
+                    <a href="../index.html">
+                                                Home
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../activities">
+                                                Activities
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../supporters.html">
+                                                Supporters
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../member.html">
+                                                Become a member
+                    </a>
+                </li>
+                                                                <li class="active">
+                    <a href="../blog">
+                                                Blog
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../governance.html">
+                                                Governance
+                    </a>
+                </li>
+                                                                                                                                </ul>                   </div>
+    </div>
+        <script src="../user/plugins/simplesearch/js/simplesearch.js" type="text/javascript" ></script>
+
+    <script>
+    $(function () {
+        $(document).ready(function() {
+          $.slidebars({
+            hideControlClasses: true,
+            scrollLock: true
+          });
+        });
+    });
+    </script>
+    </body>
+</html>
+
+

@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Alle prese con PyTorch - Parte 3: Implementare nuovi moduli | Italian Association for Machine Learning</title>
+    <meta content="GravCMS"  />
+<meta content="The Italian Association for Machine Learning (IAML) is a not-for-profit organization with the purpose of promoting knowledge of machine learning in all aspects of the Italian public life, from universities to enterprises and IT professionals."  />
+<meta property="og:title" content="Alle prese con PyTorch #3 (Implementare nuovi moduli) | IAML.it"  />
+<meta property="og:image" content="https://iaml.it/blog/alle-prese-con-pytorch-parte-3/images/swish1.png"  />
+<meta property="og:url" content="https://iaml.it/blog/alle-prese-con-pytorch-parte-3/"  />
+<meta property="og:description" content="Nella terza parte del tutorial su PyTorch vediamo come implementare nuovi moduli all&#039;interno della libreria con un esempio pratico: Swish, una funzione di attivazione con ottime performance introdotta da Google nel 2017."  />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="icon" type="image/png" href="/user/themes/deliver/images/favicon.png" />
+
+	<!-- Global site tag (gtag.js) - Google Ads: 774709547 --> <script async src="https://www.googletagmanager.com/gtag/js?id=AW-774709547"></script> <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'AW-774709547'); </script> 
+	
+		
+                            		                                                <link href="/user/themes/deliver/css-compiled/nucleus.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css-compiled/template.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/custom.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/toc.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/font-awesome.min.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/facebook/css/facebook.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/facebook/assets/unitegallery/css/unite-gallery.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/facebook/assets/unitegallery/themes/default/ug-theme-default.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/markdown-notices/assets/notices.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/breadcrumbs/css/breadcrumbs.css" type="text/css" rel="stylesheet" />
+<link href="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/events/assets/events.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/form/assets/form-styles.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/mathjax/assets/css/mathjax.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/simplesearch/css/simplesearch.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/highlight/css/zenburn.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/login/css/login.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/slidebars.min.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/slideme.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/socialbuttons/vendor/rrssb/css/rrssb.css" type="text/css" rel="stylesheet" />
+
+
+                                                            <script src="/system/assets/jquery/jquery-2.x.min.js" type="text/javascript" ></script>
+<script src="/user/themes/deliver/js/modernizr.custom.71422.js" type="text/javascript" ></script>
+<script src="/user/plugins/facebook/assets/unitegallery/js/unitegallery.min.js" type="text/javascript" ></script>
+<script src="/user/plugins/facebook/assets/unitegallery/themes/default/ug-theme-default.js" type="text/javascript" ></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.js" type="text/javascript" ></script>
+<script src="/user/plugins/events/assets/events.js" type="text/javascript" ></script>
+<script src="/user/plugins/mathjax/assets/js/mathjax.js" type="text/javascript" ></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript" ></script>
+<script src="/user/plugins/highlight/js/highlight.pack.js" type="text/javascript" ></script>
+<script src="/user/themes/deliver/js/deliver.js" type="text/javascript" ></script>
+<script src="/user/themes/deliver/js/slidebars.min.js" type="text/javascript" ></script>
+<script src="/user/themes/deliver/js/jquery.slideme2.js" type="text/javascript" ></script>
+<script src="/user/plugins/socialbuttons/vendor/rrssb/js/rrssb.min.js" type="text/javascript" ></script>
+
+<script>
+window.addEventListener("load", function(){
+window.cookieconsent.initialise({
+"palette": {
+    "popup": {
+        "background": "#4d4d4d",
+        "text": "#fff"
+    },
+    "button": {
+        "background": "#f1d600",
+        "text": "#000",
+        "border": "#f1d600"
+    }
+},
+"position": "bottom",
+"theme": "block",
+"content": {
+    "message": "This website uses cookies to ensure you get the best experience on our website.",
+    "dismiss": "Got it!",
+    "link": "Learn more",
+    "href": "https://cookiesandyou.com"
+}
+})});
+hljs.initHighlightingOnLoad();
+
+</script>
+
+
+</head>
+<body id="top" class="header-lite fullwidth blogstyling">
+    <div id="sb-site">
+                <header id="header">
+                <div class="logo">
+                    <h3><a href="https://iaml.it"><img src="/user/pages/images/IAML_logo_viola.png" /></a></h3>
+                                            <ul class="social-icons">
+            <li>
+            <a href="https://twitter.com/iaml_it">
+                <i class="fa fa-twitter"></i>            </a>
+        </li>
+            <li>
+            <a href="https://www.linkedin.com/company/iaml/">
+                <i class="fa fa-linkedin"></i>            </a>
+        </li>
+            <li>
+            <a href="https://www.facebook.com/machinelearningitalia/">
+                <i class="fa fa-facebook"></i>            </a>
+        </li>
+            <li>
+            <a href="blog.rss">
+                <i class="fa fa-rss"></i>            </a>
+        </li>
+    </ul>  
+                                    </div>
+                <div id="navbar">
+                                                            
+<ul class="navigation">
+                                                        <li class="">
+                    <a href="/">
+                                                Home
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/activities">
+                                                Activities
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/supporters">
+                                                Supporters
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/member">
+                                                Become a member
+                    </a>
+                </li>
+                                                                <li class="active">
+                    <a href="/blog">
+                                                Blog
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/governance">
+                                                Governance
+                    </a>
+                </li>
+                                                                                                                                </ul>                                                   <form class="search-box">
+    <input type="search" placeholder="Search..." value="" data-search-input="/search/query" />
+    <script>
+    jQuery(document).ready(function($){
+        var input = $('[data-search-input]');
+
+        input.on('keypress', function(event) {
+            if (event.which == 13 && input.val().length > 3) {
+                event.preventDefault();
+                window.location.href = input.data('search-input') + ':' + input.val();
+            }
+        });
+    });
+    </script>
+    <i class="fa fa-search"></i>
+</form>                    <span class="panel-activation sb-toggle-left navbar-left menu-btn fa fa-bars"></span>
+                </div>
+        </header>
+        
+        
+                <section id="body" class="">
+                            
+				<div class="flush-top blog-header blog-header-image" style="background: #B4B093 url(/user/pages/05.blog/blue_header.jpg) no-repeat right;">
+            <h1>Alle prese con PyTorch - Parte 3: Implementare nuovi moduli</h1>
+        </div>
+            
+        
+<div id="breadcrumbs" itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
+                                            <a href="/" itemprop="url"><span itemprop="title">Home</span></a>
+                        <i class="fa fa-angle-right"></i>
+                                                <a href="/blog" itemprop="url"><span itemprop="title">Blog</span></a>
+                        <i class="fa fa-angle-right"></i>
+                                                <span itemprop="title">Alle prese con PyTorch - Parte 3: Implementare nuovi moduli</span>
+                        </div>
+		
+		<div class="blog-content-item g-grid pure-g-r">
+			<div id="item" class="g-block pure-u-2-3">
+			    <div class="list-item">
+
+    <div class="list-blog-header">
+                    <img src="/images/7/4/e/4/8/74e48e871c4eda7bf469cc2f0f836df5e2588fd5-c2ujkgbviaaylf6.jpeg" />
+        
+                    <h4><a href="/blog/alle-prese-con-pytorch-parte-3">Alle prese con PyTorch - Parte 3: Implementare nuovi moduli</a></h4>
+        
+        <span class="list-blog-date">
+            <i class="fa fa-calendar"></i>
+            01, May
+        </span>
+                <span class="list-blog-author">
+            <i class="fa fa-user"></i>
+            Simone Scardapane
+        </span>
+                       <ul class="tags">
+            <i class="fa fa-tag"></i>
+                        <li><a href="/blog/tag:pytorch">pytorch</a></li>
+                        <li><a href="/blog/tag:rete neurale">rete neurale</a></li>
+                        <li><a href="/blog/tag:attivazione">attivazione</a></li>
+                        <li><a href="/blog/tag:swish">swish</a></li>
+                        <li><a href="/blog/tag:autograd">autograd</a></li>
+                    </ul>
+        
+    </div>
+
+	<div>
+	<br />
+	<!-- AddToAny BEGIN -->
+<div class="a2a_kit a2a_kit_size_32 a2a_default_style">
+<a class="a2a_dd" href="https://www.addtoany.com/share"></a>
+<a class="a2a_button_facebook"></a>
+<a class="a2a_button_twitter"></a>
+<a class="a2a_button_linkedin"></a>
+<a class="a2a_button_google_plus"></a>
+<a class="a2a_button_email"></a>
+</div>
+<script async src="https://static.addtoany.com/menu/page.js"></script>
+<!-- AddToAny END -->
+</div>
+	
+    <div class="list-blog-padding">
+
+            <p><p><a href="http://pytorch.org/">PyTorch</a> è un framework di deep learning, sviluppato principalmente dal <em>Facebook AI Research</em> (FAIR) group, che ha guadagnato una enorme popolarità fra gli sviluppatori grazie alla combinazione di semplicità ed efficienza. Questi tutorial sono dedicati ad esplorare la libreria, partendo dai concetti più semplici fino alla definizione di modelli estremamente sofisticati. </p>
+<p>In questa terza parte vediamo come implementare nuovi moduli all'interno della libreria con un esempio pratico: Swish, una funzione di attivazione con ottime performance introdotta da Google l'anno scorso.</p>
+<div class="notices blue">
+<h3>Leggi tutti gli articoli della serie:</h3>
+<ul>
+<li><a href="https://iaml.it/blog/alle-prese-con-pytorch-parte-1">Alle prese con PyTorch - Parte 1: Tensori e Gradienti</a></li>
+<li><a href="https://iaml.it/blog/alle-prese-con-pytorch-parte-2">Alle prese con PyTorch - Parte 2: Reti Neurali ed Ottimizzatori</a></li>
+<li>Alle prese con PyTorch - Parte 3: Implementare Nuovi Moduli (questo)</li>
+<li><a href="https://iaml.it/blog/alle-prese-con-pytorch-parte-4">Alle prese con PyTorch - Parte 4: Torchvision e Reti Convolutive</a></li>
+<li><a href="https://iaml.it/blog/alle-prese-con-pytorch-parte-5">Alle prese con PyTorch - Parte 5: JIT Compiler</a></li>
+</ul>
+</div>
+<div class="notices yellow">
+<p>Questi tutorial sono anche disponibili (parzialmente) in lingua inglese: <a href="https://iaml.it/blog/fun-with-pytorch-part-1/">Fun With PyTorch</a>.</p>
+</div>
+<p></p>
+<h2>Contenuto di questo tutorial</h2>
+<p>Finora abbiamo visto come usare gli strumenti ed i modelli già pronti di PyTorch per creare reti neurali ed ottimizzarle sui nostri problemi. Il deep learning, però, <strong>si evolve di giorno in giorno</strong>: in continuazione vengono proposte nuove idee o varianti di idee note. Per essere in grado di sperimentarle, è utile capire anche come implementare <strong>nuovi</strong> moduli all'interno di PyTorch.</p>
+<p>Per rimanere sul pratico, useremo come caso d'uso <strong>Swish</strong>, una funzione di attivazione proposta <a href="https://arxiv.org/abs/1710.05941">in un articolo ad Ottobre 2017</a> in alternativa alle più classiche ReLU o tangenti iperboliche, che sembra in grado di ottenere miglioramenti significativi in numerosi problemi.</p>
+<div class="notices yellow">
+<p>Curiosità: Swish non è stata progettata 'a mano', ma è il risultato di una ricerca automatica nello spazio di <em>tutte</em> le possibili funzioni di attivazione, tramite un meccanismo di reinforcement learning, per cercare di trovare la 'migliore' funzione di attivazione esistente (più dettagli, ovviamente, nell'articolo originario: Ramachandran et al., <a href="https://arxiv.org/abs/1710.05941">Searching for Activation Functions</a>, arXiv:1710.05941, 2017).</p>
+</div>
+<p>Matematicamente, Swish è definita nel seguente modo:</p>
+<p class="mathjax mathjax--block">$$
+h(s) = s \cdot \sigma(\beta s) \,,$$</p>
+<p>dove <span class="mathjax mathjax--inline">$s$</span> è l'input della funzione di attivazione, <span class="mathjax mathjax--inline">$\sigma(\cdot)$</span> è la classica funzione sigmoide, e <span class="mathjax mathjax--inline">$\beta$</span> è un valore costante o appreso a livello del singolo neurone.</p>
+<p>Avremo modo di commentare ampiamente le caratteristiche di Swish durante la nostra implementazione. Per rendere tutto il più chiaro possibile, procederemo in tre fasi (più una sezione 'bonus'), costruendo versioni via via più sofisticate della funzione stessa.</p>
+<h2>Parte 1 di 3: Swish senza parametri</h2>
+<p>Partiamo dal caso più semplice, con <span class="mathjax mathjax--inline">$\beta$</span> fisso ad 1, che nell'articolo viene chiamata Swish-1 (ed era stata <a href="https://arxiv.org/abs/1702.03118">proposta in precedenza</a> sotto il nome di sigmoid-weighted linear unit). </p>
+<p>Ricordate dalla seconda parte del tutorial che tutti i componenti di una rete neurale, in PyTorch, sono implementati come estensioni di <code>torch.nn.Module</code>, per permettere di riutilizzarli all'interno di modelli sempre più complessi. In questo senso, implementare Swish-1 è molto simile a quanto visto in precedenza:</p>
+<pre><code class="language-py">import torch
+class Swish1(torch.nn.Module):
+    def forward(self, input):
+        return input * torch.sigmoid(input)</code></pre>
+<p>Non c'è bisogno di inizializzare nulla in questo caso, non avendo nessun parametro da selezionare. Questa versione è già funzionale: ad esempio, possiamo reimplementare il modello <a href="https://iaml.it/blog/alle-prese-con-pytorch-parte-2">che avevamo usato su Iris</a>, sostituendo la ReLU con la nostra nuova funzione:</p>
+<pre><code class="language-py">net_sequential = nn.Sequential(
+        nn.Linear(4, 10),
+        Swish1(),
+        nn.Linear(10, 3)
+)</code></pre>
+<p>Possiamo anche divertirci a graficare la funzione:</p>
+<pre><code class="language-py"># Valori sull'asse x
+x = np.linspace(-5.0, 5.0, 1000).reshape(-1, 1)
+
+# Calcola Swish-1 su tutti i valori
+swish1 = Swish1()
+y = swish1(torch.from_numpy(x))
+
+# Grafica il risultato
+plt.plot(x, y.numpy())</code></pre>
+<figure role="group">
+        <img src="https://iaml.it/blog/alle-prese-con-pytorch-parte-3/images/swish1.png"alt="Swish-1" />
+        </figure>
+<p>Notiamo che questa versione della funzione è molto simile alla ReLU, con la differenza importante che Swish-1 ha un comportamento non-monotono: per attivazioni negative diminuisce prima di risalire verso 0. Il motivo del perché questo migliori le performance non è chiarissimo <a href="https://arxiv.org/abs/1710.05941">nemmeno agli autori dell'articolo</a>!</p>
+<p>Possiamo anche usare gli strumenti di differenziazione automatica per graficare la derivata della funzione:</p>
+<pre><code class="language-py">x = torch.linspace(-5.0, 5.0, 1000, requires_grad=True)
+
+# Ci sono modi più efficienti! :-)
+g = [torch.autograd.grad(swish1(xi), xi) for xi in x]
+
+plt.plot(x.detach().numpy(), g)</code></pre>
+<figure role="group">
+        <img src="https://iaml.it/blog/alle-prese-con-pytorch-parte-3/images/gradient_swish1.png"alt="Swish-1 (Gradiente)" />
+        </figure>
+<p>Fatto tutto questo, passiamo a qualcosa di più interessante.</p>
+<h2>Parte 2 di 3: Swish con parametro costante</h2>
+<p>Per la seconda parte dell'implementazione, introduciamo il parametro <span class="mathjax mathjax--inline">$\beta$</span> ma lo lasciamo a scelta dell'utente e non adattabile. Saremmo tentati (seguendo quanto visto prima) di implementare il tutto così:</p>
+<pre><code class="language-py">class ConstantBetaSwish(nn.Module):
+    # QUESTA IMPLEMENTAZIONE E' ERRATA
+
+    def __init__(self, beta=2.0):
+        super(ConstantBetaSwish, self).__init__()
+        self.beta = torch.tensor(beta)
+
+    def forward(self, input):
+        return input * torch.sigmoid(input * self.beta)</code></pre>
+<p>L'unica differenza è la costante <span class="mathjax mathjax--inline">$\beta$</span>, passata come parametro di inizializzazione. Anche se tutto sembra corretto, questa implementazione ha un bug, che spunta fuori se proviamo ad ottenere lo stato di questo modulo (ad esempio per fare <a href="https://iaml.it/blog/alle-prese-con-pytorch-parte-2">checkpointing</a>:</p>
+<pre><code class="language-py">swish2.state_dict() # Vuoto!</code></pre>
+<p>Per fare in modo che <span class="mathjax mathjax--inline">$\beta$</span> venga considerato parte integrante dello stato del modulo, è necessario 'registrarlo' in fase di inizializzazione con un metodo apposito, <code>register_buffer</code>:</p>
+<pre><code class="language-py">class ConstantBetaSwish(nn.Module):
+
+    def __init__(self, beta=2.0):
+        super(ConstantBetaSwish, self).__init__()
+        self.register_buffer('beta', torch.tensor(beta, dtype=torch.float32))
+
+    def forward(self, input):
+        return input * torch.sigmoid(input * Variable(self.beta))
+
+    def extra_repr(self):
+        return 'beta={}'.format(self.beta)</code></pre>
+<p>Ne abbiamo anche approfittato per aggiungere un nuovo metodo, <code>extra_repr</code>, che permette di stampare a schermo informazioni utili sul modulo, ad esempio:</p>
+<pre><code class="language-py">net = nn.Sequential(
+        nn.Linear(4, 5),
+        ConstantBetaSwish(),
+        nn.Linear(5, 2)
+)
+print(net)
+# Sequential(
+#  (0): Linear(in_features=4, out_features=5, bias=True)
+#  (1): ConstantBetaSwish(beta=2.0)
+#  (2): Linear(in_features=5, out_features=2, bias=True)
+# )</code></pre>
+<p>Possiamo usare questa versione anche per vedere come si comporta Swish al variare di <span class="mathjax mathjax--inline">$\beta$</span>:</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/alle-prese-con-pytorch-parte-3/images/beta_swish.png"alt="Swish con beta costante" />
+        </figure>
+<p>Al variare di <span class="mathjax mathjax--inline">$\beta$</span> la funzione assume numerose forme interessanti, passando dall'essere una funzione quasi lineare con <span class="mathjax mathjax--inline">$\beta$</span> molto piccolo, fino alla classica ReLU per <span class="mathjax mathjax--inline">$\beta$</span> molto alto. Sarebbe interessante poter usare <em>tutte</em> queste varianti all'interno dei nostri modelli - o ancora meglio, lasciare che sia l'ottimizzazione stessa a decidere quale usare.</p>
+<p>Siete interessati? Proseguiamo!</p>
+<h2>Parte 3 di 3: Swish con parametro adattabile</h2>
+<p>Far sì che l'ottimizzazione selezioni un <span class="mathjax mathjax--inline">$\beta$</span> ottimale per ciascun neurone è abbastanza facile: basta dire a PyTorch che quei valori sono <em>parametri</em> del modello stesso, e verranno inclusi automaticamente nella fase di ottimizzazione. Niente di più facile:</p>
+<pre><code class="language-py">class BetaSwish(nn.Module):
+    def __init__(self, num_parameters=1):
+        super(BetaSwish, self).__init__()
+
+        self.num_parameters = num_parameters
+        self.beta = torch.nn.Parameter(torch.ones(1, num_parameters))
+
+    def forward(self, input):
+        return input * torch.sigmoid(input * self.beta)</code></pre>
+<p>Qualche commento sul codice:</p>
+<ol>
+<li>A differenza di prima, dobbiamo specificare quanti neuroni compongono questo strato (<code>num_parameters</code>): questo perché dobbiamo inizializzare un parametro per ogni neurone.</li>
+<li>I parametri sono inseriti in un oggetto <code>torch.nn.Parameter</code>. Se ricordate la spiegazione nel tutorial precedente, <code>Parameter</code> è un wrapper di un tensore che identifica quali tensori in un modello devono essere allenati.</li>
+<li>Il significato di <code>input * self.beta</code> è leggermente diverso da prima: grazie al broadcasting, stiamo ora moltiplicando ogni colonna di <code>input</code> per un <span class="mathjax mathjax--inline">$\beta$</span> diverso.</li>
+</ol>
+<p>Vediamo un esempio di modello costruito con la nuova funzione:</p>
+<pre><code class="language-py">net = nn.Sequential(
+        nn.Linear(4, 10),
+        BetaSwish(10),
+        nn.Linear(10, 3)
+)</code></pre>
+<p>Se lo eseguiamo sull'esempio dello scorso tutorial (Iris), l'errore scende rapidamente a zero anche in questo caso:</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/alle-prese-con-pytorch-parte-3/images/iris_loss_function.png"alt="Evoluzione funzione costo (Iris)" />
+        </figure>
+<p>Ma la cosa interessante è vedere i valori risultanti di <span class="mathjax mathjax--inline">$\beta$</span>:</p>
+<pre><code class="language-py">net[1].beta.detach().numpy()
+# array([[0.44259977, 0.9548798 , 0.19685858, 1.0720267 , 3.1051192 ,
+#        0.09515426, 1.9494272 , 1.4172938 , 1.4043328 , 0.06701402]],
+#      dtype=float32)</code></pre>
+<p>L'archittetura ottimale per questo problema, nonostante la sua semplicità, richiede un misto di funzioni di attivazione nello strato nascosto!</p>
+<h2>Bonus: implementare gradienti personalizzati</h2>
+<p>Fino a questo punto abbiamo usato solo combinazioni di funzioni predefinite di PyTorch. Nonostante questo copra buona parte di quanto è necessario in pratica, a volte siamo costretti (per diverse ragioni) ad usare funzioni esterne o definite da noi. Purtroppo, questo "rompe" il meccanismo di differenziazione automatica di PyTorch, che non può tracciare quello che avviene all'interno di queste funzioni: in questo caso, è necessario definire noi il gradiente del nuovo modulo.</p>
+<p>Questo ci porta ad un livello più basso dei meccanismi di PyTorch, le <code>Function</code>. Le <code>Function</code> sono gli atomi indivisibili di PyTorch, che definiscono le operazioni elementari che è possibile eseguire (es., la somma di due tensori) ed i loro rispettivi gradienti. Ogni grafo che abbiamo definito finora è costituito, alla sua base, solo di tensori e funzioni.</p>
+<p>Come esempio, supponiamo di voler reimplementare Swish-1, questa volta usando però la sigmoide definita nella libreria di scipy:</p>
+<pre><code class="language-py">from scipy.special import expit</code></pre>
+<p>Vediamo l'implementazione in questo caso:</p>
+<pre><code class="language-py">class SwishFunction(torch.autograd.Function):
+
+    @staticmethod
+    def forward(ctx, input):
+        # Calcola la sigmoide (uscendo da autograd)
+        input_sigmoid = torch.from_numpy(expit(input.detach().numpy()))
+        # Salva tutto quello che serve per la back-propagation
+        ctx.save_for_backward(input, input_sigmoid)
+        return input * input_sigmoid
+
+    @staticmethod
+    def backward(ctx, grad_output):
+        # Recupera i tensori salvati
+        input,input_sigmoid, = ctx.saved_tensors
+        # Calcola il gradiente
+        grad_af = input_sigmoid + input * input_sigmoid * (1 - input_sigmoid)
+        return grad_output * grad_af</code></pre>
+<p>Commentiamo le varie istruzioni del codice:</p>
+<ol>
+<li>
+<p>Prima di tutto, com'è ovvio, ereditiamo da <code>Function</code> e non da <code>Module</code>. Una funzione richiede la definizione della sua forward pass (<code>forward</code>), e la rispettiva backward pass per la back-propagation (<code>backward()</code>). Si noti come entrambi siano metodi statici e non più metodi dinamici dell'oggetto.</p>
+</li>
+<li>
+<p>Per calcolare <span class="mathjax mathjax--inline">$\sigma(s)$</span>, questa volta eseguiamo <code>torch.from_numpy(expit(input.detach().numpy()))</code>: questo richiede di staccarci dal meccanismo di auto-differenziazione (con <code>detach()</code>) per invocare una funzione su array di NumPy.</p>
+</li>
+<li>
+<p>Poiché <code>forward</code> e <code>backward</code> sono metodi statici, è necessario un meccanismo per salvare tutti i valori utili per la back-propagation: questo è fornito da <code>ctx.save_for_backward</code> nella fase forward, e <code>ctx.saved_tensors</code> (per recuperarli) nella fase backward. In questo caso salviamo l'input passato alla funzione (necessario), ed anche il valore di <span class="mathjax mathjax--inline">$\sigma(s)$</span>, che risparmia un po' di conti nella fase backward.</p>
+</li>
+<li>
+<p>La penultima riga di <code>backward</code> calcola il gradiente di Swish, che si ottiene facilmente derivando per parti: <span class="mathjax mathjax--inline">$\frac{d \text{Swish-1}(s)}{d s} = \sigma(s) + s \cdot \sigma'(s)$</span>.</p>
+</li>
+<li>
+<p>Come detto prima, i gradienti vengono sempre calcolati all'interno di un meccanismo di back-propagation: <code>grad_output</code> è un tensore che mantiene i gradienti calcolati fino a quel punto da autograd. Poiché le funzioni di attivazione operano sui singoli elementi, il gradiente complessivo è dato dal gradiente di Swish-1 moltiplicato per <code>grad_output</code>.</p>
+</li>
+<li>La fase backward in questo caso ritorna un solo tensore in output, ovvero il gradiente rispetto a <code>input</code>: nel caso la funzione avesse più input, sarebbe necessario ritornare il gradiente rispetto a ciascuno di essi.</li>
+</ol>
+<div class="notices blue">
+<p>Possiamo anche aggiungere dei controlli per verificare che sia effettivamente necessario calcolare i gradienti: si veda <a href="http://pytorch.org/docs/master/notes/extending.html">http://pytorch.org/docs/master/notes/extending.html</a>.</p>
+</div>
+<p>Per verificare che i gradienti siano implementati correttamente, PyTorch mette a disposizione un test alle differenze finite, che verifica numericamente che i valori risultanti siano corretti:</p>
+<pre><code class="language-py">from torch.autograd import gradcheck
+input = (torch.randn(20, 20, requires_grad=True),)
+test = gradcheck(SwishFunction.apply, input, eps=1e-2, atol=1e-2)
+print(test)
+# True</code></pre>
+<p>A questo punto non rimane altro che ridefinire il nostro modulo, questa volta sfruttando la nostra nuova funzione:</p>
+<pre><code class="language-py">swish = SwishFunction.apply
+
+class Swish(nn.Module):
+    def forward(self, input):
+        return swish(input)</code></pre>
+<p>Ed anche per questa volta è tutto! Nella prossima parte del tutorial, è tempo di passare alle reti convolutive ed agli strumenti per lavorare sulle immagini: <a href="https://iaml.it/blog/alle-prese-con-pytorch-parte-4">Alle prese con PyTorch - Parte 4: Torchvision e Reti Convolutive</a>.</p>
+<div class="notices blue">
+<h3>Leggi tutti gli articoli della serie:</h3>
+<ul>
+<li><a href="https://iaml.it/blog/alle-prese-con-pytorch-parte-1">Alle prese con PyTorch - Parte 1: Tensori e Gradienti</a></li>
+<li><a href="https://iaml.it/blog/alle-prese-con-pytorch-parte-2">Alle prese con PyTorch - Parte 2: Reti Neurali ed Ottimizzatori</a></li>
+<li>Alle prese con PyTorch - Parte 3: Implementare Nuovi Moduli (questo)</li>
+<li><a href="https://iaml.it/blog/alle-prese-con-pytorch-parte-4">Alle prese con PyTorch - Parte 4: Torchvision e Reti Convolutive</a></li>
+<li><a href="https://iaml.it/blog/alle-prese-con-pytorch-parte-5">Alle prese con PyTorch - Parte 5: JIT Compiler</a></li>
+</ul>
+</div>
+<hr />
+<p>Se questo articolo ti è piaciuto e vuoi tenerti aggiornato sulle nostre attività, ricordati che l'<a href="/member">iscrizione all'Italian Association for Machine Learning</a> è gratuita! Puoi seguirci anche su <a href="https://www.facebook.com/machinelearningitalia/">Facebook</a> e su <a href="https://www.linkedin.com/company/18312943/">LinkedIn</a>.</p></p>
+            
+    
+        <p class="prev-next">
+                            <a class="button" href="/blog/multitask-learning-tensorflow"><i class="fa fa-chevron-left"></i> Previous Post</a>
+            
+                            <a class="button" href="/blog/dalle-onde-cerebrali-alla-robotica">Next Post <i class="fa fa-chevron-right"></i></a>
+                    </p>
+    
+    </div>
+</div>
+			</div>
+			<div id="sidebar" class="g-block size-1-3 pure-u-1-3">
+				<div class="sidebar-content">
+    <h4>Search the blog</h4>
+    <input type="text" placeholder="Search..." value="" data-searchsidebar-input="/search/query" />
+<script>
+jQuery(document).ready(function($){
+    var input = $('[data-searchsidebar-input]');
+
+    input.on('keypress', function(event) {
+        if (event.which == 13 && input.val().length > 3) {
+            event.preventDefault();
+            window.location.href = input.data('searchsidebar-input') + ':' + input.val();
+        }
+    });
+});
+</script>
+</div>
+<!--
+<div class="sidebar-content">
+	<h4>Some Text Widget</h4>
+	<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna.</p>
+</div>
+!-->
+<div class="sidebar-content">
+    <h4>Categories</h4>
+    
+
+<ul class="archives">
+        <li>
+        <a href="/blog/category:Tutorials">Tutorials </a> (16)
+    </li>
+        <li>
+        <a href="/blog/category:Discussions">Discussions </a> (12)
+    </li>
+        <li>
+        <a href="/blog/category:Announcements">Announcements </a> (4)
+    </li>
+        <li>
+        <a href="/blog/category:Tutorials%20%28English%29">Tutorials (English) </a> (4)
+    </li>
+        <li>
+        <a href="/blog/category:Articles%27%20summaries">Articles' summaries </a> (3)
+    </li>
+        <li>
+        <a href="/blog/category:Discussions%20%28English%29">Discussions (English) </a> (2)
+    </li>
+        <li>
+        <a href="/blog/category:Focus-on">Focus-on </a> (1)
+    </li>
+        <li>
+        <a href="/blog/category:Reviews">Reviews </a> (1)
+    </li>
+        <li>
+        <a href="/blog/category:Discussion">Discussion </a> (1)
+    </li>
+    </ul>
+</div>
+<div class="sidebar-content">
+    <h4>Archives</h4>
+	<ul class="archives">
+    <li>
+    	<a href="/blog/archives_month:apr_2020">
+        <span class="archive_date">April 2020</span>
+                <span>(1)</span>
+                </a>
+    </li>
+</ul>
+</div>
+<div class="sidebar-content">
+    <h4>Popular Tags</h4>
+    
+
+<ul class="archives">
+        <li>
+        <a href="/blog/tag:deep%20learning">deep learning </a> (11)
+    </li>
+        <li>
+        <a href="/blog/tag:pytorch">pytorch </a> (9)
+    </li>
+        <li>
+        <a href="/blog/tag:reti%20neurali">reti neurali </a> (5)
+    </li>
+        <li>
+        <a href="/blog/tag:google">google </a> (4)
+    </li>
+        <li>
+        <a href="/blog/tag:jit">jit </a> (4)
+    </li>
+        <li>
+        <a href="/blog/tag:tensorflow">tensorflow </a> (4)
+    </li>
+        <li>
+        <a href="/blog/tag:ottimizzazione">ottimizzazione </a> (4)
+    </li>
+        <li>
+        <a href="/blog/tag:rete%20neurale">rete neurale </a> (3)
+    </li>
+        <li>
+        <a href="/blog/tag:time%20series">time series </a> (3)
+    </li>
+        <li>
+        <a href="/blog/tag:keras">keras </a> (3)
+    </li>
+        <li>
+        <a href="/blog/tag:reti%20convolutive">reti convolutive </a> (3)
+    </li>
+        <li>
+        <a href="/blog/tag:pipeline">pipeline </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:sklearn">sklearn </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:autodiff">autodiff </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:automatic%20differentation">automatic differentation </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:reverse-mode">reverse-mode </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:derivate">derivate </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:differenziazione">differenziazione </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:model%20selection">model selection </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:cross%20validation">cross validation </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:c%2B%2B">c++ </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:numpy">numpy </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:vmap">vmap </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:caffe">caffe </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:compiler">compiler </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:jax">jax </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:codemotion">codemotion </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:bias">bias </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:discrimination">discrimination </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:fairness">fairness </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:iaml">iaml </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:database">database </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:iperparametri">iperparametri </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:autograph">autograph </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:head">head </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:multi-task">multi-task </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:learning">learning </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:novit%C3%A0">novità </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:dev%20summit">dev summit </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:custom%20estimator">custom estimator </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:hyperopt">hyperopt </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:goodfellow">goodfellow </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:nlp">nlp </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:dati%20mancanti">dati mancanti </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:transformer">transformer </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:attenzione">attenzione </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:robocop">robocop </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:yolo">yolo </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:object%20detection">object detection </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:bayes">bayes </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:autoencoders">autoencoders </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:variational">variational </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:eager">eager </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:imputazione">imputazione </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:CIFAR">CIFAR </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:word%20embedding">word embedding </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:MNIST">MNIST </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:immagini">immagini </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:classificazione">classificazione </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:kpi">kpi </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:reprogramming">reprogramming </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:adversarial">adversarial </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:browser">browser </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:javascript">javascript </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:reti%20ricorsive">reti ricorsive </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:reti%20ricorrenti">reti ricorrenti </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:ftth">ftth </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:adversarial%20example">adversarial example </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:management">management </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:robotica">robotica </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:ocr">ocr </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:focus">focus </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:iphone">iphone </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:python">python </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:face%20id">face id </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:momento">momento </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:adam">adam </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:neuroscienza">neuroscienza </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:onde%20cerebrali">onde cerebrali </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:torchvision">torchvision </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:latin">latin </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:pretrained">pretrained </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:rete%20convolutiva">rete convolutiva </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:autograd">autograd </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:swish">swish </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:attivazione">attivazione </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:checkpoint">checkpoint </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:tensori">tensori </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:variabili">variabili </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:lineare">lineare </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:regressione">regressione </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:convolutional%20networks">convolutional networks </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:Vatican">Vatican </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:project">project </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:kernel">kernel </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:ICLR">ICLR </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:ipotesi">ipotesi </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:sparsit%C3%A0">sparsità </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:funzionale">funzionale </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:functional">functional </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:adversarial%20attack">adversarial attack </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:kmeans">kmeans </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:analysis">analysis </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:clustering">clustering </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:Google">Google </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:regression">regression </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:JAX">JAX </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:gaussian%20process">gaussian process </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:ensemble">ensemble </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:boosting">boosting </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:gradient">gradient </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:semi-supervised%20learning">semi-supervised learning </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:document%20classification">document classification </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:graphs">graphs </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:variables">variables </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:linear">linear </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:k-NN">k-NN </a> (1)
+    </li>
+    </ul>
+</div>
+<div class="sidebar-content syndicate">
+    <h4>Syndicate</h4>
+    <a class="button" href="/blog.atom"><i class="fa fa-rss-square"></i> Atom 1.0</a>
+    <a class="button" href="/blog.rss"><i class="fa fa-rss-square"></i> RSS</a>
+</div>
+			</div>
+		</div>
+	
+                        <div class="modular-row footer ">
+    <div class="footer-items">
+        <div class="footer-module large">
+		<h4>About</h4>
+                            <p>Italian Association for Machine Learning (C.F. 97949550582)</p>
+            			<p>Write us: info@iaml.it</p>
+        </div>
+        <div class="footer-module"><h4>Address</h4>
+            <p>
+                                    <span><strong>Operational office</strong></span>
+                                    <span>IAML c/o Pi Campus, via Indonesia 23, 00144 Rome</span>
+                                    <span><strong>Legal office</strong></span>
+                                    <span>Via Cassia 964, 00189, Rome</span>
+                            </p>
+        </div>
+        <div class="footer-module"><h4>Quick Links</h4>
+         <ul class="quickmenu">
+                            <li><i class="fa fa-chevron-right"></i><a href="https://iaml.it/home">Home</a></li>
+                            <li><i class="fa fa-chevron-right"></i><a href="https://iaml.it/documents">Documents (Italian)</a></li>
+                    </ul>
+    </div>
+   
+</div>
+<hr>
+<div class="footer-modules">
+    <div class="footer-copyright">
+        Copyright 2018 IAML.IT. All Rights Reserved.
+    </div>
+    <div class="footer-menu">
+    <ul class="othermenu">
+           <li><a href="https://learn.getgrav.org/">Powered by Grav</a></li>
+           <li><a href="https://github.com/getgrav/grav-theme-deliver">Theme (adapted) from Deliver</a></li>
+        </ul>
+    </div>
+</div>
+</div>                    </section>
+        
+    </div>
+    <div class="sb-slidebar sb-left sb-width-thin">
+        <div id="panel">
+        
+<ul class="navigation">
+                                                        <li class="">
+                    <a href="/">
+                                                Home
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/activities">
+                                                Activities
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/supporters">
+                                                Supporters
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/member">
+                                                Become a member
+                    </a>
+                </li>
+                                                                <li class="active">
+                    <a href="/blog">
+                                                Blog
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/governance">
+                                                Governance
+                    </a>
+                </li>
+                                                                                                                                </ul>                   </div>
+    </div>
+        <script src="/user/plugins/simplesearch/js/simplesearch.js" type="text/javascript" ></script>
+
+    <script>
+    $(function () {
+        $(document).ready(function() {
+          $.slidebars({
+            hideControlClasses: true,
+            scrollLock: true
+          });
+        });
+    });
+    </script>
+    </body>
+</html>

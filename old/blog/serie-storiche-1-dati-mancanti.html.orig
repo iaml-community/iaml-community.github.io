@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Trattare i valori mancanti nelle serie storiche | Italian Association for Machine Learning</title>
+    <meta content="GravCMS"  />
+<meta content="The Italian Association for Machine Learning (IAML) is a not-for-profit organization with the purpose of promoting knowledge of machine learning in all aspects of the Italian public life, from universities to enterprises and IT professionals."  />
+<meta property="og:title" content="Trattare i valori mancanti nelle serie storiche | IAML.it"  />
+<meta property="og:image" content="https://iaml.it/blog/serie-storiche-1-dati-mancanti/image1.png"  />
+<meta property="og:url" content="https://iaml.it/blog/serie-storiche-1-dati-mancanti/"  />
+<meta property="og:description" content="In questo articolo vedremo come trattare dati mancanti in un progetto di time series analysis. Tutto il codice è liberamente disponibile su un notebook Google Colab."  />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="icon" type="image/png" href="/user/themes/deliver/images/favicon.png" />
+
+	<!-- Global site tag (gtag.js) - Google Ads: 774709547 --> <script async src="https://www.googletagmanager.com/gtag/js?id=AW-774709547"></script> <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'AW-774709547'); </script> 
+	
+		
+                            		                                                <link href="/user/themes/deliver/css-compiled/nucleus.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css-compiled/template.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/custom.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/toc.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/font-awesome.min.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/facebook/css/facebook.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/facebook/assets/unitegallery/css/unite-gallery.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/facebook/assets/unitegallery/themes/default/ug-theme-default.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/markdown-notices/assets/notices.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/breadcrumbs/css/breadcrumbs.css" type="text/css" rel="stylesheet" />
+<link href="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/events/assets/events.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/form/assets/form-styles.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/mathjax/assets/css/mathjax.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/simplesearch/css/simplesearch.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/highlight/css/zenburn.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/login/css/login.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/slidebars.min.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/slideme.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/socialbuttons/vendor/rrssb/css/rrssb.css" type="text/css" rel="stylesheet" />
+
+
+                                                            <script src="/system/assets/jquery/jquery-2.x.min.js" type="text/javascript" ></script>
+<script src="/user/themes/deliver/js/modernizr.custom.71422.js" type="text/javascript" ></script>
+<script src="/user/plugins/facebook/assets/unitegallery/js/unitegallery.min.js" type="text/javascript" ></script>
+<script src="/user/plugins/facebook/assets/unitegallery/themes/default/ug-theme-default.js" type="text/javascript" ></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.js" type="text/javascript" ></script>
+<script src="/user/plugins/events/assets/events.js" type="text/javascript" ></script>
+<script src="/user/plugins/mathjax/assets/js/mathjax.js" type="text/javascript" ></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript" ></script>
+<script src="/user/plugins/highlight/js/highlight.pack.js" type="text/javascript" ></script>
+<script src="/user/themes/deliver/js/deliver.js" type="text/javascript" ></script>
+<script src="/user/themes/deliver/js/slidebars.min.js" type="text/javascript" ></script>
+<script src="/user/themes/deliver/js/jquery.slideme2.js" type="text/javascript" ></script>
+<script src="/user/plugins/socialbuttons/vendor/rrssb/js/rrssb.min.js" type="text/javascript" ></script>
+
+<script>
+window.addEventListener("load", function(){
+window.cookieconsent.initialise({
+"palette": {
+    "popup": {
+        "background": "#4d4d4d",
+        "text": "#fff"
+    },
+    "button": {
+        "background": "#f1d600",
+        "text": "#000",
+        "border": "#f1d600"
+    }
+},
+"position": "bottom",
+"theme": "block",
+"content": {
+    "message": "This website uses cookies to ensure you get the best experience on our website.",
+    "dismiss": "Got it!",
+    "link": "Learn more",
+    "href": "https://cookiesandyou.com"
+}
+})});
+hljs.initHighlightingOnLoad();
+
+</script>
+
+
+</head>
+<body id="top" class="header-lite fullwidth blogstyling">
+    <div id="sb-site">
+                <header id="header">
+                <div class="logo">
+                    <h3><a href="https://iaml.it"><img src="/user/pages/images/IAML_logo_viola.png" /></a></h3>
+                                            <ul class="social-icons">
+            <li>
+            <a href="https://twitter.com/iaml_it">
+                <i class="fa fa-twitter"></i>            </a>
+        </li>
+            <li>
+            <a href="https://www.linkedin.com/company/iaml/">
+                <i class="fa fa-linkedin"></i>            </a>
+        </li>
+            <li>
+            <a href="https://www.facebook.com/machinelearningitalia/">
+                <i class="fa fa-facebook"></i>            </a>
+        </li>
+            <li>
+            <a href="blog.rss">
+                <i class="fa fa-rss"></i>            </a>
+        </li>
+    </ul>  
+                                    </div>
+                <div id="navbar">
+                                                            
+<ul class="navigation">
+                                                        <li class="">
+                    <a href="/">
+                                                Home
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/activities">
+                                                Activities
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/supporters">
+                                                Supporters
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/member">
+                                                Become a member
+                    </a>
+                </li>
+                                                                <li class="active">
+                    <a href="/blog">
+                                                Blog
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/governance">
+                                                Governance
+                    </a>
+                </li>
+                                                                                                                                </ul>                                                   <form class="search-box">
+    <input type="search" placeholder="Search..." value="" data-search-input="/search/query" />
+    <script>
+    jQuery(document).ready(function($){
+        var input = $('[data-search-input]');
+
+        input.on('keypress', function(event) {
+            if (event.which == 13 && input.val().length > 3) {
+                event.preventDefault();
+                window.location.href = input.data('search-input') + ':' + input.val();
+            }
+        });
+    });
+    </script>
+    <i class="fa fa-search"></i>
+</form>                    <span class="panel-activation sb-toggle-left navbar-left menu-btn fa fa-bars"></span>
+                </div>
+        </header>
+        
+        
+                <section id="body" class="">
+                            
+				<div class="flush-top blog-header blog-header-image" style="background: #B4B093 url(/user/pages/05.blog/blue_header.jpg) no-repeat right;">
+            <h1>Trattare i valori mancanti nelle serie storiche</h1>
+        </div>
+            
+        
+<div id="breadcrumbs" itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
+                                            <a href="/" itemprop="url"><span itemprop="title">Home</span></a>
+                        <i class="fa fa-angle-right"></i>
+                                                <a href="/blog" itemprop="url"><span itemprop="title">Blog</span></a>
+                        <i class="fa fa-angle-right"></i>
+                                                <span itemprop="title">Trattare i valori mancanti nelle serie storiche</span>
+                        </div>
+		
+		<div class="blog-content-item g-grid pure-g-r">
+			<div id="item" class="g-block pure-u-2-3">
+			    <div class="list-item">
+
+    <div class="list-blog-header">
+                    <img src="/images/f/0/5/6/0/f05607163eff59440dc2e6f85560c8cc75eb977d-image1.png" />
+        
+                    <h4><a href="/blog/serie-storiche-1-dati-mancanti">Trattare i valori mancanti nelle serie storiche</a></h4>
+        
+        <span class="list-blog-date">
+            <i class="fa fa-calendar"></i>
+            01, Apr
+        </span>
+                <span class="list-blog-author">
+            <i class="fa fa-user"></i>
+            Nicola Procopio
+        </span>
+                       <ul class="tags">
+            <i class="fa fa-tag"></i>
+                        <li><a href="/blog/tag:time series">time series</a></li>
+                        <li><a href="/blog/tag:dati mancanti">dati mancanti</a></li>
+                        <li><a href="/blog/tag:imputazione">imputazione</a></li>
+                    </ul>
+        
+    </div>
+
+	<div>
+	<br />
+	<!-- AddToAny BEGIN -->
+<div class="a2a_kit a2a_kit_size_32 a2a_default_style">
+<a class="a2a_dd" href="https://www.addtoany.com/share"></a>
+<a class="a2a_button_facebook"></a>
+<a class="a2a_button_twitter"></a>
+<a class="a2a_button_linkedin"></a>
+<a class="a2a_button_google_plus"></a>
+<a class="a2a_button_email"></a>
+</div>
+<script async src="https://static.addtoany.com/menu/page.js"></script>
+<!-- AddToAny END -->
+</div>
+	
+    <div class="list-blog-padding">
+
+            <p><p>Il trattamento e l'imputazione dei valori mancanti (missing values) sono due step molto delicati per ogni progetto di data science. Nonostante esistano diverse strategie per l'imputazione, tutte possono portare a errori perchè si sta introducendo un dato <strong>"artificiale"</strong>.</p>
+<blockquote>
+<p>Un consiglio che viene dato spesso è, in fase di imputazione di valori mancanti, creare per ogni feature che si sta trattando una nuova variabile booleana "<em>nomeFeature_isMissing</em>" per tracciare quali valori sono reali e quali indotti durante il processo di cleaning.</p>
+</blockquote>
+<p>Solitamente gli step che vengono seguiti in questa fase del preprocessing del dataset sono i seguenti:</p>
+<ul>
+<li>Se la percentuale di valori mancanti è alta (la soglia varia a seconda del contesto) non si può considerare la variabile, quindi viene eliminata una feature;</li>
+<li>Non eliminare mai l'intera osservazione a meno che non abbia valori mancanti su ogni feature;</li>
+<li>Scegliete una tecnica di imputazione basandovi sul tipo di dato e fenomeno che si sta trattando.</li>
+</ul>
+<p>Lo strumento Python più utilizzato per questo compito è il <a href="https://scikit-learn.org/stable/modules/generated/sklearn.impute.SimpleImputer.html">SimpleImputer di scikit-learn</a> che offre quattro strategie di sostituzione:</p>
+<ol>
+<li>sostituire i missing values con la media;</li>
+<li>sostituire i missing values con la mediana;</li>
+<li>sostituire i missing values con la moda;</li>
+<li>sostituire i missing values con una costante.</li>
+</ol>
+<p>C'è una cosa da osservare, nessuna delle strategie descritte si adatta bene allo studio delle serie storiche. Per <em>dimostrare</em> questa affermazione faremo un test utilizzando la serie storica <a href="https://stat.ethz.ch/R-manual/R-devel/library/datasets/html/AirPassengers.html"><strong>Airpassenger</strong></a>, una sequenza mensile del numero di passeggeri sui voli internazionali tra il 1949 e il 1960.</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/serie-storiche-1-dati-mancanti/images/fMY4Fjs.png" alt="airpassenger">
+        </figure>
+<blockquote>
+<p><a href="https://colab.research.google.com/drive/1IK5iZ1WCAUVHqtuCXpUGccb2wmF4z41k">Tutto il codice di questo articolo è disponibile</a> su un notebook Google Colab.</p>
+</blockquote>
+<h3>Creazione dei Missing Values</h3>
+<p>Airpassenger non presenta valori mancanti, quindi verranno introdotti in modo completamente casuale.</p>
+<pre><code class="language-python">import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+airpassengers = pd.read_csv("airpassenger.csv", index_col = 0 )
+airpassengers.columns = ["Passengers"]
+airpassengers.head()</code></pre>
+<table>
+<thead>
+<tr>
+<th>Month</th>
+<th style="text-align: right;">Passengers</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1949-01</td>
+<td style="text-align: right;">112</td>
+</tr>
+<tr>
+<td>1949-02</td>
+<td style="text-align: right;">118</td>
+</tr>
+<tr>
+<td>1949-03</td>
+<td style="text-align: right;">132</td>
+</tr>
+<tr>
+<td>1949-04</td>
+<td style="text-align: right;">129</td>
+</tr>
+<tr>
+<td>1949-05</td>
+<td style="text-align: right;">121</td>
+</tr>
+</tbody>
+</table>
+<p>Verrano generati 10 indici mediante la funzione <a href="https://docs.scipy.org/doc/numpy-1.15.1/reference/generated/numpy.random.randint.html">randint del modulo random di numpy</a>. In questi dieci indici verrà sostituito il valore originale con <em>NaN</em>.</p>
+<blockquote>
+<p>NOTA. Visto come vengono generati i valori mancanti, il risultato cambierà ogni volta che viene eseguito il codice!</p>
+</blockquote>
+<pre><code class="language-python">airpassengers_MV = airpassengers.copy()
+na_index = np.random.randint(0, airpassengers.shape[0]-1, 10)
+airpassengers_MV.iloc[na_index,0] = np.nan
+
+plt.figure(figsize=(16,8))
+plt.plot(range(airpassengers.shape[0]), airpassengers_MV["Passengers"].values, color='tab:blue')
+plt.gca().set(title="Airpassengers - Missing Values", xlabel="Time", ylabel="Passengers")
+plt.show()</code></pre>
+<table>
+<thead>
+<tr>
+<th>Month</th>
+<th style="text-align: right;">Passengers</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1949-01</td>
+<td style="text-align: right;">112</td>
+</tr>
+<tr>
+<td>1949-02</td>
+<td style="text-align: right;">118</td>
+</tr>
+<tr>
+<td>1949-03</td>
+<td style="text-align: right;">132</td>
+</tr>
+<tr>
+<td>1949-04</td>
+<td style="text-align: right;">NaN</td>
+</tr>
+<tr>
+<td>1949-05</td>
+<td style="text-align: right;">121</td>
+</tr>
+</tbody>
+</table>
+<figure role="group">
+        <img src="https://iaml.it/blog/serie-storiche-1-dati-mancanti/images/hUls9kI.png" alt="TS_with_missing">
+        </figure>
+<h2>Imputazione dei Missing Values</h2>
+<p>Di seguito verranno testate sulla serie tutte le strategie proposte da SimpleImputer di Scikit-learn.</p>
+<pre><code class="language-python">from sklearn.impute import SimpleImputer</code></pre>
+<p><code>SimpleImputer</code> rispetta la classica interfaccia di sklearn: una volta inizializzato, l'oggetto può essere utilizzando sfruttando i metodi di base, quali <code>fit</code>, <code>transform</code>. Nel nostro esempio non avendo interesse verso il forecasting e quindi non dividendo la serie in train e test, useremo <code>fit_transform</code> su tutta la sequenza.</p>
+<p>Il metodo non è altro che la concatenazione dei due:</p>
+<ul>
+<li><code>fit</code> calcola il valore da imputare (media, mediana, più frequente) sulla serie;</li>
+<li><code>transform</code> applica realmente l'imputazione.</li>
+</ul>
+<p>In input necessita di un oggetto 2D (noi passeremo un <code>DataFrame</code>) ma restituisce un array NumPy.</p>
+<h3>Sostituzione con la media</h3>
+<p>La strategia di <code>SimpleImputer</code> viene applicata mediante il parametro <em>strategy</em>, come detto in precedenza si può scegliere tra:</p>
+<ul>
+<li>"mean" <em>default</em>;</li>
+<li>"median";</li>
+<li>"most_frequent";</li>
+<li>"costant".</li>
+</ul>
+<pre><code class="language-python">imputer_mean = SimpleImputer(strategy = "mean")
+airpassengers_mean = imputer_mean.fit_transform(airpassengers_MV)
+
+airpassengers_mean[:5]</code></pre>
+<blockquote>
+<p>array([[112.        ],
+[118.        ],
+[132.        ],
+<strong><em>[282.23880597],</em></strong>
+[121.        ]])</p>
+<p>in grassetto il valore imputato</p>
+</blockquote>
+<figure role="group">
+        <img src="https://iaml.it/blog/serie-storiche-1-dati-mancanti/images/HDQmcI1.png" alt="missing_mean">
+        </figure>
+<p>Questo approccio risente molto del trend, Airpassenger è una serie con trend lineare crescente e un effetto stagionale moltiplicativo (le <em>onde</em> sono sempre più alte ogni anno), l'approccio dell'imputazione utilizzando la media crea picchi all'inizio della sequenza e valli sul finire, anche se queste ultime sono molto meno evidenti dei primi. Se la serie fosse ancora più lunga questo fenomeno sarebbe sempre più marcato. Di seguito il confronto con l'originale (in rosso).</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/serie-storiche-1-dati-mancanti/images/XG8S3KF.png" alt="confronto_mean">
+        </figure>
+<h3>Sostituzione con la mediana</h3>
+<p>La mediana è una misura di sintesi robusta agli outlier, quindi si potrebbe pensare che l'effetto trend venga un po' mitigato utilizzando questa strategia.</p>
+<pre><code class="language-python">airpassengers_median = imputer_median.fit_transform(airpassengers_MV)
+airpassengers_median[:5]</code></pre>
+<blockquote>
+<p>array([[112.],
+[118.],
+[132.],
+<strong><em>[268.],</em></strong>
+[121.]])</p>
+</blockquote>
+<figure role="group">
+        <img src="https://iaml.it/blog/serie-storiche-1-dati-mancanti/images/Z5YuwhR.png" alt="airpassenger_median">
+        </figure>
+<figure role="group">
+        <img src="https://iaml.it/blog/serie-storiche-1-dati-mancanti/images/u3huFi7.png" alt="confronto_median">
+        </figure>
+<p>L'unica cosa che è cambiata è che la mediana è più bassa della media, quindi i picchi sono più bassi, ma si acuisce l'effetto nella parte finale della serie. In conclusione:</p>
+<p><strong>Le strategie con media e mediana possono essere chiaramente scartate per l'imputazione di missing values nelle serie storiche.</strong></p>
+<blockquote>
+<p>I paragrafi successivi servono solo per testare anche le restanti opzioni presenti tra le strategie di SimpleImputer. Solitamente queste vengono utilizzate su variabili categoriche, non numeriche continue. Quindi sappiamo a priori che non si adatteranno bene alle time series.</p>
+</blockquote>
+<h3>Sostituzione con la moda</h3>
+<pre><code class="language-python">imputer_mode = SimpleImputer(strategy="most_frequent")
+airpassengers_mode = imputer_mode.fit_transform(airpassengers_MV)
+airpassengers_mode[:5]</code></pre>
+<blockquote>
+<p>array([[112.],
+[118.],
+[132.],
+<strong><em>[229.],</em></strong>
+[121.]])</p>
+</blockquote>
+<p>Visto che il trend cresce linearmente, e la stagionalità con effetto moltiplicativo, la moda è un valore più basso della media, ma anche della mediana. In questo caso sembra dare un andamento quasi naturale alla serie nella parte centrale, ma quando il valore mancante si trova nei primi/ultimi periodi l'errore sistematico è evidente.</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/serie-storiche-1-dati-mancanti/images/ikxjQtX.png" alt="airpassenger_mode">
+        </figure>
+<blockquote>
+<p><strong>N.B. La strategia "Most Frequent" è molto utile se si hanno missing values in variabili categoriche, come detto in precedenza. Un'altra strategia in questi casi può essere applicare un modello di Machine Learning (es., KNN) usando come target la variabile di cui dobbiamo imputare i missing values e come features tutte le altre, creando il training set per allenare il modello sui non missing e applicando il modello sul test, ovvero sulle osservazioni che presentano i dati mancanti.</strong></p>
+</blockquote>
+<h3>Sostituzione con una costante</h3>
+<p>Il primo problema che ci si pone in questo caso è "<em>Quale costante utilizzare?</em>":</p>
+<ul>
+<li>un quantile?</li>
+<li>il minimo/massimo?</li>
+<li>un numero a caso?</li>
+</ul>
+<p>Per questo test verranno usati lo zero, il minimo e il massimo.</p>
+<h4>Sostituzione con zero</h4>
+<p>Lo zero solitamente è sconsigliatissimo perchè non si capisce se è assenza di valore o presenza pari a zero, crea molta abiguità.</p>
+<blockquote>
+<p><em>Esempio: presenza ad eventi, se viene effettuata la sostituzione con zero non si riesce più a riconoscere se è un dato imputato o effettivamente c'è presenza zero (in aggiunta al restante errore indotto).</em></p>
+</blockquote>
+<pre><code class="language-python">imputer_zero = SimpleImputer(strategy="constant", fill_value=0)
+airpassengers_zero = imputer_zero.fit_transform(airpassengers_MV)</code></pre>
+<figure role="group">
+        <img src="https://iaml.it/blog/serie-storiche-1-dati-mancanti/images/YFkWA72.png" alt="airpassenger_zero">
+        </figure>
+<h4>Sostituzione con massimo/minimo</h4>
+<p>Queste due strategie ci daranno time series completamente sballate (a cui dedicheremo pochissime righe).</p>
+<pre><code class="language-python">imputer_max = SimpleImputer(strategy="constant", fill_value=airpassengers_MV.Passengers.max())
+airpassengers_max = imputer_max.fit_transform(airpassengers_MV)</code></pre>
+<figure role="group">
+        <img src="https://iaml.it/blog/serie-storiche-1-dati-mancanti/images/292Wryl.png" alt="imputer_max">
+        </figure>
+<p>Analogamente per il minimo:</p>
+<pre><code class="language-python">imputer_min = SimpleImputer(strategy="constant", fill_value=airpassengers_MV.Passengers.min())
+airpassengers_min = imputer_min.fit_transform(airpassengers_MV)</code></pre>
+<figure role="group">
+        <img src="https://iaml.it/blog/serie-storiche-1-dati-mancanti/images/22AGOYzv2.png" alt="imputer_min">
+        </figure>
+<h2>Imputazione per Media Mobile</h2>
+<p>La strategia vincente con le serie storiche è quella dell'imputazione per <strong>media mobile</strong>.
+Esistono diversi tipi di media mobile (qui la [pagina Wikipedia] (https://it.wikipedia.org/wiki/Media_mobile)), nella maggior parte dei casi può bastare quella lineare che verrà utilizzata in questo articolo.</p>
+<p>Data un serie storica <span class="mathjax mathjax--inline">${y_t}$</span> con <span class="mathjax mathjax--inline">$t=(1, 2, ..., T)$</span>, sia un generico elemento della serie <span class="mathjax mathjax--inline">$t$</span> un valore mancante e data una finestra temporale di dimensione <span class="mathjax mathjax--inline">$N$</span>, siano:</p>
+<ul>
+<li><span class="mathjax mathjax--inline">$m_1$</span> gli <span class="mathjax mathjax--inline">$N$</span> periodi antecedenti il valore mancante</li>
+<li><span class="mathjax mathjax--inline">$m_2$</span> gli <span class="mathjax mathjax--inline">$N$</span> periodi successivi al valore mancante</li>
+<li><span class="mathjax mathjax--inline">$\theta_i$</span> il peso da attribuire all'i-esimo valore osservato. (<em>Per noi sarà pari ad 1 visto che vogliamo una media aritmetica semplice</em>).</li>
+</ul>
+<p>Si definisce media mobile al tempo <span class="mathjax mathjax--inline">$t$</span>:</p>
+<p><span class="mathjax mathjax--inline">$mm_i$</span> = <span class="mathjax mathjax--inline">$\frac{1}{k}$</span> <span class="mathjax mathjax--inline">$\sum_{i=-m_1}^{m_2}$</span> <span class="mathjax mathjax--inline">$\theta_i$</span> <span class="mathjax mathjax--inline">$y_{t+1}$</span></p>
+<p>Dove <span class="mathjax mathjax--inline">$k = {m_1} + {m_2} + 1$</span></p>
+<blockquote>
+<p><em>NOTA. In questo articolo non useremo la funzione <a href="https://pandas.pydata.org/pandas-docs/version/0.17.0/generated/pandas.rolling_mean.html">rolling_mean di Pandas</a> per mostrare come funziona la media mobile ma verrà costruita un piccolo script ad-hoc.</em></p>
+</blockquote>
+<p>L'imputazione con questa tecnica permette di imputare al valore mancante la media locale in un range deciso dall'analista a seconda del fenomeno che si và a studiare.</p>
+<p>Il metodo è un pò più esoso in termini di calcolo e presenta alcuni problemi che vanno risolti, ad esempio:</p>
+<ul>
+<li>se manca il valore all'inizio o alla fine della serie?</li>
+<li>se nel range indicato ci sono più valori mancanti?</li>
+<li>se abbiamo missing values contigui?</li>
+</ul>
+<p>Sta al data scientist scegliere quale soluzione applicare ad ogni domanda a seconda del contesto.</p>
+<p>Nel nostro caso applicheremo una finestra temporale tra i tre valori prima e i tre valori dopo il missing value, gestendo i due casi:</p>
+<ol>
+<li>Il lower bound è negativo</li>
+<li>L'upper bound supera la lunghezza della serie.</li>
+</ol>
+<p>Se nel range si presentano più missing values viene semplicemente calcolata la media tra i valori presenti.</p>
+<blockquote>
+<p>Esempio:
+[2, NaN, 3] --&gt; [2, 2.5, 3]
+[2, NaN, NaN] --&gt; [2, 2, 2]</p>
+</blockquote>
+<p>La prima cosa che si nota da questo esempio è che  cade il <em>+1</em> finale nel calcolo di <em>k</em> visto che quel valore per noi è mancante.</p>
+<pre><code class="language-python">airpassengers_MA = airpassengers_MV.copy()
+steps = 3
+
+for idx in na_index:
+    lower = idx - steps
+    upper = idx + steps + 1
+    if lower&lt;0:
+        lower=0
+    if upper&gt;airpassengers_MA.shape[0]:
+        upper=airpassengers_MA.shape[0]
+
+    airpassengers_MA.iloc[idx,0] = airpassengers_MA.iloc[lower:upper,0].mean()</code></pre>
+<figure role="group">
+        <img src="https://iaml.it/blog/serie-storiche-1-dati-mancanti/images/yX79bKa.png" alt="interpolazione">
+        </figure>
+<p>L'andamento sembra abbastanza naturale, questo è confermato dal confronto con la serie storica originale. Quindi per le serie storiche la media mobile è nettamente la strategia vincente.</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/serie-storiche-1-dati-mancanti/images/K6fOwRu.png" alt="confronto_interpolazione">
+        </figure>
+<p><strong>Imputare un valore mancante introduce sempre errore sistematico, si può solo scegliere la strategia più adatta per minimizzarlo.</strong></p>
+<hr />
+<div class="notices blue">
+<p>Se questo articolo ti è piaciuto e vuoi tenerti aggiornato sulle nostre attività, ricordati che l'<a href="/member">iscrizione all'Italian Association for Machine Learning</a> è gratuita! Puoi seguirci su <a href="https://www.facebook.com/machinelearningitalia/">Facebook</a>, <a href="https://www.linkedin.com/company/iaml/">LinkedIn</a>, e <a href="https://twitter.com/iaml_it">Twitter</a>.</p>
+</div></p>
+            
+    
+        <p class="prev-next">
+                            <a class="button" href="/blog/infinite-neural-networks"><i class="fa fa-chevron-left"></i> Previous Post</a>
+            
+                            <a class="button" href="/blog/serie-storiche-2-sax-encoding">Next Post <i class="fa fa-chevron-right"></i></a>
+                    </p>
+    
+    </div>
+</div>
+			</div>
+			<div id="sidebar" class="g-block size-1-3 pure-u-1-3">
+				<div class="sidebar-content">
+    <h4>Search the blog</h4>
+    <input type="text" placeholder="Search..." value="" data-searchsidebar-input="/search/query" />
+<script>
+jQuery(document).ready(function($){
+    var input = $('[data-searchsidebar-input]');
+
+    input.on('keypress', function(event) {
+        if (event.which == 13 && input.val().length > 3) {
+            event.preventDefault();
+            window.location.href = input.data('searchsidebar-input') + ':' + input.val();
+        }
+    });
+});
+</script>
+</div>
+<!--
+<div class="sidebar-content">
+	<h4>Some Text Widget</h4>
+	<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna.</p>
+</div>
+!-->
+<div class="sidebar-content">
+    <h4>Categories</h4>
+    
+
+<ul class="archives">
+        <li>
+        <a href="/blog/category:Tutorials">Tutorials </a> (16)
+    </li>
+        <li>
+        <a href="/blog/category:Discussions">Discussions </a> (12)
+    </li>
+        <li>
+        <a href="/blog/category:Announcements">Announcements </a> (4)
+    </li>
+        <li>
+        <a href="/blog/category:Tutorials%20%28English%29">Tutorials (English) </a> (4)
+    </li>
+        <li>
+        <a href="/blog/category:Articles%27%20summaries">Articles' summaries </a> (3)
+    </li>
+        <li>
+        <a href="/blog/category:Discussions%20%28English%29">Discussions (English) </a> (2)
+    </li>
+        <li>
+        <a href="/blog/category:Focus-on">Focus-on </a> (1)
+    </li>
+        <li>
+        <a href="/blog/category:Reviews">Reviews </a> (1)
+    </li>
+        <li>
+        <a href="/blog/category:Discussion">Discussion </a> (1)
+    </li>
+    </ul>
+</div>
+<div class="sidebar-content">
+    <h4>Archives</h4>
+	<ul class="archives">
+    <li>
+    	<a href="/blog/archives_month:apr_2020">
+        <span class="archive_date">April 2020</span>
+                <span>(1)</span>
+                </a>
+    </li>
+</ul>
+</div>
+<div class="sidebar-content">
+    <h4>Popular Tags</h4>
+    
+
+<ul class="archives">
+        <li>
+        <a href="/blog/tag:deep%20learning">deep learning </a> (11)
+    </li>
+        <li>
+        <a href="/blog/tag:pytorch">pytorch </a> (9)
+    </li>
+        <li>
+        <a href="/blog/tag:reti%20neurali">reti neurali </a> (5)
+    </li>
+        <li>
+        <a href="/blog/tag:google">google </a> (4)
+    </li>
+        <li>
+        <a href="/blog/tag:jit">jit </a> (4)
+    </li>
+        <li>
+        <a href="/blog/tag:tensorflow">tensorflow </a> (4)
+    </li>
+        <li>
+        <a href="/blog/tag:ottimizzazione">ottimizzazione </a> (4)
+    </li>
+        <li>
+        <a href="/blog/tag:rete%20neurale">rete neurale </a> (3)
+    </li>
+        <li>
+        <a href="/blog/tag:time%20series">time series </a> (3)
+    </li>
+        <li>
+        <a href="/blog/tag:keras">keras </a> (3)
+    </li>
+        <li>
+        <a href="/blog/tag:reti%20convolutive">reti convolutive </a> (3)
+    </li>
+        <li>
+        <a href="/blog/tag:pipeline">pipeline </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:sklearn">sklearn </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:autodiff">autodiff </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:automatic%20differentation">automatic differentation </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:reverse-mode">reverse-mode </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:derivate">derivate </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:differenziazione">differenziazione </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:model%20selection">model selection </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:cross%20validation">cross validation </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:c%2B%2B">c++ </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:numpy">numpy </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:vmap">vmap </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:caffe">caffe </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:compiler">compiler </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:jax">jax </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:codemotion">codemotion </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:bias">bias </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:discrimination">discrimination </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:fairness">fairness </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:iaml">iaml </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:database">database </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:iperparametri">iperparametri </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:autograph">autograph </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:head">head </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:multi-task">multi-task </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:learning">learning </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:novit%C3%A0">novità </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:dev%20summit">dev summit </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:custom%20estimator">custom estimator </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:hyperopt">hyperopt </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:goodfellow">goodfellow </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:nlp">nlp </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:dati%20mancanti">dati mancanti </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:transformer">transformer </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:attenzione">attenzione </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:robocop">robocop </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:yolo">yolo </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:object%20detection">object detection </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:bayes">bayes </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:autoencoders">autoencoders </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:variational">variational </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:eager">eager </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:imputazione">imputazione </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:CIFAR">CIFAR </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:word%20embedding">word embedding </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:MNIST">MNIST </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:immagini">immagini </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:classificazione">classificazione </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:kpi">kpi </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:reprogramming">reprogramming </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:adversarial">adversarial </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:browser">browser </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:javascript">javascript </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:reti%20ricorsive">reti ricorsive </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:reti%20ricorrenti">reti ricorrenti </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:ftth">ftth </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:adversarial%20example">adversarial example </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:management">management </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:robotica">robotica </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:ocr">ocr </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:focus">focus </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:iphone">iphone </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:python">python </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:face%20id">face id </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:momento">momento </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:adam">adam </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:neuroscienza">neuroscienza </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:onde%20cerebrali">onde cerebrali </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:torchvision">torchvision </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:latin">latin </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:pretrained">pretrained </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:rete%20convolutiva">rete convolutiva </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:autograd">autograd </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:swish">swish </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:attivazione">attivazione </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:checkpoint">checkpoint </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:tensori">tensori </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:variabili">variabili </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:lineare">lineare </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:regressione">regressione </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:convolutional%20networks">convolutional networks </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:Vatican">Vatican </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:project">project </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:kernel">kernel </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:ICLR">ICLR </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:ipotesi">ipotesi </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:sparsit%C3%A0">sparsità </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:funzionale">funzionale </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:functional">functional </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:adversarial%20attack">adversarial attack </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:kmeans">kmeans </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:analysis">analysis </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:clustering">clustering </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:Google">Google </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:regression">regression </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:JAX">JAX </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:gaussian%20process">gaussian process </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:ensemble">ensemble </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:boosting">boosting </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:gradient">gradient </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:semi-supervised%20learning">semi-supervised learning </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:document%20classification">document classification </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:graphs">graphs </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:variables">variables </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:linear">linear </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:k-NN">k-NN </a> (1)
+    </li>
+    </ul>
+</div>
+<div class="sidebar-content syndicate">
+    <h4>Syndicate</h4>
+    <a class="button" href="/blog.atom"><i class="fa fa-rss-square"></i> Atom 1.0</a>
+    <a class="button" href="/blog.rss"><i class="fa fa-rss-square"></i> RSS</a>
+</div>
+			</div>
+		</div>
+	
+                        <div class="modular-row footer ">
+    <div class="footer-items">
+        <div class="footer-module large">
+		<h4>About</h4>
+                            <p>Italian Association for Machine Learning (C.F. 97949550582)</p>
+            			<p>Write us: info@iaml.it</p>
+        </div>
+        <div class="footer-module"><h4>Address</h4>
+            <p>
+                                    <span><strong>Operational office</strong></span>
+                                    <span>IAML c/o Pi Campus, via Indonesia 23, 00144 Rome</span>
+                                    <span><strong>Legal office</strong></span>
+                                    <span>Via Cassia 964, 00189, Rome</span>
+                            </p>
+        </div>
+        <div class="footer-module"><h4>Quick Links</h4>
+         <ul class="quickmenu">
+                            <li><i class="fa fa-chevron-right"></i><a href="https://iaml.it/home">Home</a></li>
+                            <li><i class="fa fa-chevron-right"></i><a href="https://iaml.it/documents">Documents (Italian)</a></li>
+                    </ul>
+    </div>
+   
+</div>
+<hr>
+<div class="footer-modules">
+    <div class="footer-copyright">
+        Copyright 2018 IAML.IT. All Rights Reserved.
+    </div>
+    <div class="footer-menu">
+    <ul class="othermenu">
+           <li><a href="https://learn.getgrav.org/">Powered by Grav</a></li>
+           <li><a href="https://github.com/getgrav/grav-theme-deliver">Theme (adapted) from Deliver</a></li>
+        </ul>
+    </div>
+</div>
+</div>                    </section>
+        
+    </div>
+    <div class="sb-slidebar sb-left sb-width-thin">
+        <div id="panel">
+        
+<ul class="navigation">
+                                                        <li class="">
+                    <a href="/">
+                                                Home
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/activities">
+                                                Activities
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/supporters">
+                                                Supporters
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/member">
+                                                Become a member
+                    </a>
+                </li>
+                                                                <li class="active">
+                    <a href="/blog">
+                                                Blog
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/governance">
+                                                Governance
+                    </a>
+                </li>
+                                                                                                                                </ul>                   </div>
+    </div>
+        <script src="/user/plugins/simplesearch/js/simplesearch.js" type="text/javascript" ></script>
+
+    <script>
+    $(function () {
+        $(document).ready(function() {
+          $.slidebars({
+            hideControlClasses: true,
+            scrollLock: true
+          });
+        });
+    });
+    </script>
+    </body>
+</html>

@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Ottimizzare iperparametri in Keras con Hyperopt | Italian Association for Machine Learning</title>
+    <meta content="GravCMS"  />
+<meta content="The Italian Association for Machine Learning (IAML) is a not-for-profit organization with the purpose of promoting knowledge of machine learning in all aspects of the Italian public life, from universities to enterprises and IT professionals."  />
+<meta property="og:title" content="Ottimizzare iperparametri in Keras con Hyperopt | IAML.it"  />
+<meta property="og:image" content="https://iaml.it/blog/ottimizzare-keras-hyperopt/images/parameters_choice.png"  />
+<meta property="og:url" content="https://iaml.it/blog/ottimizzare-keras-hyperopt/"  />
+<meta property="og:description" content="In questo tutorial vediamo come utilizzare [Hyperopt](http://hyperopt.github.io/hyperopt/), una libreria di black-box optimization perfetta per ottimizzare iperparametri di ogni tipo affidandosi alle sue capacità di ricerca. Come caso d&#039;uso useremo una semplice rete neurale in [Keras](https://keras.io), concentrandoci sopratutto sulla configurazione di Hyperopt."  />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="icon" type="image/png" href="../user/themes/deliver/images/favicon.png" />
+
+	<!-- Global site tag (gtag.js) - Google Ads: 774709547 --> <script async src="https://www.googletagmanager.com/gtag/js?id=AW-774709547"></script> <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'AW-774709547'); </script> 
+	
+		
+                            		                                                <link href="../user/themes/deliver/css-compiled/nucleus.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css-compiled/template.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css/custom.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css/toc.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css/font-awesome.min.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/facebook/css/facebook.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/facebook/assets/unitegallery/css/unite-gallery.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/facebook/assets/unitegallery/themes/default/ug-theme-default.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/markdown-notices/assets/notices.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/breadcrumbs/css/breadcrumbs.css" type="text/css" rel="stylesheet" />
+<link href="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/events/assets/events.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/form/assets/form-styles.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/mathjax/assets/css/mathjax.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/simplesearch/css/simplesearch.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/highlight/css/zenburn.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/login/css/login.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css/slidebars.min.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css/slideme.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/socialbuttons/vendor/rrssb/css/rrssb.css" type="text/css" rel="stylesheet" />
+
+
+                                                            <script src="../system/assets/jquery/jquery-2.x.min.js" type="text/javascript" ></script>
+<script src="../user/themes/deliver/js/modernizr.custom.71422.js" type="text/javascript" ></script>
+<script src="../user/plugins/facebook/assets/unitegallery/js/unitegallery.min.js" type="text/javascript" ></script>
+<script src="../user/plugins/facebook/assets/unitegallery/themes/default/ug-theme-default.js" type="text/javascript" ></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.js" type="text/javascript" ></script>
+<script src="../user/plugins/events/assets/events.js" type="text/javascript" ></script>
+<script src="../user/plugins/mathjax/assets/js/mathjax.js" type="text/javascript" ></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript" ></script>
+<script src="../user/plugins/highlight/js/highlight.pack.js" type="text/javascript" ></script>
+<script src="../user/themes/deliver/js/deliver.js" type="text/javascript" ></script>
+<script src="../user/themes/deliver/js/slidebars.min.js" type="text/javascript" ></script>
+<script src="../user/themes/deliver/js/jquery.slideme2.js" type="text/javascript" ></script>
+<script src="../user/plugins/socialbuttons/vendor/rrssb/js/rrssb.min.js" type="text/javascript" ></script>
+
+<script>
+window.addEventListener("load", function(){
+window.cookieconsent.initialise({
+"palette": {
+    "popup": {
+        "background": "#4d4d4d",
+        "text": "#fff"
+    },
+    "button": {
+        "background": "#f1d600",
+        "text": "#000",
+        "border": "#f1d600"
+    }
+},
+"position": "bottom",
+"theme": "block",
+"content": {
+    "message": "This website uses cookies to ensure you get the best experience on our website.",
+    "dismiss": "Got it!",
+    "link": "Learn more",
+    "href": "https://cookiesandyou.com"
+}
+})});
+hljs.initHighlightingOnLoad();
+
+</script>
+
+
+</head>
+<body id="top" class="header-lite fullwidth blogstyling">
+    <div id="sb-site">
+                <header id="header">
+                <div class="logo">
+                    <h3><a href="../index.html"><img src="../user/pages/images/IAML_logo_viola.png" /></a></h3>
+                                            <ul class="social-icons">
+            <li>
+            <a href="https://twitter.com/iaml_it">
+                <i class="fa fa-twitter"></i>            </a>
+        </li>
+            <li>
+            <a href="https://www.linkedin.com/company/iaml/">
+                <i class="fa fa-linkedin"></i>            </a>
+        </li>
+            <li>
+            <a href="https://www.facebook.com/machinelearningitalia/">
+                <i class="fa fa-facebook"></i>            </a>
+        </li>
+            <li>
+            <a href="blog.rss">
+                <i class="fa fa-rss"></i>            </a>
+        </li>
+    </ul>  
+                                    </div>
+                <div id="navbar">
+                                                            
+<ul class="navigation">
+                                                        <li class="">
+                    <a href="../index.html">
+                                                Home
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../activities">
+                                                Activities
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../supporters.html">
+                                                Supporters
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../member.html">
+                                                Become a member
+                    </a>
+                </li>
+                                                                <li class="active">
+                    <a href="../blog">
+                                                Blog
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../governance.html">
+                                                Governance
+                    </a>
+                </li>
+                                                                                                                                </ul>                                                   <form class="search-box">
+    <input type="search" placeholder="Search..." value="" data-search-input="/search/query" />
+    <script>
+    jQuery(document).ready(function($){
+        var input = $('[data-search-input]');
+
+        input.on('keypress', function(event) {
+            if (event.which == 13 && input.val().length > 3) {
+                event.preventDefault();
+                window.location.href = input.data('search-input') + ':' + input.val();
+            }
+        });
+    });
+    </script>
+    <i class="fa fa-search"></i>
+</form>                    <span class="panel-activation sb-toggle-left navbar-left menu-btn fa fa-bars"></span>
+                </div>
+        </header>
+        
+        
+                <section id="body" class="">
+                            
+				<div class="flush-top blog-header blog-header-image" style="background: #B4B093 url(/user/pages/05.blog/blue_header.jpg) no-repeat right;">
+            <h1>Ottimizzare iperparametri in Keras con Hyperopt</h1>
+        </div>
+            
+        
+<div id="breadcrumbs" itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
+                                            <a href="../index.html" itemprop="url"><span itemprop="title">Home</span></a>
+                        <i class="fa fa-angle-right"></i>
+                                                <a href="../blog" itemprop="url"><span itemprop="title">Blog</span></a>
+                        <i class="fa fa-angle-right"></i>
+                                                <span itemprop="title">Ottimizzare iperparametri in Keras con Hyperopt</span>
+                        </div>
+		
+		<div class="blog-content-item g-grid pure-g-r">
+			<div id="item" class="g-block pure-u-2-3">
+			    <div class="list-item">
+
+    <div class="list-blog-header">
+                    
+        
+                    <h4><a href="ottimizzare-keras-hyperopt.html">Ottimizzare iperparametri in Keras con Hyperopt</a></h4>
+        
+        <span class="list-blog-date">
+            <i class="fa fa-calendar"></i>
+            24, Jul
+        </span>
+                <span class="list-blog-author">
+            <i class="fa fa-user"></i>
+            Simone Scardapane
+        </span>
+                       <ul class="tags">
+            <i class="fa fa-tag"></i>
+                        <li><a href="tagkeras.html">keras</a></li>
+                        <li><a href="taghyperopt.html">hyperopt</a></li>
+                        <li><a href="tagiperparametri.html">iperparametri</a></li>
+                        <li><a href="tagreti neurali.html">reti neurali</a></li>
+                    </ul>
+        
+    </div>
+
+	<div>
+	<br />
+	<!-- AddToAny BEGIN -->
+<div class="a2a_kit a2a_kit_size_32 a2a_default_style">
+<a class="a2a_dd" href="https://www.addtoany.com/share"></a>
+<a class="a2a_button_facebook"></a>
+<a class="a2a_button_twitter"></a>
+<a class="a2a_button_linkedin"></a>
+<a class="a2a_button_google_plus"></a>
+<a class="a2a_button_email"></a>
+</div>
+<script async src="https://static.addtoany.com/menu/page.js"></script>
+<!-- AddToAny END -->
+</div>
+	
+    <div class="list-blog-padding">
+
+            <p><p>Configurare i parametri di un modello di deep learning è sempre un'operazione a metà strada fra l'arte, l'esperienza, e la pura forza bruta di calcolo. In questo tutorial vediamo come utilizzare <a href="http://hyperopt.github.io/hyperopt/">Hyperopt</a>, una libreria di black-box optimization perfetta per ottimizzare iperparametri di ogni tipo affidandosi alle sue capacità di ricerca. Tra le sue caratteristiche principali, oltre ad essere altamente configurabile ha la possibilità di lanciare più simulazioni in parallelo appoggiandosi a MongoDB. Come caso d'uso useremo una semplice rete neurale in <a href="https://keras.io">Keras</a>, concentrandoci sopratutto sulla configurazione di Hyperopt.</p>
+<h2>Introduzione ad Hyperopt</h2>
+<p><a href="http://hyperopt.github.io/hyperopt/">Hyperopt</a> è una libreria di <strong>black-box optimization</strong>, ovvero permette di ottimizzare qualsiasi funzione senza necessità di calcolarne i gradienti (come avviene per la maggior parte degli ottimizzatori in TensorFlow o altre librerie di deep learning). Nel machine learning, queste librerie sono molto utili per selezionare gli iperparametri dei nostri modelli, ottimizzando una qualche metrica di accuratezza calcolata su un dataset di validazione.</p>
+<p>Abbiamo già introdotto l'ottimizzazione degli iperparametri <a href="https://iaml.it/blog/ottimizzare-pipeline-sklearn">parlando delle pipeline di scikit-learn</a>. Oltre ad essere più configurabile delle funzioni contenute in scikit-learn, Hyperopt include un metodo di ricerca più sofisticato delle semplici grid search e random search, chiamato <strong>Tree-structured Parzen Estimator</strong> (TPE), che cerca dinamicamente di ridurre lo spazio dove ricercare le soluzioni ottimali per massimizzare il numero di chiamate alla funzione. Se siete interessati, <a href="https://papers.nips.cc/paper/4443-algorithms-for-hyper-parameter-optimization.pdf">qui</a> trovate la descrizione originale dell'approccio.</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/ottimizzare-keras-hyperopt/images/confronto_random_search_tpe.png" />
+        </figure>
+<figcaption>Confronto tra random search e tree-structured Parzen estimator per ottimizzare gli iperparametri di un modello su CIFAR-10 ([<a href="http://proceedings.mlr.press/v28/bergstra13.pdf">Bergstra et al., 2013</a>]).</figcaption>
+<h2>Configurazione per il tutorial</h2>
+<div class="notices blue">
+<p>Potete scaricare tutto il codice per questo tutorial in formato notebook su Google Colaboratory <a href="https://colab.research.google.com/drive/1QPnQNo1rZSitnO7HvBotF3rYBKb80gpK">da questo link</a>.</p>
+</div>
+<p>Per questo tutorial useremo Keras per allenare la rete neurale, Hyperopt per ottimizzarne gli iperparametri, e scikit-learn per caricare un dataset di prova. Per configurare il vostro ambiente virtuale con le ultimi versioni al momento in cui scriviamo lanciate da terminale:</p>
+<blockquote>
+<p>pip install keras==2.1.6 hyperopt==0.1 scikit-learn==0.19.2</p>
+</blockquote>
+<div class="notices yellow">
+<p>Se utilizzate Google Colaboratory, questa versione di Hyperopt va in conflitto con la versione installata di NetworkX (<a href="https://github.com/hyperopt/hyperopt/issues/357">issue #357: TypeError: 'generator' object is not subscriptable</a>). Se ottenete questo errore, effettuate un downgrade della seconda libreria e riavviate in seguito il runtime di Colab:</p>
+<blockquote>
+<p>pip install networkx==1.11</p>
+</blockquote>
+</div>
+<p>Come dati useremo il <a href="http://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_wine.html#sklearn.datasets.load_wine">wine dataset</a>, un dataset molto semplice di classificazione di vini. Per completezza, di seguito il codice per caricare i dati, preprocessarli (normalizzazione dell'input e one-hot encoding dell'output) e dividere la parte di test:</p>
+<pre><code class="language-py">from sklearn import datasets, preprocessing, model_selection
+wine_dataset = datasets.load_wine()
+X = preprocessing.MinMaxScaler().fit_transform(wine_dataset['data'])
+y = preprocessing.OneHotEncoder(sparse=False).fit_transform(wine_dataset['target'].reshape(-1, 1))
+Xtrain, Xtest, ytrain, ytest = model_selection.train_test_split(X, y, stratify=y)</code></pre>
+<h2>Un esempio introduttivo</h2>
+<p>Per fare pratica con Hyperopt, cominciamo con qualcosa di semplice (un esempio simile lo trovate <a href="https://github.com/hyperopt/hyperopt/wiki/FMin#11-the-simplest-case">nella documentazione ufficiale</a>):</p>
+<pre><code class="language-py">import numpy as np
+def simple_fcn(x):
+  return - np.sin(x ** 2.0)/x + 0.01 * x ** 2.0</code></pre>
+<figure role="group">
+        <img src="https://iaml.it/blog/ottimizzare-keras-hyperopt/images/simple_fcn.png"alt="Funzione artificiale di prova" />
+        </figure>
+<p>Il grande numero di minimi locali rende questa funzione piuttosto complessa per un ottimizzatore "classico", a meno di non inizializzarlo molto vicino al minimo globale. Per provare ad ottimizzarla con Hyperopt, iniziamo importando un po' di metodi che ci serviranno anche in seguito (non li useremo tutti subito):</p>
+<pre><code class="language-py">from hyperopt import fmin, tpe, hp, Trials
+from hyperopt import STATUS_OK</code></pre>
+<p>Con Hyperopt possiamo minimizzarla in una sola riga di codice:</p>
+<pre><code class="language-py">best = fmin(fn=simple_fcn, space=hp.uniform('x', -10, 10), algo=tpe.suggest, max_evals=100)
+print(best) # {'x': 1.0774531825730786}</code></pre>
+<figure role="group">
+        <img src="https://iaml.it/blog/ottimizzare-keras-hyperopt/images/simple_fcn_min.png"alt="Minimo della funzione artificiale di prova" />
+        </figure>
+<p>Commentiamo brevemente i quattro parametri di <code>fmin</code> (ci ritorneremo in seguito):</p>
+<ul>
+<li>
+<p><code>fn</code> è la funzione da ottimizzare. Non avendo bisogno di gradienti, può rappresentare praticamente qualsiasi cosa. Ad esempio, potremmo ottimizzare una funzione che prende in ingresso delle coordinate spaziali, ed interroga una API esterna per restituire la temperatura in quel punto preciso.</p>
+</li>
+<li>
+<p><code>space</code> è un parametro essenziale, che rappresenta la nostra intuizione su dove cercare l'ottimo. In questo caso, ad esempio, supponiamo che il minimo si trovi da qualche parte nell'intervallo <span class="mathjax mathjax--inline">$[-10, 10]$</span>, con probabilità uniforme (<code>hp.uniform</code>).</p>
+</li>
+<li>
+<p><code>algo</code> è l'algoritmo di ricerca. Per ora Hyperopt supporta una random search ed il TPE, ma è teoricamente possibile estenderla anche ad altri algoritmi. Nel caso di TPE, lo spazio di ricerca originale verrà progressivamente raffinato per concentrarsi sulle regioni più promettenti.</p>
+</li>
+<li><code>max_evals</code>, infine, è il numero di valutazioni di <code>simple_fcn</code> ammesse prima di ritornare il miglior risultato ottenuto fino a quel momento.</li>
+</ul>
+<p>C'è veramente poco altro da sapere per poter cominciare ad utilizzare Hyperopt, quindi passiamo subito a qualcosa di più interessante.</p>
+<h2>Una rete neurale in Keras (che non funziona...)</h2>
+<p>Per cominciare importiamo un po' di oggetti da Keras:</p>
+<pre><code class="language-py">from keras.models import Sequential
+from keras.layers import Dense, Dropout
+from keras.optimizers import Adam, SGD</code></pre>
+<p>La nostra rete neurale sarà per ora quanto di più basico si possa immaginare. Per comodità definiamo due funzioni: la prima, <code>train_fcn</code> per allenare il modello (una rete neurale con uno strato nascosto), e la seconda, <code>test_fcn</code>, per valutarne le prestazioni. Cominciamo dalla prima:</p>
+<pre><code class="language-py">def train_fcn(features, labels, train_params):
+
+  # Definizione del modello
+  model = Sequential()
+  model.add(Dense(units=int(train_params['layer_size']), activation='relu', input_shape=[13,]))
+  model.add(Dense(units=3, activation='softmax'))
+
+  # Ottimizzazione
+  adam = Adam(lr=train_params['learning_rate'])
+  model.compile(loss='categorical_crossentropy', optimizer=adam, metrics=['accuracy'])
+  model.fit(features, labels, epochs=50, batch_size=32, verbose=0)
+
+  return model</code></pre>
+<p>La funzione ha due iperparametri che passiamo tramite un dizionario, ovvero la dimensione dello strato nascosto della rete neurale, ed il learning rate di Adam. La funzione di test è altrettanto semplice:</p>
+<pre><code class="language-py">def test_fcn(model, features, labels):
+  test_accuracy = model.evaluate(features, labels)
+  return test_accuracy</code></pre>
+<p>A questo punto è necessario scegliere i due iperparametri! Supponendo di saperne pochissimo di Adam, possiamo fare una prima prova:</p>
+<pre><code class="language-py">default_params = {
+    'layer_size': 5,
+    'learning_rate': 1.0
+}
+model = train_fcn(Xtrain, ytrain, default_params)
+print('Accuracy is: ', test_fcn(model, Xtest, ytest))</code></pre>
+<blockquote>
+<p>Accuracy is:  [1.1551294565200805, 0.40000000331136915]</p>
+</blockquote>
+<p>Il learning rate è chiaramente troppo alto e l'ottimizzazione diverge. Al posto di continuare a provare manualmente per cercare una soluzione ottimale, è tempo di passare ad Hyperopt!</p>
+<h2>Ottimizzazione con Hyperopt</h2>
+<p>Come prima cosa, definiamo uno spazio di ricerca per gli iperparametri. Oltre a <code>hp.uniform</code>, abbiamo una <a href="https://github.com/hyperopt/hyperopt/wiki/FMin#2-defining-a-search-space">vasta scelta</a> di configurazioni possibili, a seconda dell'iperparametro. Per ora ne introduciamo altri due:</p>
+<ul>
+<li>
+<p><code>hp.choice</code> per selezionare <code>layer_size</code> in un intervallo discreto di scelte, ovvero nell'intervallo <span class="mathjax mathjax--inline">$[5, 10, \cdots, 25]$</span>.</p>
+</li>
+<li><code>hp.loguniform</code> per cercare il learning rate in un intervallo esponenziale <span class="mathjax mathjax--inline">$\exp(j)$</span>, con <span class="mathjax mathjax--inline">$j \in [-10, 0]$</span>. Questo perché iperparametri come il learning rate sono spesso poco sensibili a piccole variazioni e richiedono di valutare numerosi ordini di grandezza simultaneamente.</li>
+</ul>
+<p>Unendo tutto quanto all'interno di un dizionario:</p>
+<pre><code class="language-py">search_space = {
+  'layer_size': hp.choice('layer_size', np.arange(5, 26, 5)),
+  'learning_rate': hp.loguniform('learning_rate', -10, 0),
+}</code></pre>
+<p>Per valutare l'accuratezza di ciascun scelta, andiamo a suddividere ulteriormente il nostro dataset (in questo caso una k-fold cross-validation sarebbe probabilmente più opportuna):</p>
+<pre><code class="language-py">Xtrain, Xval, ytrain, yval = model_selection.train_test_split(Xtrain, ytrain, stratify=ytrain)</code></pre>
+<p>La funzione da ottimizzare è molto semplice: per ogni configurazione di iperparametri da provare allena un modello sulla parte rimanente di training, e ne valuta le prestazioni su quella di validazione:</p>
+<pre><code class="language-py">from keras import backend as K
+def hyperopt_fcn(params):
+  model = train_fcn(Xtrain, ytrain, params)
+  test_acc = test_fcn(model, Xval, yval)
+  K.clear_session()
+  return {'loss': -test_acc[1], 'status': STATUS_OK}</code></pre>
+<p>Qualche commento aggiuntivo:</p>
+<ol>
+<li>I parametri da testare vengono passati da Hyperopt in forma di dizionario (la stessa convenzione che abbiamo rispettato per la funzione di allenamento).</li>
+<li><code>K.clear_session()</code> evita che i modelli di Keras si accumulino in memoria.</li>
+<li>Rispetto a prima, passiamo ad Hyperopt due informazioni distinte: il valore da minimizzare (l'opposto dell'accuratezza), ed uno "status" con valore OK. Questo valore è molto utile perché permette di distinguere configurazioni che danno vita ad errori e/o problemi numerici (come un learning rate molto alto).</li>
+</ol>
+<p>L'ottimizzazione a questo punto è uguale a prima:</p>
+<pre><code class="language-py">best = fmin(hyperopt_fcn, search_space, algo=tpe.suggest, max_evals=50)</code></pre>
+<p>Possiamo valutare la configurazione ottimale ritornata dall'algoritmo:</p>
+<pre><code class="language-py">from hyperopt import space_eval
+space_eval(search_space, best)</code></pre>
+<blockquote>
+<p>{'layer_size': 15, 'learning_rate': 0.0025886368288856416}</p>
+</blockquote>
+<p>Possiamo quindi procedere ad una fase finale di training, usando gli iperparametri ottimali ma riunendo la componente di validazione a quella di training:</p>
+<pre><code class="language-py">model = train_fcn(np.vstack((Xtrain, Xval)), np.vstack((ytrain, yval)), space_eval(search_space, best))
+print('Accuracy is: ', test_fcn(model, Xtest, ytest))
+# Accuracy is:  [0.15580001407199437, 1.0]</code></pre>
+<p>100% di accuratezza! Ovviamente i problemi reali non sono mai così semplici...</p>
+<h3>Nota a margine 1: distribuzioni di probabilità quantizzate</h3>
+<p>Nel caso di parametri discreti (come <code>layer_size</code>), <code>hp.choice</code> non è l'unica possibilità. In particolare, potremmo supporre che valori simili di <code>layer_size</code> portino a valori simili di accuratezza. Per includere questa assunzione nel processo di ricerca, possiamo usare al posto di <code>hp.choice</code> una distribuzione di probabilità "quantizzata", come ad esempio:</p>
+<pre><code class="language-py">'layer_size': hp.quniform('layer_size', low=5, high=50, q=1)</code></pre>
+<p>Questa distribuzione contiene in maniera uniforme tutti i valori compresi fra <code>low</code> e <code>high</code> con passo <code>q</code> ma, a differenza di <code>hp.choice</code>, assume che ci sia una certa continuità in termini di funzione costo fra valori vicini (ed è quindi preferibile per iperparametri come <code>layer_size</code>). </p>
+<div class="notices yellow">
+<p>Esistono <a href="https://github.com/hyperopt/hyperopt/wiki/FMin#2-defining-a-search-space">versioni quantizzate</a> anche per intervalli esponenziali (es., per selezionare un batch size) o normalmente distribuiti  (es., per una variabile discreta che con molta probabilità si aggira attorno ad un certo valore) con cui sperimentare.</p>
+</div>
+<h3>Nota a margine 2: MongoDB</h3>
+<p>Hyperopt permette di parallelizzare il processo di ricerca sfruttando MongoDB per salvare i risultati intermedi. Estendere questi esempi al caso di MongoDB è molto semplice, e a tal fine rimandiamo <a href="https://github.com/hyperopt/hyperopt/wiki/Parallelizing-Evaluations-During-Search-via-MongoDB">alla guida ufficiale</a> se siete interessati.</p>
+<h2>Non siamo nulla senza debug</h2>
+<p>Non sapere nulla di cosa stia succedendo internamente ad <code>fmin</code> è chiaramente deludente. Per salvare tutti i risultati intermedi, in Hyperopt è sufficiente inizializzare un oggetto <code>Trials</code> da passare ad <code>fmin</code>:</p>
+<pre><code class="language-py">trials = Trials()
+best = fmin(hyperopt_fcn, search_space, algo=tpe.suggest, max_evals=50, trials=trials)</code></pre>
+<p>All'interno di <code>trials</code> abbiamo due proprietà utili. <code>results</code> mantiene una lista di tutti gli esperimenti insieme al loro risultato:</p>
+<pre><code class="language-py">trials.results[0:2]</code></pre>
+<blockquote>
+<p>[{'loss': -0.4005882352941176, 'status': 'ok'},
+{'loss': -0.9411764705882353, 'status': 'ok'}]</p>
+</blockquote>
+<p>Se vogliamo informazioni più comprensive, <code>trials</code> permette di conoscere la configurazione testata, un timestamp dell'esperimento, ed eventualmente il worker nel caso di simulazioni parallele:</p>
+<pre><code class="language-py">print(trials.trials[0])</code></pre>
+<blockquote>
+<p>{'book_time': datetime.datetime(2018, 7, 24, 11, 8, 13, 611000),
+'exp_key': None,
+'misc': {'cmd': ('domain_attachment', 'FMinIter_Domain'),
+'idxs': {'layer_size': [0], 'learning_rate': [0]},
+'tid': 0,
+'vals': {'layer_size': [27.0], 'learning_rate': [0.1390542781208916]},
+'workdir': None},
+'owner': None,
+'refresh_time': datetime.datetime(2018, 7, 24, 11, 8, 14, 384000),
+'result': {'loss': -0.9705882352941176, 'status': 'ok'},
+'spec': None,
+'state': 2,
+'tid': 0,
+'version': 0}</p>
+</blockquote>
+<p>Da questo oggetto possiamo ottenere moltissime informazioni utili. Prima di tutto, possiamo stampare l'accuratezza ottenuta da ciascun esperimento:</p>
+<pre><code class="language-py">import matplotlib.pyplot as plt
+plt.figure()
+xs = [t['tid'] for t in trials.trials]
+ys = [-t['result']['loss'] for t in trials.trials]
+plt.xlim(xs[0]-1, xs[-1]+1)
+plt.scatter(xs, ys, s=20, linewidth=0.01, alpha=0.75)
+plt.xlabel('Iteration', fontsize=16)
+plt.ylabel('Accuracy', fontsize=16)
+plt.show()</code></pre>
+<figure role="group">
+        <img src="https://iaml.it/blog/ottimizzare-keras-hyperopt/images/accuracy.png" />
+        </figure>
+<p>Essendo il problema molto semplice, da subito alcuni tentativi raggiungono un'accuratezza molto elevata. Progressivamente poi tutte le simulazioni si concentrano in quella fascia, man mano che Hyperopt raffina le ipotesi su ciascun iperparametro. In maniera ancora più dettagliata, possiamo analizzare che accuratezza otteniamo a seconda di come scegliamo gli iperparametri individualmente:</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/ottimizzare-keras-hyperopt/images/parameters_choice.png" />
+        </figure>
+<p>Come si vede, in generale è necessario scegliere un learning rate sotto una certa soglia, mentre il modello è relativamente insensibile alla scelta della dimensione dello strato nascosto, in quanto anche pochissimi neuroni sono sufficienti a risolvere questo problema con grande accuratezza.</p>
+<p>Nella nostra funzione possiamo ritornare qualsiasi oggetto desideriamo venga salvato da Hyperopt. Ad esempio, ecco una semplice modifica che permette di salvare il tempo di allenamento per ciascun modello:</p>
+<pre><code class="language-py">from timeit import default_timer as timer
+def hyperopt_fcn(params):
+
+  # Calcola il tempo di training
+  start = timer()
+  model = train_fcn(Xtrain, ytrain, params)
+  end = timer()
+
+  test_acc = test_fcn(model, Xval, yval)
+  K.clear_session()
+  return {'loss': -test_acc[1], 'status': STATUS_OK, 'train_time': (end-start)}</code></pre>
+<h2>Ancora più flessibilità: spazi di ricerca condizionali</h2>
+<p>Un aspetto interessante di Hyperopt è che, grazie ad <code>hp.choice</code>, possiamo creare spazi di ricerca condizionali o addirittura ricorsivi. Ad esempio, il nostro povero esperimento con il learning rate di prima potrebbe spingerci a voler provare anche altri algoritmi di ottimizzazione. Per cominciare, vediamo come definire uno spazio di ricerca per selezionare un algoritmo di ottimizzazione tra Adam ed una più semplice discesa al gradiente con momentum:</p>
+<pre><code class="language-py">opt_search_space = hp.choice('name',
+        [
+        {'name': 'adam', 
+            'learning_rate': hp.loguniform('learning_rate_adam', -10, 0), # Note the name of the label to avoid duplicates
+        },
+        {'name': 'sgd',
+            'learning_rate': hp.loguniform('learning_rate_sgd', -15, 1), # Note the name of the label to avoid duplicates
+            'momentum': hp.uniform('momentum', 0, 1.0),
+        }
+        ])}</code></pre>
+<p>Concentriamoci sulla chiamata di <code>hp.choice</code>: come prima, questa permette di selezionare fra due diverse alternative (contenute in una lista); diversamente da prima, però, ognuna di queste alternative è a sua volta un dizionario che definisce un diverso spazio di ricerca. In particolare, nel primo caso (adam), andiamo a scegliere solo un learning rate, mentre nel secondo caso (sgd), scegliamo sia un learning rate che un parametro di momentum. </p>
+<p>Grazie alla possibilità di avere spazi di ricerca innestati fra di loro, possiamo includere questo oggetto nel nostro spazio di ricerca originario:</p>
+<pre><code class="language-py">search_space = {
+  'optimizer': opt_search_space,
+  'layer_size': hp.choice('layer_size', np.arange(5, 26, 5))
+}</code></pre>
+<p>Per avere un'idea più precisa di cosa faccia questo spazio di ricerca, andiamo a campionarlo qualche volta:</p>
+<pre><code class="language-py">from hyperopt.pyll.stochastic import sample
+for _ in range(3):
+  print(sample(search_space))
+# {'layer_size': 10, 'optimizer': {'learning_rate': 0.0004927227823704443, 'name': 'adam'}}
+# {'layer_size': 5, 'optimizer': {'learning_rate': 0.00039102348250862214, 'momentum': 0.045526270930157486, 'name': 'sgd'}}
+# {'layer_size': 15, 'optimizer': {'learning_rate': 0.00012154874605560738, 'name': 'adam'}}</code></pre>
+<p>Come si vede, 'optimizer' è ora a sua volta un dizionario che contiene tutti i parametri necessari ad istanziare un ottimizzatore. A questo punto possiamo divertirci a rendere il tutto quanto più parametrico possibile. Ad esempio, perché non provare ad aggiungere un secondo strato nascosto?</p>
+<pre><code class="language-py">second_layer_search_space = \
+  hp.choice('second_layer', 
+    [
+      {
+        'include': False,
+      },
+      {
+        'include': True,
+        'layer_size': hp.choice('layer_size', np.arange(5, 26, 5)),
+      }
+
+  ])</code></pre>
+<p>Un altro iperparametro che potremmo configurare è il batch size. In questo caso, una convenzione tipica è di valutarlo su potenze di due crescenti, es., 2, 4, 8... Hyperopt non ha nessuna classe di default per fare questo, ma includere questo comportamento è facilissimo. In particolare, possiamo campionare in maniera uniforme l'esponente della potenza di due, e definire una funzione personalizzata per ottenere l'effettivo batch size (si noti come è necessario decorare la funzione con <code>scope.define</code>):</p>
+<pre><code class="language-py">from hyperopt.pyll import scope
+@scope.define
+def power_of_two(a):
+     return 2.0 ** a</code></pre>
+<p>Includiamo tutto nel nostro spazio di ricerca:</p>
+<pre><code class="language-py">search_space = {
+    'optimizer': opt_search_space,
+    'second_layer': second_layer_search_space,
+    'layer_1_size': hp.choice('layer_1_size', np.arange(5, 26, 5)),
+    'batch_size': scope.power_of_two(hp.quniform('batch_size', 0, 8, q=1))
+}</code></pre>
+<p>Modifichiamo la nostra funzione di training per prendere in considerazione tutti i nostri nuovi iperparametri:</p>
+<pre><code class="language-py">def train_fcn(features, labels, params):
+
+  model = Sequential()
+  model.add(Dense(units=params['layer_1_size'], activation='relu', input_dim=13))
+
+  # Aggiunge condizionalmente un secondo strato nascosto
+  if params['second_layer']['include']:
+    model.add(Dense(units=params['second_layer']['layer_size'], activation='relu'))
+
+  model.add(Dense(units=3, activation='softmax'))
+
+  # Seleziona l'ottimizzatore corretto
+  if params['optimizer']['name'] == 'adam':
+    opt = Adam(lr=params['optimizer']['learning_rate'])
+  else:
+    opt = SGD(lr=params['optimizer']['learning_rate'], momentum=params['optimizer']['momentum'])
+
+  model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
+
+  # Anche il batch size ora è un iperparametro
+  model.fit(features, labels, epochs=50, batch_size=int(params['batch_size']), verbose=0)
+
+  return model </code></pre>
+<p>L'allenamento è uguale ai casi precedenti!</p>
+<h2>Qualche parola conclusiva</h2>
+<p>Ovviamente Hyperopt non è l'unica scelta disponibile per l'ottimizzazione degli iperparametri, ed esistono numerose altre librerie che potreste voler esplorare a partire da qui. Fra queste vale la pena ricordare <a href="https://github.com/HIPS/Spearmint">Spearmint</a> (tra le migliori basate sull'ottimizzazione Bayesiana), e <a href="https://scikit-optimize.github.io/">skopt</a>, una libreria ancora in forte sviluppo con un larghissimo numero di algoritmi disponibili, oltre ovviamente a librerie di hyperparameter tuning disponibili sulle varie piattaforme cloud come <a href="https://aws.amazon.com/it/blogs/aws/sagemaker-automatic-model-tuning/">Amazon SageMaker</a>. Non mancheremo di esplorare anche queste librerie prossimamente.</p>
+<hr />
+<p>Se questo articolo ti è piaciuto e vuoi tenerti aggiornato sulle nostre attività, ricordati che l'<a href="../member.html">iscrizione all'Italian Association for Machine Learning</a> è gratuita! Puoi seguirci anche su <a href="https://www.facebook.com/machinelearningitalia/">Facebook</a> e su <a href="https://www.linkedin.com/company/18312943/">LinkedIn</a>.</p></p>
+            
+    
+        <p class="prev-next">
+                            <a class="button" href="alle-prese-con-pytorch-parte-4.html"><i class="fa fa-chevron-left"></i> Previous Post</a>
+            
+                            <a class="button" href="riprogrammare-reti-neurali.html">Next Post <i class="fa fa-chevron-right"></i></a>
+                    </p>
+    
+    </div>
+</div>
+			</div>
+			<div id="sidebar" class="g-block size-1-3 pure-u-1-3">
+				<div class="sidebar-content">
+    <h4>Search the blog</h4>
+    <input type="text" placeholder="Search..." value="" data-searchsidebar-input="/search/query" />
+<script>
+jQuery(document).ready(function($){
+    var input = $('[data-searchsidebar-input]');
+
+    input.on('keypress', function(event) {
+        if (event.which == 13 && input.val().length > 3) {
+            event.preventDefault();
+            window.location.href = input.data('searchsidebar-input') + ':' + input.val();
+        }
+    });
+});
+</script>
+</div>
+<!--
+<div class="sidebar-content">
+	<h4>Some Text Widget</h4>
+	<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna.</p>
+</div>
+!-->
+<div class="sidebar-content">
+    <h4>Categories</h4>
+    
+
+<ul class="archives">
+        <li>
+        <a href="categoryTutorials.html">Tutorials </a> (16)
+    </li>
+        <li>
+        <a href="categoryDiscussions.html">Discussions </a> (12)
+    </li>
+        <li>
+        <a href="categoryAnnouncements.html">Announcements </a> (4)
+    </li>
+        <li>
+        <a href="categoryTutorials (English).html">Tutorials (English) </a> (4)
+    </li>
+        <li>
+        <a href="categoryArticles' summaries.html">Articles' summaries </a> (3)
+    </li>
+        <li>
+        <a href="categoryDiscussions (English).html">Discussions (English) </a> (2)
+    </li>
+        <li>
+        <a href="categoryFocus-on.html">Focus-on </a> (1)
+    </li>
+        <li>
+        <a href="categoryReviews.html">Reviews </a> (1)
+    </li>
+        <li>
+        <a href="categoryDiscussion.html">Discussion </a> (1)
+    </li>
+    </ul>
+</div>
+<div class="sidebar-content">
+    <h4>Archives</h4>
+	<ul class="archives">
+    <li>
+    	<a href="archives_monthapr_2020.html">
+        <span class="archive_date">April 2020</span>
+                <span>(1)</span>
+                </a>
+    </li>
+</ul>
+</div>
+<div class="sidebar-content">
+    <h4>Popular Tags</h4>
+    
+
+<ul class="archives">
+        <li>
+        <a href="tagdeep learning.html">deep learning </a> (11)
+    </li>
+        <li>
+        <a href="tagpytorch.html">pytorch </a> (9)
+    </li>
+        <li>
+        <a href="tagreti neurali.html">reti neurali </a> (5)
+    </li>
+        <li>
+        <a href="taggoogle.html">google </a> (4)
+    </li>
+        <li>
+        <a href="tagjit.html">jit </a> (4)
+    </li>
+        <li>
+        <a href="tagtensorflow.html">tensorflow </a> (4)
+    </li>
+        <li>
+        <a href="tagottimizzazione.html">ottimizzazione </a> (4)
+    </li>
+        <li>
+        <a href="tagrete neurale.html">rete neurale </a> (3)
+    </li>
+        <li>
+        <a href="tagtime series.html">time series </a> (3)
+    </li>
+        <li>
+        <a href="tagkeras.html">keras </a> (3)
+    </li>
+        <li>
+        <a href="tagreti convolutive.html">reti convolutive </a> (3)
+    </li>
+        <li>
+        <a href="tagpipeline.html">pipeline </a> (2)
+    </li>
+        <li>
+        <a href="tagsklearn.html">sklearn </a> (2)
+    </li>
+        <li>
+        <a href="tagautodiff.html">autodiff </a> (2)
+    </li>
+        <li>
+        <a href="tagautomatic differentation.html">automatic differentation </a> (2)
+    </li>
+        <li>
+        <a href="tagreverse-mode.html">reverse-mode </a> (2)
+    </li>
+        <li>
+        <a href="tagderivate.html">derivate </a> (2)
+    </li>
+        <li>
+        <a href="tagdifferenziazione.html">differenziazione </a> (2)
+    </li>
+        <li>
+        <a href="tagmodel selection.html">model selection </a> (2)
+    </li>
+        <li>
+        <a href="tagcross validation.html">cross validation </a> (2)
+    </li>
+        <li>
+        <a href="tagc++.html">c++ </a> (2)
+    </li>
+        <li>
+        <a href="tagnumpy.html">numpy </a> (2)
+    </li>
+        <li>
+        <a href="tagvmap.html">vmap </a> (2)
+    </li>
+        <li>
+        <a href="tagcaffe.html">caffe </a> (2)
+    </li>
+        <li>
+        <a href="tagcompiler.html">compiler </a> (2)
+    </li>
+        <li>
+        <a href="tagjax.html">jax </a> (2)
+    </li>
+        <li>
+        <a href="tagcodemotion.html">codemotion </a> (1)
+    </li>
+        <li>
+        <a href="tagbias.html">bias </a> (1)
+    </li>
+        <li>
+        <a href="tagdiscrimination.html">discrimination </a> (1)
+    </li>
+        <li>
+        <a href="tagfairness.html">fairness </a> (1)
+    </li>
+        <li>
+        <a href="tagiaml.html">iaml </a> (1)
+    </li>
+        <li>
+        <a href="tagdatabase.html">database </a> (1)
+    </li>
+        <li>
+        <a href="tagiperparametri.html">iperparametri </a> (1)
+    </li>
+        <li>
+        <a href="tagautograph.html">autograph </a> (1)
+    </li>
+        <li>
+        <a href="taghead.html">head </a> (1)
+    </li>
+        <li>
+        <a href="tagmulti-task.html">multi-task </a> (1)
+    </li>
+        <li>
+        <a href="taglearning.html">learning </a> (1)
+    </li>
+        <li>
+        <a href="tagnovità.html">novità </a> (1)
+    </li>
+        <li>
+        <a href="tagdev summit.html">dev summit </a> (1)
+    </li>
+        <li>
+        <a href="tagcustom estimator.html">custom estimator </a> (1)
+    </li>
+        <li>
+        <a href="taghyperopt.html">hyperopt </a> (1)
+    </li>
+        <li>
+        <a href="taggoodfellow.html">goodfellow </a> (1)
+    </li>
+        <li>
+        <a href="tagnlp.html">nlp </a> (1)
+    </li>
+        <li>
+        <a href="tagdati mancanti.html">dati mancanti </a> (1)
+    </li>
+        <li>
+        <a href="tagtransformer.html">transformer </a> (1)
+    </li>
+        <li>
+        <a href="tagattenzione.html">attenzione </a> (1)
+    </li>
+        <li>
+        <a href="tagrobocop.html">robocop </a> (1)
+    </li>
+        <li>
+        <a href="tagyolo.html">yolo </a> (1)
+    </li>
+        <li>
+        <a href="tagobject detection.html">object detection </a> (1)
+    </li>
+        <li>
+        <a href="tagbayes.html">bayes </a> (1)
+    </li>
+        <li>
+        <a href="tagautoencoders.html">autoencoders </a> (1)
+    </li>
+        <li>
+        <a href="tagvariational.html">variational </a> (1)
+    </li>
+        <li>
+        <a href="tageager.html">eager </a> (1)
+    </li>
+        <li>
+        <a href="tagimputazione.html">imputazione </a> (1)
+    </li>
+        <li>
+        <a href="tagCIFAR.html">CIFAR </a> (1)
+    </li>
+        <li>
+        <a href="tagword embedding.html">word embedding </a> (1)
+    </li>
+        <li>
+        <a href="tagMNIST.html">MNIST </a> (1)
+    </li>
+        <li>
+        <a href="tagimmagini.html">immagini </a> (1)
+    </li>
+        <li>
+        <a href="tagclassificazione.html">classificazione </a> (1)
+    </li>
+        <li>
+        <a href="tagkpi.html">kpi </a> (1)
+    </li>
+        <li>
+        <a href="tagreprogramming.html">reprogramming </a> (1)
+    </li>
+        <li>
+        <a href="tagadversarial.html">adversarial </a> (1)
+    </li>
+        <li>
+        <a href="tagbrowser.html">browser </a> (1)
+    </li>
+        <li>
+        <a href="tagjavascript.html">javascript </a> (1)
+    </li>
+        <li>
+        <a href="tagreti ricorsive.html">reti ricorsive </a> (1)
+    </li>
+        <li>
+        <a href="tagreti ricorrenti.html">reti ricorrenti </a> (1)
+    </li>
+        <li>
+        <a href="tagftth.html">ftth </a> (1)
+    </li>
+        <li>
+        <a href="tagadversarial example.html">adversarial example </a> (1)
+    </li>
+        <li>
+        <a href="tagmanagement.html">management </a> (1)
+    </li>
+        <li>
+        <a href="tagrobotica.html">robotica </a> (1)
+    </li>
+        <li>
+        <a href="tagocr.html">ocr </a> (1)
+    </li>
+        <li>
+        <a href="tagfocus.html">focus </a> (1)
+    </li>
+        <li>
+        <a href="tagiphone.html">iphone </a> (1)
+    </li>
+        <li>
+        <a href="tagpython.html">python </a> (1)
+    </li>
+        <li>
+        <a href="tagface id.html">face id </a> (1)
+    </li>
+        <li>
+        <a href="tagmomento.html">momento </a> (1)
+    </li>
+        <li>
+        <a href="tagadam.html">adam </a> (1)
+    </li>
+        <li>
+        <a href="tagneuroscienza.html">neuroscienza </a> (1)
+    </li>
+        <li>
+        <a href="tagonde cerebrali.html">onde cerebrali </a> (1)
+    </li>
+        <li>
+        <a href="tagtorchvision.html">torchvision </a> (1)
+    </li>
+        <li>
+        <a href="taglatin.html">latin </a> (1)
+    </li>
+        <li>
+        <a href="tagpretrained.html">pretrained </a> (1)
+    </li>
+        <li>
+        <a href="tagrete convolutiva.html">rete convolutiva </a> (1)
+    </li>
+        <li>
+        <a href="tagautograd.html">autograd </a> (1)
+    </li>
+        <li>
+        <a href="tagswish.html">swish </a> (1)
+    </li>
+        <li>
+        <a href="tagattivazione.html">attivazione </a> (1)
+    </li>
+        <li>
+        <a href="tagcheckpoint.html">checkpoint </a> (1)
+    </li>
+        <li>
+        <a href="tagtensori.html">tensori </a> (1)
+    </li>
+        <li>
+        <a href="tagvariabili.html">variabili </a> (1)
+    </li>
+        <li>
+        <a href="taglineare.html">lineare </a> (1)
+    </li>
+        <li>
+        <a href="tagregressione.html">regressione </a> (1)
+    </li>
+        <li>
+        <a href="tagconvolutional networks.html">convolutional networks </a> (1)
+    </li>
+        <li>
+        <a href="tagVatican.html">Vatican </a> (1)
+    </li>
+        <li>
+        <a href="tagproject.html">project </a> (1)
+    </li>
+        <li>
+        <a href="tagkernel.html">kernel </a> (1)
+    </li>
+        <li>
+        <a href="tagICLR.html">ICLR </a> (1)
+    </li>
+        <li>
+        <a href="tagipotesi.html">ipotesi </a> (1)
+    </li>
+        <li>
+        <a href="tagsparsità.html">sparsità </a> (1)
+    </li>
+        <li>
+        <a href="tagfunzionale.html">funzionale </a> (1)
+    </li>
+        <li>
+        <a href="tagfunctional.html">functional </a> (1)
+    </li>
+        <li>
+        <a href="tagadversarial attack.html">adversarial attack </a> (1)
+    </li>
+        <li>
+        <a href="tagkmeans.html">kmeans </a> (1)
+    </li>
+        <li>
+        <a href="taganalysis.html">analysis </a> (1)
+    </li>
+        <li>
+        <a href="tagclustering.html">clustering </a> (1)
+    </li>
+        <li>
+        <a href="tagGoogle.html">Google </a> (1)
+    </li>
+        <li>
+        <a href="tagregression.html">regression </a> (1)
+    </li>
+        <li>
+        <a href="tagJAX.html">JAX </a> (1)
+    </li>
+        <li>
+        <a href="taggaussian process.html">gaussian process </a> (1)
+    </li>
+        <li>
+        <a href="tagensemble.html">ensemble </a> (1)
+    </li>
+        <li>
+        <a href="tagboosting.html">boosting </a> (1)
+    </li>
+        <li>
+        <a href="taggradient.html">gradient </a> (1)
+    </li>
+        <li>
+        <a href="tagsemi-supervised learning.html">semi-supervised learning </a> (1)
+    </li>
+        <li>
+        <a href="tagdocument classification.html">document classification </a> (1)
+    </li>
+        <li>
+        <a href="taggraphs.html">graphs </a> (1)
+    </li>
+        <li>
+        <a href="tagvariables.html">variables </a> (1)
+    </li>
+        <li>
+        <a href="taglinear.html">linear </a> (1)
+    </li>
+        <li>
+        <a href="tagk-NN.html">k-NN </a> (1)
+    </li>
+    </ul>
+</div>
+<div class="sidebar-content syndicate">
+    <h4>Syndicate</h4>
+    <a class="button" href="../blog.atom"><i class="fa fa-rss-square"></i> Atom 1.0</a>
+    <a class="button" href="../blog.rss"><i class="fa fa-rss-square"></i> RSS</a>
+</div>
+			</div>
+		</div>
+	
+                        <div class="modular-row footer ">
+    <div class="footer-items">
+        <div class="footer-module large">
+		<h4>About</h4>
+                            <p>Italian Association for Machine Learning (C.F. 97949550582)</p>
+            			<p>Write us: info@iaml.it</p>
+        </div>
+        <div class="footer-module"><h4>Address</h4>
+            <p>
+                                    <span><strong>Operational office</strong></span>
+                                    <span>IAML c/o Pi Campus, via Indonesia 23, 00144 Rome</span>
+                                    <span><strong>Legal office</strong></span>
+                                    <span>Via Cassia 964, 00189, Rome</span>
+                            </p>
+        </div>
+        <div class="footer-module"><h4>Quick Links</h4>
+         <ul class="quickmenu">
+                            <li><i class="fa fa-chevron-right"></i><a href="../home">Home</a></li>
+                            <li><i class="fa fa-chevron-right"></i><a href="https://iaml.it/documents">Documents (Italian)</a></li>
+                    </ul>
+    </div>
+   
+</div>
+<hr>
+<div class="footer-modules">
+    <div class="footer-copyright">
+        Copyright 2018 IAML.IT. All Rights Reserved.
+    </div>
+    <div class="footer-menu">
+    <ul class="othermenu">
+           <li><a href="https://learn.getgrav.org/">Powered by Grav</a></li>
+           <li><a href="https://github.com/getgrav/grav-theme-deliver">Theme (adapted) from Deliver</a></li>
+        </ul>
+    </div>
+</div>
+</div>                    </section>
+        
+    </div>
+    <div class="sb-slidebar sb-left sb-width-thin">
+        <div id="panel">
+        
+<ul class="navigation">
+                                                        <li class="">
+                    <a href="../index.html">
+                                                Home
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../activities">
+                                                Activities
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../supporters.html">
+                                                Supporters
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../member.html">
+                                                Become a member
+                    </a>
+                </li>
+                                                                <li class="active">
+                    <a href="../blog">
+                                                Blog
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../governance.html">
+                                                Governance
+                    </a>
+                </li>
+                                                                                                                                </ul>                   </div>
+    </div>
+        <script src="../user/plugins/simplesearch/js/simplesearch.js" type="text/javascript" ></script>
+
+    <script>
+    $(function () {
+        $(document).ready(function() {
+          $.slidebars({
+            hideControlClasses: true,
+            scrollLock: true
+          });
+        });
+    });
+    </script>
+    </body>
+</html>
+
+

@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Home | Italian Association for Machine Learning</title>
+    <meta content="GravCMS"  />
+<meta content="The Italian Association for Machine Learning (IAML) is a not-for-profit organization with the purpose of promoting knowledge of machine learning in all aspects of the Italian public life, from universities to enterprises and IT professionals."  />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="icon" type="image/png" href="/user/themes/deliver/images/favicon.png" />
+
+	<!-- Global site tag (gtag.js) - Google Ads: 774709547 --> <script async src="https://www.googletagmanager.com/gtag/js?id=AW-774709547"></script> <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'AW-774709547'); </script> 
+	
+		
+                            		                                                <link href="/user/themes/deliver/css-compiled/nucleus.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css-compiled/template.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/custom.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/toc.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/font-awesome.min.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/facebook/css/facebook.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/facebook/assets/unitegallery/css/unite-gallery.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/facebook/assets/unitegallery/themes/default/ug-theme-default.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/markdown-notices/assets/notices.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/breadcrumbs/css/breadcrumbs.css" type="text/css" rel="stylesheet" />
+<link href="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/events/assets/events.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/form/assets/form-styles.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/mathjax/assets/css/mathjax.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/simplesearch/css/simplesearch.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/highlight/css/zenburn.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/login/css/login.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/slidebars.min.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/slideme.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/socialbuttons/vendor/rrssb/css/rrssb.css" type="text/css" rel="stylesheet" />
+
+
+                                                                
+    <script src="/system/assets/jquery/jquery-2.x.min.js" type="text/javascript" ></script>
+<script src="/user/themes/deliver/js/modernizr.custom.71422.js" type="text/javascript" ></script>
+<script src="/user/plugins/facebook/assets/unitegallery/js/unitegallery.min.js" type="text/javascript" ></script>
+<script src="/user/plugins/facebook/assets/unitegallery/themes/default/ug-theme-default.js" type="text/javascript" ></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.js" type="text/javascript" ></script>
+<script src="/user/plugins/events/assets/events.js" type="text/javascript" ></script>
+<script src="/user/plugins/mathjax/assets/js/mathjax.js" type="text/javascript" ></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript" ></script>
+<script src="/user/plugins/highlight/js/highlight.pack.js" type="text/javascript" ></script>
+<script src="/user/themes/deliver/js/deliver.js" type="text/javascript" ></script>
+<script src="/user/themes/deliver/js/slidebars.min.js" type="text/javascript" ></script>
+<script src="/user/themes/deliver/js/jquery.slideme2.js" type="text/javascript" ></script>
+<script src="/user/plugins/socialbuttons/vendor/rrssb/js/rrssb.min.js" type="text/javascript" ></script>
+
+<script>
+window.addEventListener("load", function(){
+window.cookieconsent.initialise({
+"palette": {
+    "popup": {
+        "background": "#4d4d4d",
+        "text": "#fff"
+    },
+    "button": {
+        "background": "#f1d600",
+        "text": "#000",
+        "border": "#f1d600"
+    }
+},
+"position": "bottom",
+"theme": "block",
+"content": {
+    "message": "This website uses cookies to ensure you get the best experience on our website.",
+    "dismiss": "Got it!",
+    "link": "Learn more",
+    "href": "https://cookiesandyou.com"
+}
+})});
+hljs.initHighlightingOnLoad();
+
+</script>
+
+
+</head>
+<body id="top" class="modular header-image fullwidth about">
+    <div id="sb-site">
+                <header id="header">
+                <div class="logo">
+                    <h3><a href="https://iaml.it"><img src="/user/pages/images/IAML_logo_bianco.png" /></a></h3>
+                                            <ul class="social-icons">
+            <li>
+            <a href="https://twitter.com/iaml_it">
+                <i class="fa fa-twitter"></i>            </a>
+        </li>
+            <li>
+            <a href="https://www.linkedin.com/company/iaml/">
+                <i class="fa fa-linkedin"></i>            </a>
+        </li>
+            <li>
+            <a href="https://www.facebook.com/machinelearningitalia/">
+                <i class="fa fa-facebook"></i>            </a>
+        </li>
+            <li>
+            <a href="blog.rss">
+                <i class="fa fa-rss"></i>            </a>
+        </li>
+    </ul>  
+                                    </div>
+                <div id="navbar">
+                                                                        
+<ul class="navigation">
+                                                        <li class="active">
+                    <a href="/">
+                                                Home
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/activities">
+                                                Activities
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/supporters">
+                                                Supporters
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/member">
+                                                Become a member
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/blog">
+                                                Blog
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/governance">
+                                                Governance
+                    </a>
+                </li>
+                                                                                                                                </ul>                               
+                        <form class="search-box">
+    <input type="search" placeholder="Search..." value="" data-search-input="/search/query" />
+    <script>
+    jQuery(document).ready(function($){
+        var input = $('[data-search-input]');
+
+        input.on('keypress', function(event) {
+            if (event.which == 13 && input.val().length > 3) {
+                event.preventDefault();
+                window.location.href = input.data('search-input') + ':' + input.val();
+            }
+        });
+    });
+    </script>
+    <i class="fa fa-search"></i>
+</form>                    <span class="panel-activation sb-toggle-left navbar-left menu-btn fa fa-bars"></span>
+                </div>
+        </header>
+        
+        
+                <section id="body" class="">
+                
+            <div id="top"></div>
+        <div id="content-slide">
+  <div class="slideme">
+           <div class="modular-row showcase flush-top" style="background-image: url(/user/pages/01.home/_showcase/blue_header.jpg);">
+          <h1>Italian Association for Machine Learning</h1>
+          <h2>Building together a better data-driven society</h2>
+          
+		  <a class="button" href="http://www.iaml.it/member"><strong>BECOME A MEMBER</strong></a>  	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  
+		  <a class="button" href="https://www.facebook.com/machinelearningitalia/">FACEBOOK</a>
+		  <a class="button" href="https://twitter.com/iaml_it">TWITTER</a>
+		  <a class="button" href="https://www.linkedin.com/company/iaml">LINKEDIN</a>
+      </div>
+  </div>
+</div>
+
+
+
+<script type="text/javascript">
+$('#content-slide').slideme({
+  arrows: ,
+  autoslide: ,
+  autoslideHoverStop: ,
+  interval: ,
+  loop: ,
+  pagination: "numbers",
+  transition : '',
+  itemsForSlide: ,
+  touch: ,
+  swipe: ,
+
+});
+</script>
+
+            <div id="about"></div>
+        <div class="modular-row callout">
+ <p style="font-size: 1.2rem"><strong>Machine learning</strong> is a key technology powering most advancements in artificial intelligence and data science. Our aim as the <strong>Italian Association for Machine Learning</strong> (IAML) is to foster the development of ML in all sectors of the public life, by organizing, promoting, and sponsoring technical conferences, events, Meetups, and other initiatives throughout Italy (learn more in the <a href="/blog/opening" target="_blank">opening statement</a> from our blog). </p>
+<p style="font-size: 1.2rem">We believe that the future will be intensely <strong>data-driven</strong>. For us, creating a dynamic hub that brings together professionals, industries, and academics will be essential to achieve this vision. To this end, we promote discussions on all facets of ML, from the technical aspects to the ethical, juridical and economical repercussions.</p>
+<div class="notices blue">
+<p style="font-size: 1.2rem">Interested? Membership to IAML is free: <a href="/member">fill out the subscription form</a> to be kept updated! Do not forget to check out our <a href="/activities">activities</a> and <a href="/activities">blog</a>.</p>
+</div>
+ 
+
+</div>
+
+
+            <div id="_feed"></div>
+        <div class="modular-row bottom ">
+    <hr style="border-top: 1px #8c8b8b; margin: 1rem auto 0rem auto;">
+<div class="g-grid pure-g">
+
+<div class="g-block size-1-2">
+
+    <h2>Facebook feed</h2>
+    <hr style="border-top: 1px #8c8b8b; margin: 1rem auto 1rem auto; width: 30%;">
+    <iframe src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2Fmachinelearningitalia%2F&tabs=timeline&width=500&height=300&small_header=true&adapt_container_width=true&hide_cover=false&show_facepile=true&appId=226314534090015" width="500" height="300" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
+
+    <h2>From our blog</h2>
+    <hr style="border-top: 1px #8c8b8b; margin: 1rem auto 1rem auto; width: 30%;">
+    <ul>
+        <li class="recent-posts">
+            <strong><a href="/blog/dal-knn-al-transformer">Dal k-NN al Transformer in pochi passi (quasi)</a></strong> [Published by Simone Scardapane on 01/25/2021].    
+        </li>
+        <li class="recent-posts">
+            <strong><a href="/blog/machine-learning-project-management">Machine Learning per il Project Management – un esempio di applicazione sulla costruzione di reti FTTH</a></strong> [Published by Davide Mazza on 08/03/2020].    
+        </li>
+        <li class="recent-posts">
+            <strong><a href="/blog/serie-storiche-3-dynamic-time-warping">Breve introduzione al Dynamic Time Warping</a></strong> [Published by Nicola Procopio on 06/18/2020].    
+        </li>
+        <li class="recent-posts">
+            <strong><a href="/blog/serie-storiche-2-sax-encoding">Individuare pattern con il SAX encoding</a></strong> [Published by Nicola Procopio on 04/24/2020].    
+        </li>
+        <li class="recent-posts">
+            <strong><a href="/blog/serie-storiche-1-dati-mancanti">Trattare i valori mancanti nelle serie storiche</a></strong> [Published by Nicola Procopio on 04/01/2020].    
+        </li>
+        </ul>
+
+</div>
+
+<div class="g-block size-1-2" style="padding-left:3em;">
+
+<h2>Coming events</h2>
+<hr style="border-top: 1px #8c8b8b; margin: 1rem auto 1rem auto; width: 30%;">
+
+
+
+
+          
+  
+
+</div>
+
+</div>
+            </div>
+
+            <div id="_founders"></div>
+        <div class="modular-row team">
+    <p><big><h2>EXECUTIVE BOARD</h2></big></p>
+<div markdown="1">
+<img src="/home/_founders/IAML_Executive_Board_1.png" alt="Simone Scardapane" />
+<img src="/home/_founders/IAML_Executive_Board_2.png" alt="Gabriele Nocco" />
+<img src="/home/_founders/IAML_Executive_Board_3.png" alt="Gabriele Randelli" />
+<img src="/home/_founders/IAML_Executive_Board_4.png" alt="Roberto Alma" />
+</div>
+<hr>
+<p><big><h2>ADVISORY BOARD</h2></big></p>
+<div markdown="1">
+<img src="/home/_founders/IAML_Advisory_Board_1.png" alt="Sébastien Bratières" />
+<img src="/home/_founders/IAML_Advisory_Board_2.png" alt="Silvia Chiappa" />
+<img src="/home/_founders/IAML_Advisory_Board_3.png" alt="Paolo Frasconi" />
+<img src="/home/_founders/IAML_Advisory_Board_4.png" alt="Lorenzo Rosasco" />
+<img src="/home/_founders/IAML_Advisory_Board_5.png" alt="Marco Trombetti" />
+</div>
+    <div class="members">
+            </div>
+    <div class="callout-line"></div>
+</div>
+
+    
+                        <div class="modular-row footer ">
+    <div class="footer-items">
+        <div class="footer-module large">
+		<h4>About</h4>
+                            <p>Italian Association for Machine Learning (C.F. 97949550582)</p>
+            			<p>Write us: info@iaml.it</p>
+        </div>
+        <div class="footer-module"><h4>Address</h4>
+            <p>
+                                    <span><strong>Operational office</strong></span>
+                                    <span>IAML c/o Pi Campus, via Indonesia 23, 00144 Rome</span>
+                                    <span><strong>Legal office</strong></span>
+                                    <span>Via Cassia 964, 00189, Rome</span>
+                            </p>
+        </div>
+        <div class="footer-module"><h4>Quick Links</h4>
+         <ul class="quickmenu">
+                            <li><i class="fa fa-chevron-right"></i><a href="https://iaml.it/home">Home</a></li>
+                            <li><i class="fa fa-chevron-right"></i><a href="https://iaml.it/documents">Documents (Italian)</a></li>
+                    </ul>
+    </div>
+   
+</div>
+<hr>
+<div class="footer-modules">
+    <div class="footer-copyright">
+        Copyright 2018 IAML.IT. All Rights Reserved.
+    </div>
+    <div class="footer-menu">
+    <ul class="othermenu">
+           <li><a href="https://learn.getgrav.org/">Powered by Grav</a></li>
+           <li><a href="https://github.com/getgrav/grav-theme-deliver">Theme (adapted) from Deliver</a></li>
+        </ul>
+    </div>
+</div>
+</div>                    </section>
+        
+    </div>
+    <div class="sb-slidebar sb-left sb-width-thin">
+        <div id="panel">
+        
+<ul class="navigation">
+                                                        <li class="active">
+                    <a href="/">
+                                                Home
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/activities">
+                                                Activities
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/supporters">
+                                                Supporters
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/member">
+                                                Become a member
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/blog">
+                                                Blog
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/governance">
+                                                Governance
+                    </a>
+                </li>
+                                                                                                                                </ul>                   </div>
+    </div>
+            <script src="/user/plugins/simplesearch/js/simplesearch.js" type="text/javascript" ></script>
+
+    <script>
+    $(function () {
+        $(document).ready(function() {
+          $.slidebars({
+            hideControlClasses: true,
+            scrollLock: true
+          });
+        });
+    });
+    </script>
+    
+    </body>
+</html>

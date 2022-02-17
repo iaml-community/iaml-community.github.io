@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Dalle onde cerebrali alle protesi robotiche con il deep learning: un'introduzione | Italian Association for Machine Learning</title>
+    <meta content="GravCMS"  />
+<meta content="The Italian Association for Machine Learning (IAML) is a not-for-profit organization with the purpose of promoting knowledge of machine learning in all aspects of the Italian public life, from universities to enterprises and IT professionals."  />
+<meta property="og:title" content="Dalle onde cerebrali alle protesi robotiche con il deep learning | IAML.it"  />
+<meta property="og:image" content="http://iaml.it/blog/face-id-deep-learning/images/image_6.gif"  />
+<meta property="og:url" content="https://iaml.it/blog/dalle-onde-cerebrali-alla-robotica"  />
+<meta property="og:description" content="Un&#039;introduzione sull&#039;uso del deep learning per visualizzare e decodificare l&#039;attività neurale del cervello e controllare protesi robotiche."  />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="icon" type="image/png" href="/user/themes/deliver/images/favicon.png" />
+
+	<!-- Global site tag (gtag.js) - Google Ads: 774709547 --> <script async src="https://www.googletagmanager.com/gtag/js?id=AW-774709547"></script> <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'AW-774709547'); </script> 
+	
+		
+                            		                                                <link href="/user/themes/deliver/css-compiled/nucleus.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css-compiled/template.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/custom.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/toc.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/font-awesome.min.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/facebook/css/facebook.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/facebook/assets/unitegallery/css/unite-gallery.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/facebook/assets/unitegallery/themes/default/ug-theme-default.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/markdown-notices/assets/notices.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/breadcrumbs/css/breadcrumbs.css" type="text/css" rel="stylesheet" />
+<link href="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/events/assets/events.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/form/assets/form-styles.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/mathjax/assets/css/mathjax.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/simplesearch/css/simplesearch.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/highlight/css/zenburn.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/login/css/login.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/slidebars.min.css" type="text/css" rel="stylesheet" />
+<link href="/user/themes/deliver/css/slideme.css" type="text/css" rel="stylesheet" />
+<link href="/user/plugins/socialbuttons/vendor/rrssb/css/rrssb.css" type="text/css" rel="stylesheet" />
+
+
+                                                            <script src="/system/assets/jquery/jquery-2.x.min.js" type="text/javascript" ></script>
+<script src="/user/themes/deliver/js/modernizr.custom.71422.js" type="text/javascript" ></script>
+<script src="/user/plugins/facebook/assets/unitegallery/js/unitegallery.min.js" type="text/javascript" ></script>
+<script src="/user/plugins/facebook/assets/unitegallery/themes/default/ug-theme-default.js" type="text/javascript" ></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.js" type="text/javascript" ></script>
+<script src="/user/plugins/events/assets/events.js" type="text/javascript" ></script>
+<script src="/user/plugins/mathjax/assets/js/mathjax.js" type="text/javascript" ></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript" ></script>
+<script src="/user/plugins/highlight/js/highlight.pack.js" type="text/javascript" ></script>
+<script src="/user/themes/deliver/js/deliver.js" type="text/javascript" ></script>
+<script src="/user/themes/deliver/js/slidebars.min.js" type="text/javascript" ></script>
+<script src="/user/themes/deliver/js/jquery.slideme2.js" type="text/javascript" ></script>
+<script src="/user/plugins/socialbuttons/vendor/rrssb/js/rrssb.min.js" type="text/javascript" ></script>
+
+<script>
+window.addEventListener("load", function(){
+window.cookieconsent.initialise({
+"palette": {
+    "popup": {
+        "background": "#4d4d4d",
+        "text": "#fff"
+    },
+    "button": {
+        "background": "#f1d600",
+        "text": "#000",
+        "border": "#f1d600"
+    }
+},
+"position": "bottom",
+"theme": "block",
+"content": {
+    "message": "This website uses cookies to ensure you get the best experience on our website.",
+    "dismiss": "Got it!",
+    "link": "Learn more",
+    "href": "https://cookiesandyou.com"
+}
+})});
+hljs.initHighlightingOnLoad();
+
+</script>
+
+
+</head>
+<body id="top" class="header-lite fullwidth blogstyling">
+    <div id="sb-site">
+                <header id="header">
+                <div class="logo">
+                    <h3><a href="https://iaml.it"><img src="/user/pages/images/IAML_logo_viola.png" /></a></h3>
+                                            <ul class="social-icons">
+            <li>
+            <a href="https://twitter.com/iaml_it">
+                <i class="fa fa-twitter"></i>            </a>
+        </li>
+            <li>
+            <a href="https://www.linkedin.com/company/iaml/">
+                <i class="fa fa-linkedin"></i>            </a>
+        </li>
+            <li>
+            <a href="https://www.facebook.com/machinelearningitalia/">
+                <i class="fa fa-facebook"></i>            </a>
+        </li>
+            <li>
+            <a href="blog.rss">
+                <i class="fa fa-rss"></i>            </a>
+        </li>
+    </ul>  
+                                    </div>
+                <div id="navbar">
+                                                            
+<ul class="navigation">
+                                                        <li class="">
+                    <a href="/">
+                                                Home
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/activities">
+                                                Activities
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/supporters">
+                                                Supporters
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/member">
+                                                Become a member
+                    </a>
+                </li>
+                                                                <li class="active">
+                    <a href="/blog">
+                                                Blog
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/governance">
+                                                Governance
+                    </a>
+                </li>
+                                                                                                                                </ul>                                                   <form class="search-box">
+    <input type="search" placeholder="Search..." value="" data-search-input="/search/query" />
+    <script>
+    jQuery(document).ready(function($){
+        var input = $('[data-search-input]');
+
+        input.on('keypress', function(event) {
+            if (event.which == 13 && input.val().length > 3) {
+                event.preventDefault();
+                window.location.href = input.data('search-input') + ':' + input.val();
+            }
+        });
+    });
+    </script>
+    <i class="fa fa-search"></i>
+</form>                    <span class="panel-activation sb-toggle-left navbar-left menu-btn fa fa-bars"></span>
+                </div>
+        </header>
+        
+        
+                <section id="body" class="">
+                            
+				<div class="flush-top blog-header blog-header-image" style="background: #B4B093 url(/user/pages/05.blog/blue_header.jpg) no-repeat right;">
+            <h1>Dalle onde cerebrali alle protesi robotiche con il deep learning: un'introduzione</h1>
+        </div>
+            
+        
+<div id="breadcrumbs" itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
+                                            <a href="/" itemprop="url"><span itemprop="title">Home</span></a>
+                        <i class="fa fa-angle-right"></i>
+                                                <a href="/blog" itemprop="url"><span itemprop="title">Blog</span></a>
+                        <i class="fa fa-angle-right"></i>
+                                                <span itemprop="title">Dalle onde cerebrali alle protesi robotiche con il deep learning: un'introduzione</span>
+                        </div>
+		
+		<div class="blog-content-item g-grid pure-g-r">
+			<div id="item" class="g-block pure-u-2-3">
+			    <div class="list-item">
+
+    <div class="list-blog-header">
+                    <img src="/images/0/9/a/6/5/09a65e79689e22e4207ac45ae7385a9603ee9f12-1dcahsodbeolyldzra28dma.png" />
+        
+                    <h4><a href="/blog/dalle-onde-cerebrali-alla-robotica">Dalle onde cerebrali alle protesi robotiche con il deep learning: un'introduzione</a></h4>
+        
+        <span class="list-blog-date">
+            <i class="fa fa-calendar"></i>
+            29, May
+        </span>
+                <span class="list-blog-author">
+            <i class="fa fa-user"></i>
+            Norman Di Palo (Trad. Simone Scardapane)
+        </span>
+                       <ul class="tags">
+            <i class="fa fa-tag"></i>
+                        <li><a href="/blog/tag:deep learning">deep learning</a></li>
+                        <li><a href="/blog/tag:robotica">robotica</a></li>
+                        <li><a href="/blog/tag:onde cerebrali">onde cerebrali</a></li>
+                        <li><a href="/blog/tag:neuroscienza">neuroscienza</a></li>
+                        <li><a href="/blog/tag:reti convolutive">reti convolutive</a></li>
+                        <li><a href="/blog/tag:keras">keras</a></li>
+                    </ul>
+        
+    </div>
+
+	<div>
+	<br />
+	<!-- AddToAny BEGIN -->
+<div class="a2a_kit a2a_kit_size_32 a2a_default_style">
+<a class="a2a_dd" href="https://www.addtoany.com/share"></a>
+<a class="a2a_button_facebook"></a>
+<a class="a2a_button_twitter"></a>
+<a class="a2a_button_linkedin"></a>
+<a class="a2a_button_google_plus"></a>
+<a class="a2a_button_email"></a>
+</div>
+<script async src="https://static.addtoany.com/menu/page.js"></script>
+<!-- AddToAny END -->
+</div>
+	
+    <div class="list-blog-padding">
+
+            <p><p>Il sistema nervoso umano è una struttura incredibilmente complessa. In ogni istante, <a href="https://biology.stackexchange.com/questions/44788/has-the-human-body-the-greatest-total-length-of-nerves-of-all-animals">oltre centomila chilometri di terminazioni nervose</a> connettono ciascuna parte del vostro corpo con il midollo spinale ed il cervello. Per ogni movimento che fate, è attraverso questa enorme "rete" che vengono trasmessi gli impulsi elettrici che coordinano e gesticono l'attività dei muscoli. E ciascuno di questi commandi ha a sua volta origine dal cervello, una struttura ancora più formidabile, nel quale miliardi di neuroni comunicano tra di loro e verso l'esterno tramite l'invio di continui segnali elettrici. Comprendere ed interpretare gli schemi che sottendono questa continua attività cerebrale è il sogno proibito di qualunque neuroscienziato e neurobiologo, una sfida che si è rivelata negli anni sempre più impegnativa.</p>
+<blockquote>
+<blockquote>
+<blockquote>
+<p>Questo articolo è una traduzione italiana dell'<a href="https://towardsdatascience.com/from-brain-waves-to-arm-movements-with-deep-learning-an-introduction-3c2a8b535ece">originale su Towards Data Science</a>. Potete trovare tutto il codice Python <a href="https://colab.research.google.com/drive/1lDfmXMo7_mcVBo9EAtgLNIgeJV50GTce#scrollTo=AFoTOqC-4Rjl">su un notebook di Google Colaboratory</a> o in un <a href="https://github.com/normandipalo/eeg-to-action">repository GitHub</a>.</p>
+</blockquote>
+</blockquote>
+</blockquote>
+<p>L'<strong>elettroencefalografia (EEG)</strong> è uno dei metodi meno invasivi per monitorare l'attività cerebrale di un soggetto, registrando le fluttuazioni nel voltaggio elettrico del cervello con una serie di elettrodi. In genere, per avere un quadro complessivo dell'attività cerebrale fino a 30 di questi elettrodi sono posizionati ad intervalli regolari sul capo del paziente. Purtroppo, al di fuori dei test in laboratorio, la relazione che intercorre tra queste registrazioni e l'attività cerebrale stessa è <a href="https://www.kaggle.com/c/grasp-and-lift-eeg-detection">complessa e molto meno compresa di quanto vorremmo</a>. "Decodificare" in qualche modo questi segnali è quindi una sfida enorme, che permetterebbe di controllare protesi artificiali ed altri apparati attraverso l'uso di interfacce uomo-macchina (<em>brain-computer interface</em>, BCI) a loro volta poco invasive.</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/dalle-onde-cerebrali-alla-robotica/images/image_1.png"alt="Esempio di onde cerebrali registrate tramite EEG" />
+        </figure>
+<figcaption>Esempio di onde cerebrali registrate tramite EEG (CC BY-SA 2.0, <a href="https://www.kaggle.com/c/grasp-and-lift-eeg-detection">Commons Wikipedia</a>).</figcaption>
+<p>In questa ottica, i recenti progressi nel campo del <strong>deep learning</strong> in problemi simili aprono nuove prospettive per analizzare questi segnali con l'uso di <strong>reti neurali</strong>. Questo post è un'introduzione a questo tema estremamente affascinante. Per prima cosa, leggeremo dei dati EEG forniti da una <a href="https://www.kaggle.com/c/grasp-and-lift-eeg-detection">competizione su Kaggle</a>, con l'obiettivo di capire quali pattern corrispondono a determinati gesti del braccio e della mano come, ad esempio, afferrare un oggetto o sollevarlo. In seguito, progetteremo una rete neurale allenata allo scopo di riconoscere questi movimenti, dopo aver <strong>processato i dati</strong> con diverse tecniche. Nel mentre, vi mostrerò anche alcune visualizzazioni dell'attività cerebrale, per avere un'idea dei dati su cui andiamo a lavorare.</p>
+<p>L'<strong>obiettivo ultimo</strong> di questa area di ricerca è di sviluppare <strong>protesi  artificiali</strong> accessibili a tutti, che chiunque possa controllare tramite impulsi nervosi, per permettere a chi ha perso un arto di tornare a poter eseguire facilmente tutti quei compiti che oggi gli sono preclusi. In futuro, tecniche simili potranno essere usate anche per misurare l'attività elettrica nei muscoli, decodificando in automatico il movimento che la persona stava eseguendo.</p>
+<h2>Che dati utilizzeremo</h2>
+<p>Potete scaricare liberamente i dati <a href="https://www.kaggle.com/c/grasp-and-lift-eeg-detection">da questo link</a> (è sufficiente un account Kaggle). Il dataset è composto da numerosi file .csv, tra cui:</p>
+<ul>
+<li>
+<p>Dati EEG registrati con 32 elettrodi posizionati sul capo del paziente e registrati a 500 Hz.</p>
+</li>
+<li>Etichette (per ogni istante temporale) del movimento che il soggetto sta compiendo (scelto tra 6 possibilità).</li>
+</ul>
+<p>I dati sono collezionati chiedendo ai soggetti di compiere diverse azioni semplici, come afferrare un oggetto o sollevarlo con un braccio. Il dataset è diviso da un lato fra i vari soggetti, e per ciascun soggetto in una serie di <em>episodi</em>. Le <strong>onde cerebrali sono molto soggettive</strong>: un modello ben allenato può facilmente identificare nuovi episodi della stessa persona, ma può faticare molto a fare lo stesso su nuovi soggetti se il dataset non è stato variegato a sufficienza.</p>
+<p>Ricapitolando, l'obiettivo è di creare una rete neurale che prenda come input le registrazioni EEG e fornisca in output una distribuzione di probabilità sulle sei azioni che il soggetto sta compiendo. Nel dataset non è considerato il caso in cui il soggetto non stia compiendo un'azione: in questo caso, possiamo aggiungerlo come classe aggiuntiva, o considerare ogni azione come una predizione indipendente, scegliendone una solo se supera una certa soglia. Se tutte le azioni sono sotto tale soglia, lo consideriamo un caso di "no-action".</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/dalle-onde-cerebrali-alla-robotica/images/image_2.jpg"alt="Posizione degli elettrodi" />
+        </figure>
+<figcaption>Posizione degli elettrodi (presa da <a href="https://www.kaggle.com/c/grasp-and-lift-eeg-detection/data">https://www.kaggle.com/c/grasp-and-lift-eeg-detection/data</a>).</figcaption>
+<p>Per cominciare, ho realizzato un'animazione dell'attività degli elettrodi. Poiché la frequenza di campionamento è molto alta (500 Hz), ho usato un <strong>filtro passa basso</strong> per diminuire queste variazioni, ed ho creato un'animazione con i primi 100 frame, che corrispondono a 1/5 di secondo circa.</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/dalle-onde-cerebrali-alla-robotica/images/image_3.gif"alt="Animazione degli elettrodi" />
+        </figure>
+<figcaption>Animazione dei 32 elettrodi nei primi 200 ms.</figcaption>
+<p>Possiamo visualizzare la stessa informazione come una heatmap a due dimensioni, dove l'asse verticale è il tempo (che scorre "verso il basso"), e l'asse orizzontale separa i 32 elettrodi.</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/dalle-onde-cerebrali-alla-robotica/images/image_4.png"alt="Heatmap dell'EEG" />
+        </figure>
+<figcaption>Heatmap temporale dell'attività EEG (sull'asse verticale, il tempo scorre dall'alto verso il basso).</figcaption>
+<p>Questa visualizzazione è molto utile poiché, come vedremo, ci permette di lavorare con <strong>convoluzioni spazio-temporali</strong>.</p>
+<h2>Processare i dati</h2>
+<p>Per agevolare il classificatore, possiamo processare i dati per rendere più semplice la fase successiva di allenamento. Ad esempio, la frequenza di campionamento molto alta dell'EEG contrasta con il fatto che le azioni cambiano con una frequenza molto bassa: i dati in input cambiano molto velocemente, mentre le azioni rimangono costanti, ed alcune di queste fluttuazioni sono indistinguibili da puro rumore. Un modello che lavori nel tempo riceverebbe quindi dati in continuo cambiamento, mentre l'output rimarrebbe costante.</p>
+<p>Come accennato prima, il primo passo è quello di <strong>filtrare i dati con un filtro passa basso</strong>. In questo caso, anche una semplice media a finestra mobile aiuta: in questo modo mitighiamo il cambiamento nelle frequenze troppo alte, mantenendo allo stesso tempo l'informazione utile contenuta nelle frequenze più basse (la frequenza del cambio di azione è di circa 1 Hz). A questo punto, possiamo anche <strong>sottocampionare i dati</strong>, ovvero tenere un solo punto ogni 10, 100, ecc. Questo aiuta a ridurre la dimensionalità nel tempo e diminuisce la correlazione nei dati.</p>
+<p>Anche se potremmo utilizzare moltre altre tecniche, per semplicità in questa introduzione ci fermiamo qui ed andiamo avanti con la progettazione della rete neurale.</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/dalle-onde-cerebrali-alla-robotica/images/image_5.gif" />
+        </figure>
+<h2>Progettare la rete neurale (e testarla)</h2>
+<p>Quando lavoriamo con dati nel tempo, una delle architetture più utilizzate sono le <strong>reti neurali ricorrenti</strong>. Queste reti hanno una struttura dinamica, con uno stato interno che permette di codificare informazione tra gli istanti temporali in modo da prendere decisioni basate sull'intera sequenza degli input. Inizialmente ho progettato una <strong>LSTM in Keras</strong>, fornendole i dati in input dei quali ho mantenuto la struttura temporale. I risultati erano buoni, ma in questa introduzione mi interessa di più mostrare l'utilizzo di una più semplice <strong>rete neurale convolutiva</strong> (<em>convolutional neural network</em>, CNN) che, anche se usata classicamente per le immagini, funziona molto bene anche in queste situazioni.</p>
+<p>Come detto prima, in un certo senso stiamo lavorando con informazioni spazio-temporali: l'asse verticale della heatmap rappresenta l'evoluzione temporale, mentre l'asse orizzontale mostra i vari elettrodi. Più vicino sono gli elettrodi sulla heatmap, più vicini li ritroviamo anche nel loro posizionamento sul capo (quasi sempre). Questo rende la heatmap perfetta per estrarre feature con delle convoluzioni: in effetti, un kernel 2D permette di estrarre informazioni sia nel tempo che nello spazio. Immaginate un <strong>classico filtro convolutivo 3x3</strong>: dalla heatmap, questo estrarrebbe feature facendo una media pesata di tre istanti temporali diversi (tre righe della heatmap), ma anche da tre diversi elettrodi (tre colonne della heatmap). Grazie a questo, una CNN con molti filtri può trovare feature che descrivono <strong>come cambiano le attivazioni degli elettrodi su un certo intervallo di tempo in relazione al movimento desiderato</strong>.</p>
+<p>Per testare questo, ho implementato una semplice CNN in Keras per valutarne le prestazioni. Potete trovare tutto il codice Python dell'articolo <a href="https://colab.research.google.com/drive/1lDfmXMo7_mcVBo9EAtgLNIgeJV50GTce#scrollTo=AFoTOqC-4Rjl">su un notebook di Google Colaboratory</a> o sulla <a href="https://github.com/normandipalo/eeg-to-action">repository GitHub</a>. Qui sotto trovate il codice necessario per creare ed ottimizzare la rete neurale.</p>
+<pre><code class="language-py"># Import da Keras
+import keras
+from keras.models import Sequential
+from keras.layers import Dense, Dropout
+from keras.layers import Embedding
+from keras.layers import LSTM, CuDNNLSTM, BatchNormalization, Conv2D, Flatten, MaxPooling2D, Dropout
+from keras.optimizers import Adam
+
+# Costruzione del modello
+model = Sequential()
+model.add(Conv2D(filters = 64, kernel_size = (7,7), padding = "same", activation = "relu", input_shape = (time_steps//subsample, 32, 1)))
+model.add(BatchNormalization())
+model.add(Conv2D(filters = 64, kernel_size = (5,5), padding = "same", activation = "relu", input_shape = (time_steps//subsample, 32, 1)))
+model.add(BatchNormalization())
+model.add(Conv2D(filters = 64, kernel_size = (3,3), padding = "same", activation = "relu", input_shape = (time_steps//subsample, 32, 1)))
+model.add(BatchNormalization())
+model.add(Flatten())
+model.add(Dense(32, activation = "relu"))
+model.add(BatchNormalization())
+model.add(Dense(6, activation = "sigmoid"))
+
+# Ottimizzazione
+adam = Adam(lr = 0.001)
+model.compile(optimizer = adam, loss = "categorical_crossentropy", metrics = ["accuracy"])
+model.summary()</code></pre>
+<p>Per valutare le prestazioni del modello, come suggerito anche nella competizione Kaggle, andiamo a calcolare l'<strong>area under the curve (AUC)</strong> (se non siete familiari con l'AUC, <a href="https://datascience.stackexchange.com/questions/806/advantages-of-auc-vs-standard-accuracy">qui</a> ne trovate una spiegazione intuitiva). Come potete vedere nel notebook, la rete raggiunge rapidamente uno score AUC di 0.85, con una fase di allenamento molto veloce.</p>
+<p>Potremmo migliorare queste prestazioni complicando a piacere la fase di preprocessing o l'architettura della rete. In generale, però, questa prova introduttiva mostra già la capacità incredibile delle reti neurali di apprendere da questo genere di dati.</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/dalle-onde-cerebrali-alla-robotica/images/image_6.gif" />
+        </figure>
+<h2>Conclusione</h2>
+<p>Questo articolo era un'introduzione all'analisi di EEG con tecniche di deep learning. Abbiamo visto alcune visualizzazioni intuitive dei dati, e come usare le reti neurali per estrarre feature e riconoscere i movimenti umani. Credo che queste tecnologie (protesi robotiche, interfacce uomo-macchina) saranno profondamente influenzate dal deep learning man mano che le varie tecniche, piattaforme e competizioni cresceranno negli anni.</p>
+<p>L'impatto di queste tecnologie sarà incredibile. Avere a disposizione protesi a basso costo che possono essere controllate intuitivamente può migliorare in modo significativo <a href="https://web.stanford.edu/class/engr110/2011/LeBlanc-03a.pdf">la vita di milioni di persone</a> nel mondo.</p>
+<p>Se siete interessati, vi suggerisco di guardare il <a href="https://medium.com/symbionic-project">Symbionic Project</a>, un progetto partito da poco con l'obiettivo di creare un <strong>braccio artificiale intelligente ed a basso costo</strong>, che possa essere controllato con l'attivazione dei muscoli, per rendere realmente "democratico" l'accesso a questi sistemi.</p>
+<h2>Qualcosa su di me</h2>
+<p>Norman Di Palo è uno studente di AI e Robotica all'Università Sapienza di Roma. Ha partecipato al primo batch della <a href="http://picampus-school.com/programme/school-of-ai/">Pi School of Artificial Intelligence</a>, dove ora è AI &amp; Robotics Advisor. Lavora nel campo del deep learning da circa un anno, con progetti che vanno dalle self-driving car alla robotica. È co-founder di una startup nel campo AI incubata a <a href="http://luissenlabs.com/">LUISS Enlabs</a>. Potete contattarlo via mail (normandipalo@me.com) o su <a href="https://www.linkedin.com/in/norman-di-palo/">LinkedIn</a>.</p>
+<hr />
+<p>Se questo articolo ti è piaciuto e vuoi tenerti aggiornato sulle nostre attività, ricordati che l'<a href="/member">iscrizione all'Italian Association for Machine Learning</a> è gratuita! Puoi seguirci anche su <a href="https://www.facebook.com/machinelearningitalia/">Facebook</a> e su <a href="https://www.linkedin.com/company/iaml/">LinkedIn</a>.</p></p>
+            
+    
+        <p class="prev-next">
+                            <a class="button" href="/blog/alle-prese-con-pytorch-parte-3"><i class="fa fa-chevron-left"></i> Previous Post</a>
+            
+                            <a class="button" href="/blog/alle-prese-con-pytorch-parte-4">Next Post <i class="fa fa-chevron-right"></i></a>
+                    </p>
+    
+    </div>
+</div>
+			</div>
+			<div id="sidebar" class="g-block size-1-3 pure-u-1-3">
+				<div class="sidebar-content">
+    <h4>Search the blog</h4>
+    <input type="text" placeholder="Search..." value="" data-searchsidebar-input="/search/query" />
+<script>
+jQuery(document).ready(function($){
+    var input = $('[data-searchsidebar-input]');
+
+    input.on('keypress', function(event) {
+        if (event.which == 13 && input.val().length > 3) {
+            event.preventDefault();
+            window.location.href = input.data('searchsidebar-input') + ':' + input.val();
+        }
+    });
+});
+</script>
+</div>
+<!--
+<div class="sidebar-content">
+	<h4>Some Text Widget</h4>
+	<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna.</p>
+</div>
+!-->
+<div class="sidebar-content">
+    <h4>Categories</h4>
+    
+
+<ul class="archives">
+        <li>
+        <a href="/blog/category:Tutorials">Tutorials </a> (16)
+    </li>
+        <li>
+        <a href="/blog/category:Discussions">Discussions </a> (12)
+    </li>
+        <li>
+        <a href="/blog/category:Announcements">Announcements </a> (4)
+    </li>
+        <li>
+        <a href="/blog/category:Tutorials%20%28English%29">Tutorials (English) </a> (4)
+    </li>
+        <li>
+        <a href="/blog/category:Articles%27%20summaries">Articles' summaries </a> (3)
+    </li>
+        <li>
+        <a href="/blog/category:Discussions%20%28English%29">Discussions (English) </a> (2)
+    </li>
+        <li>
+        <a href="/blog/category:Focus-on">Focus-on </a> (1)
+    </li>
+        <li>
+        <a href="/blog/category:Reviews">Reviews </a> (1)
+    </li>
+        <li>
+        <a href="/blog/category:Discussion">Discussion </a> (1)
+    </li>
+    </ul>
+</div>
+<div class="sidebar-content">
+    <h4>Archives</h4>
+	<ul class="archives">
+    <li>
+    	<a href="/blog/archives_month:apr_2020">
+        <span class="archive_date">April 2020</span>
+                <span>(1)</span>
+                </a>
+    </li>
+</ul>
+</div>
+<div class="sidebar-content">
+    <h4>Popular Tags</h4>
+    
+
+<ul class="archives">
+        <li>
+        <a href="/blog/tag:deep%20learning">deep learning </a> (11)
+    </li>
+        <li>
+        <a href="/blog/tag:pytorch">pytorch </a> (9)
+    </li>
+        <li>
+        <a href="/blog/tag:reti%20neurali">reti neurali </a> (5)
+    </li>
+        <li>
+        <a href="/blog/tag:google">google </a> (4)
+    </li>
+        <li>
+        <a href="/blog/tag:jit">jit </a> (4)
+    </li>
+        <li>
+        <a href="/blog/tag:tensorflow">tensorflow </a> (4)
+    </li>
+        <li>
+        <a href="/blog/tag:ottimizzazione">ottimizzazione </a> (4)
+    </li>
+        <li>
+        <a href="/blog/tag:rete%20neurale">rete neurale </a> (3)
+    </li>
+        <li>
+        <a href="/blog/tag:time%20series">time series </a> (3)
+    </li>
+        <li>
+        <a href="/blog/tag:keras">keras </a> (3)
+    </li>
+        <li>
+        <a href="/blog/tag:reti%20convolutive">reti convolutive </a> (3)
+    </li>
+        <li>
+        <a href="/blog/tag:pipeline">pipeline </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:sklearn">sklearn </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:autodiff">autodiff </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:automatic%20differentation">automatic differentation </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:reverse-mode">reverse-mode </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:derivate">derivate </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:differenziazione">differenziazione </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:model%20selection">model selection </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:cross%20validation">cross validation </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:c%2B%2B">c++ </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:numpy">numpy </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:vmap">vmap </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:caffe">caffe </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:compiler">compiler </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:jax">jax </a> (2)
+    </li>
+        <li>
+        <a href="/blog/tag:codemotion">codemotion </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:bias">bias </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:discrimination">discrimination </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:fairness">fairness </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:iaml">iaml </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:database">database </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:iperparametri">iperparametri </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:autograph">autograph </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:head">head </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:multi-task">multi-task </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:learning">learning </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:novit%C3%A0">novità </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:dev%20summit">dev summit </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:custom%20estimator">custom estimator </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:hyperopt">hyperopt </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:goodfellow">goodfellow </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:nlp">nlp </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:dati%20mancanti">dati mancanti </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:transformer">transformer </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:attenzione">attenzione </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:robocop">robocop </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:yolo">yolo </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:object%20detection">object detection </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:bayes">bayes </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:autoencoders">autoencoders </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:variational">variational </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:eager">eager </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:imputazione">imputazione </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:CIFAR">CIFAR </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:word%20embedding">word embedding </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:MNIST">MNIST </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:immagini">immagini </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:classificazione">classificazione </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:kpi">kpi </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:reprogramming">reprogramming </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:adversarial">adversarial </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:browser">browser </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:javascript">javascript </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:reti%20ricorsive">reti ricorsive </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:reti%20ricorrenti">reti ricorrenti </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:ftth">ftth </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:adversarial%20example">adversarial example </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:management">management </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:robotica">robotica </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:ocr">ocr </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:focus">focus </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:iphone">iphone </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:python">python </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:face%20id">face id </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:momento">momento </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:adam">adam </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:neuroscienza">neuroscienza </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:onde%20cerebrali">onde cerebrali </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:torchvision">torchvision </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:latin">latin </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:pretrained">pretrained </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:rete%20convolutiva">rete convolutiva </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:autograd">autograd </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:swish">swish </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:attivazione">attivazione </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:checkpoint">checkpoint </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:tensori">tensori </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:variabili">variabili </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:lineare">lineare </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:regressione">regressione </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:convolutional%20networks">convolutional networks </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:Vatican">Vatican </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:project">project </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:kernel">kernel </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:ICLR">ICLR </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:ipotesi">ipotesi </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:sparsit%C3%A0">sparsità </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:funzionale">funzionale </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:functional">functional </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:adversarial%20attack">adversarial attack </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:kmeans">kmeans </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:analysis">analysis </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:clustering">clustering </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:Google">Google </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:regression">regression </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:JAX">JAX </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:gaussian%20process">gaussian process </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:ensemble">ensemble </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:boosting">boosting </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:gradient">gradient </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:semi-supervised%20learning">semi-supervised learning </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:document%20classification">document classification </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:graphs">graphs </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:variables">variables </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:linear">linear </a> (1)
+    </li>
+        <li>
+        <a href="/blog/tag:k-NN">k-NN </a> (1)
+    </li>
+    </ul>
+</div>
+<div class="sidebar-content syndicate">
+    <h4>Syndicate</h4>
+    <a class="button" href="/blog.atom"><i class="fa fa-rss-square"></i> Atom 1.0</a>
+    <a class="button" href="/blog.rss"><i class="fa fa-rss-square"></i> RSS</a>
+</div>
+			</div>
+		</div>
+	
+                        <div class="modular-row footer ">
+    <div class="footer-items">
+        <div class="footer-module large">
+		<h4>About</h4>
+                            <p>Italian Association for Machine Learning (C.F. 97949550582)</p>
+            			<p>Write us: info@iaml.it</p>
+        </div>
+        <div class="footer-module"><h4>Address</h4>
+            <p>
+                                    <span><strong>Operational office</strong></span>
+                                    <span>IAML c/o Pi Campus, via Indonesia 23, 00144 Rome</span>
+                                    <span><strong>Legal office</strong></span>
+                                    <span>Via Cassia 964, 00189, Rome</span>
+                            </p>
+        </div>
+        <div class="footer-module"><h4>Quick Links</h4>
+         <ul class="quickmenu">
+                            <li><i class="fa fa-chevron-right"></i><a href="https://iaml.it/home">Home</a></li>
+                            <li><i class="fa fa-chevron-right"></i><a href="https://iaml.it/documents">Documents (Italian)</a></li>
+                    </ul>
+    </div>
+   
+</div>
+<hr>
+<div class="footer-modules">
+    <div class="footer-copyright">
+        Copyright 2018 IAML.IT. All Rights Reserved.
+    </div>
+    <div class="footer-menu">
+    <ul class="othermenu">
+           <li><a href="https://learn.getgrav.org/">Powered by Grav</a></li>
+           <li><a href="https://github.com/getgrav/grav-theme-deliver">Theme (adapted) from Deliver</a></li>
+        </ul>
+    </div>
+</div>
+</div>                    </section>
+        
+    </div>
+    <div class="sb-slidebar sb-left sb-width-thin">
+        <div id="panel">
+        
+<ul class="navigation">
+                                                        <li class="">
+                    <a href="/">
+                                                Home
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/activities">
+                                                Activities
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/supporters">
+                                                Supporters
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/member">
+                                                Become a member
+                    </a>
+                </li>
+                                                                <li class="active">
+                    <a href="/blog">
+                                                Blog
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="/governance">
+                                                Governance
+                    </a>
+                </li>
+                                                                                                                                </ul>                   </div>
+    </div>
+        <script src="/user/plugins/simplesearch/js/simplesearch.js" type="text/javascript" ></script>
+
+    <script>
+    $(function () {
+        $(document).ready(function() {
+          $.slidebars({
+            hideControlClasses: true,
+            scrollLock: true
+          });
+        });
+    });
+    </script>
+    </body>
+</html>

@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Variational Autoencoders 1 - The Basics | Italian Association for Machine Learning</title>
+    <meta content="GravCMS"  />
+<meta content="The Italian Association for Machine Learning (IAML) is a not-for-profit organization with the purpose of promoting knowledge of machine learning in all aspects of the Italian public life, from universities to enterprises and IT professionals."  />
+<meta property="og:title" content="Variational Autoencoders 1 - The Basics | IAML.it"  />
+<meta property="og:image" content="https://iaml.it/blog/variational-autoencoders-1/0OWDuTC.png"  />
+<meta property="og:url" content="https://iaml.it/blog/variational-autoencoders-1/"  />
+<meta property="og:description" content="The Variational Autoencoder (VAE) is a not-so-new-anymore Latent Variable Model which allows to estimate the uncertainty in the predictions and inject domain knowledge through informative priors."  />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="icon" type="image/png" href="../user/themes/deliver/images/favicon.png" />
+
+	<!-- Global site tag (gtag.js) - Google Ads: 774709547 --> <script async src="https://www.googletagmanager.com/gtag/js?id=AW-774709547"></script> <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'AW-774709547'); </script> 
+	
+		
+                            		                                                <link href="../user/themes/deliver/css-compiled/nucleus.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css-compiled/template.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css/custom.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css/toc.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css/font-awesome.min.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/facebook/css/facebook.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/facebook/assets/unitegallery/css/unite-gallery.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/facebook/assets/unitegallery/themes/default/ug-theme-default.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/markdown-notices/assets/notices.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/breadcrumbs/css/breadcrumbs.css" type="text/css" rel="stylesheet" />
+<link href="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/events/assets/events.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/form/assets/form-styles.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/mathjax/assets/css/mathjax.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/simplesearch/css/simplesearch.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/highlight/css/zenburn.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/login/css/login.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css/slidebars.min.css" type="text/css" rel="stylesheet" />
+<link href="../user/themes/deliver/css/slideme.css" type="text/css" rel="stylesheet" />
+<link href="../user/plugins/socialbuttons/vendor/rrssb/css/rrssb.css" type="text/css" rel="stylesheet" />
+
+
+                                                            <script src="../system/assets/jquery/jquery-2.x.min.js" type="text/javascript" ></script>
+<script src="../user/themes/deliver/js/modernizr.custom.71422.js" type="text/javascript" ></script>
+<script src="../user/plugins/facebook/assets/unitegallery/js/unitegallery.min.js" type="text/javascript" ></script>
+<script src="../user/plugins/facebook/assets/unitegallery/themes/default/ug-theme-default.js" type="text/javascript" ></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.js" type="text/javascript" ></script>
+<script src="../user/plugins/events/assets/events.js" type="text/javascript" ></script>
+<script src="../user/plugins/mathjax/assets/js/mathjax.js" type="text/javascript" ></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript" ></script>
+<script src="../user/plugins/highlight/js/highlight.pack.js" type="text/javascript" ></script>
+<script src="../user/themes/deliver/js/deliver.js" type="text/javascript" ></script>
+<script src="../user/themes/deliver/js/slidebars.min.js" type="text/javascript" ></script>
+<script src="../user/themes/deliver/js/jquery.slideme2.js" type="text/javascript" ></script>
+<script src="../user/plugins/socialbuttons/vendor/rrssb/js/rrssb.min.js" type="text/javascript" ></script>
+
+<script>
+window.addEventListener("load", function(){
+window.cookieconsent.initialise({
+"palette": {
+    "popup": {
+        "background": "#4d4d4d",
+        "text": "#fff"
+    },
+    "button": {
+        "background": "#f1d600",
+        "text": "#000",
+        "border": "#f1d600"
+    }
+},
+"position": "bottom",
+"theme": "block",
+"content": {
+    "message": "This website uses cookies to ensure you get the best experience on our website.",
+    "dismiss": "Got it!",
+    "link": "Learn more",
+    "href": "https://cookiesandyou.com"
+}
+})});
+hljs.initHighlightingOnLoad();
+
+</script>
+
+
+</head>
+<body id="top" class="header-lite fullwidth blogstyling">
+    <div id="sb-site">
+                <header id="header">
+                <div class="logo">
+                    <h3><a href="../index.html"><img src="../user/pages/images/IAML_logo_viola.png" /></a></h3>
+                                            <ul class="social-icons">
+            <li>
+            <a href="https://twitter.com/iaml_it">
+                <i class="fa fa-twitter"></i>            </a>
+        </li>
+            <li>
+            <a href="https://www.linkedin.com/company/iaml/">
+                <i class="fa fa-linkedin"></i>            </a>
+        </li>
+            <li>
+            <a href="https://www.facebook.com/machinelearningitalia/">
+                <i class="fa fa-facebook"></i>            </a>
+        </li>
+            <li>
+            <a href="blog.rss">
+                <i class="fa fa-rss"></i>            </a>
+        </li>
+    </ul>  
+                                    </div>
+                <div id="navbar">
+                                                            
+<ul class="navigation">
+                                                        <li class="">
+                    <a href="../index.html">
+                                                Home
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../activities">
+                                                Activities
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../supporters.html">
+                                                Supporters
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../member.html">
+                                                Become a member
+                    </a>
+                </li>
+                                                                <li class="active">
+                    <a href="../blog">
+                                                Blog
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../governance.html">
+                                                Governance
+                    </a>
+                </li>
+                                                                                                                                </ul>                                                   <form class="search-box">
+    <input type="search" placeholder="Search..." value="" data-search-input="/search/query" />
+    <script>
+    jQuery(document).ready(function($){
+        var input = $('[data-search-input]');
+
+        input.on('keypress', function(event) {
+            if (event.which == 13 && input.val().length > 3) {
+                event.preventDefault();
+                window.location.href = input.data('search-input') + ':' + input.val();
+            }
+        });
+    });
+    </script>
+    <i class="fa fa-search"></i>
+</form>                    <span class="panel-activation sb-toggle-left navbar-left menu-btn fa fa-bars"></span>
+                </div>
+        </header>
+        
+        
+                <section id="body" class="">
+                            
+				<div class="flush-top blog-header blog-header-image" style="background: #B4B093 url(/user/pages/05.blog/blue_header.jpg) no-repeat right;">
+            <h1>Variational Autoencoders 1 - The Basics</h1>
+        </div>
+            
+        
+<div id="breadcrumbs" itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
+                                            <a href="../index.html" itemprop="url"><span itemprop="title">Home</span></a>
+                        <i class="fa fa-angle-right"></i>
+                                                <a href="../blog" itemprop="url"><span itemprop="title">Blog</span></a>
+                        <i class="fa fa-angle-right"></i>
+                                                <span itemprop="title">Variational Autoencoders 1 - The Basics</span>
+                        </div>
+		
+		<div class="blog-content-item g-grid pure-g-r">
+			<div id="item" class="g-block pure-u-2-3">
+			    <div class="list-item">
+
+    <div class="list-blog-header">
+                    <img src="../images/a/e/6/d/8/ae6d81096705be1b091292f0e8a1860da113d46b-iooxa6p.png" />
+        
+                    <h4><a href="variational-autoencoders-1.html">Variational Autoencoders 1 - The Basics</a></h4>
+        
+        <span class="list-blog-date">
+            <i class="fa fa-calendar"></i>
+            25, Feb
+        </span>
+                <span class="list-blog-author">
+            <i class="fa fa-user"></i>
+            Andrea Panizza
+        </span>
+                       <ul class="tags">
+            <i class="fa fa-tag"></i>
+                        <li><a href="tagvariational.html">variational</a></li>
+                        <li><a href="tagautoencoders.html">autoencoders</a></li>
+                        <li><a href="tagbayes.html">bayes</a></li>
+                    </ul>
+        
+    </div>
+
+	<div>
+	<br />
+	<!-- AddToAny BEGIN -->
+<div class="a2a_kit a2a_kit_size_32 a2a_default_style">
+<a class="a2a_dd" href="https://www.addtoany.com/share"></a>
+<a class="a2a_button_facebook"></a>
+<a class="a2a_button_twitter"></a>
+<a class="a2a_button_linkedin"></a>
+<a class="a2a_button_google_plus"></a>
+<a class="a2a_button_email"></a>
+</div>
+<script async src="https://static.addtoany.com/menu/page.js"></script>
+<!-- AddToAny END -->
+</div>
+	
+    <div class="list-blog-padding">
+
+            <p><p>The Variational Autoencoder (VAE) is a not-so-new-anymore Latent Variable Model (<a href="https://arxiv.org/pdf/1312.6114.pdf">Kingma &amp; Welling, 2014</a>), which by introducing a probabilistic interpretation of autoencoders, allows to not only estimate the variance/uncertainty in the predictions, but also to inject domain knowledge through the use of informative priors, and possibly to make the latent space more interpretable. VAEs can have various applications, mostly related to data generation (for example, image generation, sound generation and <em>missing data imputation</em>)<sup id="fnref1:1"><a href="#fn:1" class="footnote-ref">1</a></sup>.</p>
+<p class="mathjax mathjax--block">\[
+\DeclareMathOperator\supp{supp}
+\DeclareMathOperator*{\argmax}{arg\,max}\]</p>
+<nav class="table-of-contents minitoc" role="navigation">
+                <span class="toctitle">Overview:</span>
+      
+                                                                                              
+  <ul>
+      
+        
+        
+              <li><a href="#va-es-are-generative-models" class="toclink" title="VAEs are generative models">VAEs are generative models</a></li>
+      
+        
+        
+              <li><a href="#va-es-are-latent-variable-models" class="toclink" title="VAEs are Latent Variable models">VAEs are Latent Variable models</a></li>
+      
+        
+        
+              <li><a href="#estimating-the-model" class="toclink" title="Estimating the model">Estimating the model</a></li>
+      
+                      <li><ul>
+          
+        
+              <li><a href="#enter-variational-inference" class="toclink" title="Enter Variational Inference">Enter Variational Inference</a></li>
+      
+                      <li><ul>
+          
+        
+              <li><a href="#the-kullback-leibler-divergence" class="toclink" title="The Kullback-Leibler divergence">The Kullback-Leibler divergence</a></li>
+      
+        
+        
+              <li><a href="#some-elbo-grease" class="toclink" title="Some ELBO grease">Some ELBO grease</a></li>
+      
+        
+        
+              <li><a href="#bend-your-elbo" class="toclink" title="Bend your ELBO">Bend your ELBO</a></li>
+      
+                      </ul></li>
+          
+        
+              <li><a href="#the-sgvb-estimator-and-the-aevb..." class="toclink" title="The SGVB estimator and the AEVB algorithm">The SGVB estimator and the AEVB algorithm</a></li>
+      
+                      </ul></li>
+          
+        
+              <li><a href="#amortized-variational-inference..." class="toclink" title="Amortized Variational Inference, AKA Variational Autoencoders, finally!">Amortized Variational Inference, AKA Variational Autoencoders, finally!</a></li>
+      
+                      <li><ul>
+              <li><ul>
+          
+        
+              <li><a href="#learning-the-vae" class="toclink" title="Learning the VAE">Learning the VAE</a></li>
+      
+        
+        
+              <li><a href="#generating-samples" class="toclink" title="Generating samples">Generating samples</a></li>
+      
+                      </ul></li>
+          
+        
+              <li><a href="#experimental-results" class="toclink" title="Experimental results">Experimental results</a></li>
+      
+                      </ul></li>
+          
+        
+              <li><a href="#about-the-author" class="toclink" title="About the author">About the author</a></li>
+      
+    
+  </ul>
+</nav>
+
+
+<h2 id="va-es-are-generative-models" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#va-es-are-generative-models" title="Permanent link: VAEs are generative models" data-icon="#">VAEs are generative models</a></h2>
+<p>Unlike classical (sparse, denoising, etc.) autoencoders, VAEs are probabilistic <em>generative</em> models, like GANs (Generative Adversarial Networks). With <em>generative</em> we denote a model which learns the probability distribution <span class="mathjax mathjax--inline">$p(\mathbf{x})$</span> over the input space <span class="mathjax mathjax--inline">$\mathcal{X}$</span>. This means that after training such a model, we can then sample from our approximation of <span class="mathjax mathjax--inline">$p(\mathbf{x})$</span>. If our training set contains handwritten digits (<a href="http://yann.lecun.com/exdb/mnist/">MNIST</a>), then the trained generative model is able to create images which look like handwritten digits, even though they're not "copies" of the images in the training set. In the case of images, if our training set contains natural images (<a href="https://www.cs.toronto.edu/~kriz/cifar.html">CIFAR-10</a>) or celebrity faces (<a href="http://mmlab.ie.cuhk.edu.hk/projects/CelebA.html">CelebA</a>), it will generate images which look like photo pics.</p>
+<p>Learning the distribution of the images in the training set implies that images which look like handwritten digits (for example) have an high probability of being generated, while images which look like the Jolly Roger or random noise have a low probability. In other words, it means learning about the dependencies among pixels: if our image is a <span class="mathjax mathjax--inline">$28\times 28=784$</span> pixels grayscale image from MNIST, the model should learn that if a pixel is very bright, then there's a significant probability that some neighboring pixels are bright too, that if we have a long, slanted line of bright pixels we may have another smaller, horizontal line of pixels above this one (a 7), etc. </p>
+<figure role="group">
+        <img src="https://iaml.it/blog/variational-autoencoders-1/images/n8tVcHc.png">
+        </figure>
+<h2 id="va-es-are-latent-variable-models" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#va-es-are-latent-variable-models" title="Permanent link: VAEs are Latent Variable models" data-icon="#">VAEs are Latent Variable models</a></h2>
+<p>The VAE is a <em>Latent Variable Model</em> (LVM): this means that <span class="mathjax mathjax--inline">$\mathbf{x}$</span>, the random vector of the 784 pixel intensities (the <em>observed</em> variables), is modeled as a (possibly very complicated) function of a random vector <span class="mathjax mathjax--inline">$\mathbf{z}\in\mathcal{Z}$</span> of lower dimensionality, whose components are unobserved (<em>latent</em>) variables. Usually an uncorrelated Gaussian prior for <span class="mathjax mathjax--inline">$\mathbf{z}$</span> is assumed, but this is not required. Coincisely, we assume the following data generating process:</p>
+<p class="mathjax mathjax--block">\[
+\begin{align}
+\mathbf{z} &\sim p_{\theta^*}(\mathbf{z}) \\
+\mathbf{x}\vert\mathbf{z} &\sim p_{\theta^*}(\mathbf{x}\vert\mathbf{z}) 
+\end{align}\]</p>
+<p>And we assume that both the prior <span class="mathjax mathjax--inline">$p_{\theta^*}(\mathbf{z})$</span> and the likelihood <span class="mathjax mathjax--inline">$p_{\theta^*}(\mathbf{x}\vert\mathbf{z})$</span> come from some parametric families (possibly different). The corresponding DAG (Directed Acyclic Graph) is then:</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/variational-autoencoders-1/images/iOOXa6P.png">
+        </figure>
+<figcaption>Adapted from <a href="https://arxiv.org/pdf/1312.6114.pdf">Kingma &amp; Welling, 2014</a>.</figcaption>
+<p>Latent variable models are also sometimes called <em>hierarchical</em> or <em>multilevel</em> models, and they are models that use the rules of conditional probability to specify complicated probability distributions over high dimensional spaces, by composing simpler probability density functions. The original VAE has only two levels, but recently <a href="https://arxiv.org/abs/1902.02102">an <em>amazing</em> paper on a hierarchial VAE</a> with multiple levels of latent variables has been published (note that the hierarchy of latent variables in a probabilistic model has nothing to do with the layers of a neural network).</p>
+<p>When does a latent variable model make intuitive sense? For example, in the MNIST case we think that the handwritten digits belong to a manifold of dimension much smaller than the dimension of <span class="mathjax mathjax--inline">$\mathbf{x}$</span>, because the vast majority of random arrangements of 784 pixel intensities, don't look at all like handwritten digits. The representation of the image should be equivariant to certain transformations (e.g., rotations, translations and small deformations) but not to others. So in this case it makes sense to think that the image samples are generated by taking samples (<em>which we don't observe</em>) in a sample space of much smaller dimension, and then transforming them according to some complicated function. </p>
+<h2 id="estimating-the-model" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#estimating-the-model" title="Permanent link: Estimating the model" data-icon="#">Estimating the model</a></h2>
+<p>We are now given a dataset consisting of <span class="mathjax mathjax--inline">$N$</span> i.i.d. samples, <span class="mathjax mathjax--inline">$\mathbf{X}=\{\mathbf{x}_i\}_{i=1}^N$</span> (note again that we do <strong>not</strong> observe <span class="mathjax mathjax--inline">$\mathbf{z}$</span>) and we want to estimate <span class="mathjax mathjax--inline">$\theta^*$</span>. The standard "recipe" would be to maximize the likelihood of the data (marginalized over the latent variables), i.e., Maximum Likelihood Estimation:</p>
+<p class="mathjax mathjax--block">\[
+\hat{\theta}=\argmax_{\theta\in\Theta}p_{\theta}(\mathbf{X}) =\argmax_{\theta\in\Theta}\sum_{i=1}^N\log_{\theta}{p(\mathbf{x}_i)}\]</p>
+<p>However, we're immediately faced with two challenges:</p>
+<ol>
+<li>
+<p>computing <span class="mathjax mathjax--inline">$p_{\theta}(\mathbf{x}_i)$</span> requires solving the integral</p>
+<p class="mathjax mathjax--block">\[
+p_{\theta}(\mathbf{x}_i) = \int p_{\theta}(\mathbf{x}_i\vert\mathbf{z})p_{\theta}(\mathbf{z})d\mathbf{z} \label{a}\tag{1}\]</p>
+<p>which is often intractable <sup id="fnref1:2"><a href="#fn:2" class="footnote-ref">2</a></sup>, even in the simple case of one hidden layer nonlinear neural networks.</p>
+</li>
+<li>we need to compute the integral for <em>all</em> <span class="mathjax mathjax--inline">$N$</span> data samples <span class="mathjax mathjax--inline">$\mathbf{x}_i$</span> of a large dataset, which rules out either batch optimization, or sampling-based solutions such as <a href="https://arxiv.org/abs/1206.4768">Monte Carlo EM</a>, which would require an expensive sampling step for each <span class="mathjax mathjax--inline">$\mathbf{x}_i$</span>. </li>
+</ol>
+<p>We need to get <em>waaay</em> smarter.</p>
+<h3 id="enter-variational-inference" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#enter-variational-inference" title="Permanent link: Enter Variational Inference" data-icon="#">Enter Variational Inference</a></h3>
+<p>To solve the first problem, i.e., the intractability of the marginal likelihood, we use an age-old (in ML years) trick: Variational Inference (introduced in <a href="https://people.eecs.berkeley.edu/~jordan/papers/variational-intro.pdf">Jordan et al., 1999</a> and nicely reviewed in <a href="https://arxiv.org/pdf/1601.00670.pdf">Blei et al., 2018</a>). VI transforms the inference problem into an optimization problem. This way, we get rid of integration, but we pay a price, as we'll see later. <strong>Fair warning</strong>: this section is more mathy than the rest. I'll introduce necessary concepts such as the <a href="https://en.wikipedia.org/wiki/Kullback-Leibler_divergence">Kullback-Leibler divergence</a>, but you may want to skip to the next session, for a first read.</p>
+<h4 id="the-kullback-leibler-divergence" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#the-kullback-leibler-divergence" title="Permanent link: The Kullback-Leibler divergence" data-icon="#">The Kullback-Leibler divergence</a></h4>
+<p>VI starts by introducing a family <span class="mathjax mathjax--inline">$\mathcal{Q}$</span> of parametric approximations <span class="mathjax mathjax--inline">$q_{\phi}(\mathbf{z}\vert\mathbf{x})$</span> to the true posterior distribution <span class="mathjax mathjax--inline">$p_{\theta}(\mathbf{z}\vert\mathbf{x})$</span>, indexed by <span class="mathjax mathjax--inline">$\phi$</span>. The goal of VI is to find the value(s) of <span class="mathjax mathjax--inline">$\phi$</span> such that <span class="mathjax mathjax--inline">$q_{\phi}(\mathbf{z}\vert\mathbf{x})\in\mathcal{Q}$</span> is "closest" to <span class="mathjax mathjax--inline">$p_{\theta}(\mathbf{z}\vert\mathbf{x})$</span> in some sense. In particular, we seek to minimize the <em>Kullback-Leibler divergence</em> </p>
+<p class="mathjax mathjax--block">\[
+D_{KL}(q_{\phi}(\mathbf{z}\vert\mathbf{x})\vert\vert p_{\theta}(\mathbf{z}\vert\mathbf{x}))=\int q_{\phi}(\mathbf{z}\vert\mathbf{x}) \log{\frac{q_{\phi}(\mathbf{z}\vert\mathbf{x})}{p_{\theta}(\mathbf{z}\vert\mathbf{x})}}d\mathbf{z} \]</p>
+<p>which is a similarity measure for probabilities distributions. For the following, we'll need two properties of <span class="mathjax mathjax--inline">$D_{KL}$</span>: </p>
+<ol>
+<li><span class="mathjax mathjax--inline">$D_{KL}(q\vert\vert p)\ge0 \ \forall p,q$</span></li>
+<li><span class="mathjax mathjax--inline">$D_{KL}(q\vert\vert p) = 0 \iff p = q \ \text{a.e.}$</span></li>
+</ol>
+<h4 id="some-elbo-grease" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#some-elbo-grease" title="Permanent link: Some ELBO grease" data-icon="#">Some ELBO grease</a></h4>
+<p>However, our <em>primary</em> goal is to estimate the generative model parameters <span class="mathjax mathjax--inline">$\theta^*$</span> through Maximum (Marginal) Likelihood Estimation. Thus, let's try to rewrite the marginal log-likelihood of a data point in terms of <span class="mathjax mathjax--inline">$D_{KL}(q_{\phi}(\mathbf{z}\vert\mathbf{x}_i)\vert\vert p_{\theta}(\mathbf{z}\vert\mathbf{x}_i))$</span>:</p>
+<p class="mathjax mathjax--block">\[
+\begin{multline}\log{p_{\theta}(\mathbf{x}_i)} = \log{p_{\theta}(\mathbf{x}_i)}\int q_{\phi}(\mathbf{z}\vert\mathbf{x}_i)d\mathbf{z} = \int q_{\phi}(\mathbf{z}\vert\mathbf{x}_i)\log{p_{\theta}(\mathbf{x}_i)}  d\mathbf{z} = \\ \int q_{\phi}(\mathbf{z}\vert\mathbf{x}_i)\log{\frac{p_{\theta}(\mathbf{x}_i, \mathbf{z})}{p_{\theta}(\mathbf{z}\vert\mathbf{x}_i)}}  d\mathbf{z} = \int q_{\phi}(\mathbf{z}\vert\mathbf{x}_i) \log{\frac{p_{\theta}(\mathbf{x}_i, \mathbf{z})}{p_{\theta}(\mathbf{z}\vert\mathbf{x}_i)}\frac{q_{\phi}(\mathbf{z}\vert\mathbf{x}_i)}{q_{\phi}(\mathbf{z}\vert\mathbf{x}_i)}} d\mathbf{z}  \end{multline}\]</p>
+<p>where in the second-to-last inequality we used Bayes' rule, and the last equality holds if <span class="mathjax mathjax--inline">$\supp {p_{\theta}(\mathbf{x}_i, \mathbf{z})}\subset\supp{q_{\phi}(\mathbf{z}\vert\mathbf{x}_i)}$</span> (otherwise it becomes an inequality). We can now see a term similar to <span class="mathjax mathjax--inline">$D_{KL}(q_{\phi}(\mathbf{z}\vert\mathbf{x})\vert\vert p_{\theta}(\mathbf{z}\vert\mathbf{x}))$</span> inside the integral, so let's pop it out:</p>
+<p class="mathjax mathjax--block">\[
+\begin{multline}\log{p_{\theta}(\mathbf{x}_i)} = \int q_{\phi}(\mathbf{z}\vert\mathbf{x}_i) \log{\frac{q_{\phi}(\mathbf{z}\vert\mathbf{x}_i)}{p_{\theta}(\mathbf{z}\vert\mathbf{x}_i)}\frac{p_{\theta}(\mathbf{x}_i, \mathbf{z})}{q_{\phi}(\mathbf{z}\vert\mathbf{x}_i)}}d\mathbf{z} = \\  \int q_{\phi}(\mathbf{z}\vert\mathbf{x}_i) \log{\frac{q_{\phi}(\mathbf{z}\vert\mathbf{x}_i)}{p_{\theta}(\mathbf{z}\vert\mathbf{x}_i)}}d\mathbf{z}+\int q_{\phi}(\mathbf{z}\vert\mathbf{x}_i)\log{\frac{p_{\theta}(\mathbf{x}_i, \mathbf{z})}{q_{\phi}(\mathbf{z}\vert\mathbf{x}_i)}} d\mathbf{z}=\\  D_{KL}(q_{\phi}(\mathbf{z}\vert\mathbf{x}_i)\vert\vert p_{\theta}(\mathbf{z}\vert\mathbf{x}_i))+ \mathcal{L}(\phi,\theta;\mathbf{x}_i)  \end{multline}\]</p>
+<p>Summarizing: </p>
+<p class="mathjax mathjax--block">\[
+\log{p_{\theta}(\mathbf{x}_i)} = D_{KL}(q_{\phi}(\mathbf{z}\vert\mathbf{x}_i)\vert\vert p_{\theta}(\mathbf{z}\vert\mathbf{x}_i))+ \mathcal{L}(\phi,\theta;\mathbf{x}_i) \label{b}\tag{2}\]</p>
+<p>The term <span class="mathjax mathjax--inline">$\mathcal{L}(\phi,\theta;\mathbf{x}_i)$</span> is called the <em><strong>E</strong>vidence</em> (or <em>variational</em>) <em><strong>L</strong>ower <strong>BO</strong>und</em> (<em><strong>ELBO</strong></em> for friends), because it's always <em>no greater than</em> the marginal likelihood (or <em>evidence</em>) for datapoint <span class="mathjax mathjax--inline">$\mathbf{x}_i$</span>, since <span class="mathjax mathjax--inline">$D_{KL}(q\vert\vert p)\ge0$</span>:</p>
+<p class="mathjax mathjax--block">\[
+\log{p_{\theta}(\mathbf{x}_i)} \geq \mathcal{L}(\phi,\theta;\mathbf{x}_i)\]</p>
+<p>Thus, maximizing the ELBO goes into the direction of maximizing the marginal likelihood, our original goal. However, the ELBO doesn't contain the pesky marginal evidence, which is what made the problem intractable. As a matter of fact, instead of maximizing the marginal log-likelihood of data, in VI we drop the term <span class="mathjax mathjax--inline">$D_{KL}(q_{\phi}(\mathbf{z}\vert\mathbf{x}_i)\vert\vert p_{\theta}(\mathbf{z}\vert\mathbf{x}_i))$</span>, sum on all data points and our learning objective becomes</p>
+<p class="mathjax mathjax--block">\[
+\max_{\theta}\sum_{i=1}^N\max_{\phi}\mathcal{L}(\phi,\theta;\mathbf{x}_i) \label{c}\tag{3}\]</p>
+<p>Summarizing, we learn a LVM by maximizing the ELBO with respect to both the model parameters <span class="mathjax mathjax--inline">$\theta$</span> and the variational parameters <span class="mathjax mathjax--inline">$\phi_i$</span> for each data point <span class="mathjax mathjax--inline">$\mathbf{x}_i$</span>. </p>
+<div class="notices blue">
+<p><strong>Note</strong> that until now, we haven't mentioned either neural networks or VAE. The approach has been very general, and it could apply to any Latent Variable Model which has the DAG representation shown above.</p>
+</div>
+<p>The ELBO can be written as </p>
+<p class="mathjax mathjax--block">\[
+\int q_{\phi}(\mathbf{z}\vert\mathbf{x}_i)\log{\frac{p_{\theta}(\mathbf{x}_i, \mathbf{z})}{q_{\phi}(\mathbf{z}\vert\mathbf{x}_i)}} d\mathbf{z}=\mathbb{E}_{q_{\phi}(\mathbf{z}\vert\mathbf{x}_i)}[\log{p_{\theta}(\mathbf{x}_i, \mathbf{z})}-\log{q_{\phi}(\mathbf{z}\vert\mathbf{x}_i)}] \label{d}\tag{4}\]</p>
+<p>or alternatively:</p>
+<p class="mathjax mathjax--block">\[
+\begin{multline} \int q_{\phi}(\mathbf{z}\vert\mathbf{x}_i)\log{\frac{p_{\theta}(\mathbf{x}_i, \mathbf{z})}{q_{\phi}(\mathbf{z}\vert\mathbf{x}_i)}} d\mathbf{z}=\int q_{\phi}(\mathbf{z}\vert\mathbf{x}_i)\log{\frac{p_{\theta}(\mathbf{x}_i| \mathbf{z})p_{\theta}(\mathbf{z})}{q_{\phi}(\mathbf{z}\vert\mathbf{x}_i)}} d\mathbf{z} = \\ \int q_{\phi}(\mathbf{z}\vert\mathbf{x}_i)\log{p_{\theta}(\mathbf{x}_i\vert\mathbf{z})}d\mathbf{z} - \int q_{\phi}(\mathbf{z}\vert\mathbf{x}_i)\log{\frac{q_{\phi}(\mathbf{z}\vert\mathbf{x}_i)}{p_{\theta}(\mathbf{z})}} d\mathbf{z} =\\
+ = \mathbb{E}_{q_{\phi}(\mathbf{z}\vert\mathbf{x}_i)}[\log{p_{\theta}(\mathbf{x}_i\vert\mathbf{z})}] - D_{KL}(q_{\phi}(\mathbf{z}\vert\mathbf{x}_i)\vert\vert p_{\theta}(\mathbf{z})) 
+ \end{multline} \label{e}\tag{5}\]</p>
+<p>This last form lends itself to some nice interpretations, as we'll see later<sup id="fnref1:3"><a href="#fn:3" class="footnote-ref">3</a></sup>.</p>
+<h4 id="bend-your-elbo" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#bend-your-elbo" title="Permanent link: Bend your ELBO" data-icon="#">Bend your ELBO</a></h4>
+<p>We list here some useful properties of the ELBO. Not all of them will be needed in the following, but we list them anyway as an useful companion for reading other tutorials or papers on VAEs. </p>
+<ul>
+<li>
+<p>for each data point <span class="mathjax mathjax--inline">$\mathbf{x}_i$</span>, the true posterior distribution <span class="mathjax mathjax--inline">$p_{\theta}(\mathbf{z}\vert\mathbf{x}_i)$</span> may or may not belong to <span class="mathjax mathjax--inline">$\mathcal{Q}$</span>. If it does, then property 2 of <span class="mathjax mathjax--inline">$D_{KL}$</span>  implies that <span class="mathjax mathjax--inline">$\mathcal{L}(\phi_i,\theta;\mathbf{x}_i)$</span> is maximized for <span class="mathjax mathjax--inline">$\phi_i=\phi_i^*\mid q_{\phi_i^*}(\mathbf{z}\vert\mathbf{x}_i)=p_{\theta}(\mathbf{z}\vert\mathbf{x}_i)$</span>, and maximizing the ELBO is equivalent to maximizing the marginal likelihood. If it doesn't, then there will be a nonzero difference between the ELBO and the actual marginal likelihood of the data point, for any values of <span class="mathjax mathjax--inline">$\phi$</span>.</p>
+<figure role="group">
+    <img src="https://iaml.it/blog/variational-autoencoders-1/images/q6XMxtY.png">
+    </figure>
+<figcaption>Adapted from <a href="https://deepgenerativemodels.github.io/notes/vae/">https://deepgenerativemodels.github.io/notes/vae/</a>.</figcaption>
+<p>The remaining error is called <em>approximation gap</em> (<a href="https://arxiv.org/abs/1801.03558">Cremer et al., 2017</a>) and it can only be reduced by expanding the variational family <span class="mathjax mathjax--inline">$\mathcal{Q}$</span> (<a href="https://arxiv.org/abs/1606.04934">Kinga et al., 2016</a>, <a href="https://arxiv.org/abs/1706.02326">Tomczak &amp; Welling, 2017</a> and many others). However, overly flexible inference models can also have side effects  (<a href="https://arxiv.org/abs/1805.08913">Rui et al., 2018</a>). </p>
+</li>
+</ul>
+<ul>
+<li>combining Eq.<span class="mathjax mathjax--inline">$\ref{c}$</span> and Eq.<span class="mathjax mathjax--inline">$\ref{e}$</span>, we see that maximizing the term <span class="mathjax mathjax--inline">$\sum_{i=1}^N\mathbb{E}_{q_{\phi}(\mathbf{z}\vert\mathbf{x}_i)}[\log{p_{\theta}(\mathbf{x}_i\vert\mathbf{z})}]$</span> maximizes the probability that, under repeated sampling from <span class="mathjax mathjax--inline">$\mathbf{z}\sim q_{\phi}(\mathbf{z}\vert\mathbf{x}_i)$</span>, we generate samples <span class="mathjax mathjax--inline">$\mathbf{x}$</span> which are similar to the training samples <span class="mathjax mathjax--inline">$\mathbf{x}_i$</span>. For this reason it's often interpreted as a <em>reconstruction quality</em> (or its opposite is interpreted as a reconstruction loss). The term <span class="mathjax mathjax--inline">$-D_{KL}(q_{\phi}(\mathbf{z}\vert\mathbf{x}_i)\vert\vert p_{\theta}(\mathbf{z}))$</span> penalizes the flexibile <span class="mathjax mathjax--inline">$q_{\phi}(\mathbf{z}\vert\mathbf{x}_i)$</span> for being too dissimilar from the prior <span class="mathjax mathjax--inline">$p_{\theta}(\mathbf{z})$</span>. In other words, it's a <em>regularizer</em>.  Thus the ELBO can be interpreted as the sum of a reconstruction error term, and a regularizer term. This is legit, but let's not forget that the goal of VI is still to <strong>maximize the marginal likelihood of the training data</strong>. </li>
+</ul>
+<h3 id="the-sgvb-estimator-and-the-aevb..." class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#the-sgvb-estimator-and-the-aevb..." title="Permanent link: The SGVB estimator and the AEVB algorithm" data-icon="#">The SGVB estimator and the AEVB algorithm</a></h3>
+<p>We defined the VI objective function: now we need a scalable algorithm to learn a model using that objective function. To this end, we introduce the Stochastic Gradient-based estimator for the ELBO and its gradient w.r.t. <span class="mathjax mathjax--inline">$\theta$</span> and <span class="mathjax mathjax--inline">$\phi$</span>, called Stochastic Gradient Variational Bayes (SGVB). We want to use stochastic gradient ascent, thus we need the gradient of Eq.<span class="mathjax mathjax--inline">$\ref{d}$</span>:</p>
+<p class="mathjax mathjax--block">\[
+\nabla_{\theta,\phi}\mathbb{E}_{q_{\phi}(\mathbf{z}\vert\mathbf{x}_i)}[\log{p_{\theta}(\mathbf{x}_i, \mathbf{z})}-\log{q_{\phi}(\mathbf{z}\vert\mathbf{x}_i)}]\]</p>
+<p>The gradient w.r.t. <span class="mathjax mathjax--inline">$\theta$</span> is immediate:</p>
+<p class="mathjax mathjax--block">\[
+ \mathbb{E}_{q_{\phi}(\mathbf{z}\vert\mathbf{x}_i)}[\nabla_{\theta}\log{p_{\theta}(\mathbf{x}_i, \mathbf{z})}] \]</p>
+<p>and we can estimate the expectation using Monte Carlo.</p>
+<p>The gradient w.r.t. <span class="mathjax mathjax--inline">$\phi$</span> is more badass: since the expectation and the gradient are both w.r.t <span class="mathjax mathjax--inline">$q_{\phi}$</span>, we cannot simply swap them. As shown in <a href="https://www.cs.toronto.edu/~amnih/papers/nvil.pdf">Mnih &amp; Gregor, 2014</a>, we can prove that</p>
+<p class="mathjax mathjax--block">\[
+ \nabla_{\phi}\mathbb{E}_{q_{\phi}(\mathbf{z}\vert\mathbf{x}_i)}[\log{p_{\theta}(\mathbf{x}_i, \mathbf{z})}-\log{q_{\phi}(\mathbf{z}\vert\mathbf{x}_i)}] = \mathbb{E}_{q_{\phi}(\mathbf{z}\vert\mathbf{x}_i)}[(\log{p_{\theta}(\mathbf{x}_i, \mathbf{z})}-\log{q_{\phi}(\mathbf{z}\vert\mathbf{x}_i)})\nabla_{\phi}\log{q_{\phi}(\mathbf{z}\vert\mathbf{x}_i)}]\]</p>
+<p>Again, now that the gradient is inside the expectation, we could use Monte Carlo to estimate it. However, the resulting estimator, called the <em>score function</em> estimator, has high variance. The key contribution of Kingma and Welling, 2014, is an alternative estimator, which is much more well-behaved: the SGVB estimator, based on the <em>reparametrization trick</em>. For many differentiable parametric families, it's possible to draw samples of the random variable <span class="mathjax mathjax--inline">$\tilde{\mathbf{z}}\sim q_{\phi}(\mathbf{z}\vert\mathbf{x}_i)$</span> with a two-step generative process:</p>
+<ul>
+<li>generate samples <span class="mathjax mathjax--inline">$\boldsymbol{\epsilon} \sim p(\boldsymbol{\epsilon})$</span> from a simple distribution <span class="mathjax mathjax--inline">$p(\boldsymbol{\epsilon})$</span>, such as <span class="mathjax mathjax--inline">$\mathcal{N}(0,I)$</span></li>
+<li>apply a differentiable, deterministic function <span class="mathjax mathjax--inline">$g_{\phi}(\boldsymbol{\epsilon}, \mathbf{x})$</span> to the random noise <span class="mathjax mathjax--inline">$\boldsymbol{\epsilon}$</span>. The resulting random variable <span class="mathjax mathjax--inline">$\tilde{\mathbf{z}} = g_{\phi}(\boldsymbol{\epsilon}, \mathbf{x})$</span> is indeed distributed as <span class="mathjax mathjax--inline">$q_{\phi}(\mathbf{z}\vert\mathbf{x})$</span></li>
+</ul>
+<p>A classic example is the univariate Gaussian. Let <span class="mathjax mathjax--inline">$q_{\phi}(z\vert x) = q_{\mu,\sigma}(z)=\mathcal{N}(\mu,\sigma)$</span>. Then of course if <span class="mathjax mathjax--inline">$\epsilon\sim \mathcal{N}(0,1)$</span> and <span class="mathjax mathjax--inline">$g_{\phi}(s)=\mu+\sigma s$</span>, we know that <span class="mathjax mathjax--inline">$z=g_{\phi}(\epsilon)\sim\mathcal{N}(\mu,\sigma)$</span>, as desired. There are many other families which can be similarily reparametrized.</p>
+<p>The biggest selling point of the reparametrization trick is that we can now write the gradient of the expectation w.r.t. <span class="mathjax mathjax--inline">$q_{\phi}(\mathbf{z}\vert\mathbf{x}_i)$</span> of any function <span class="mathjax mathjax--inline">$f(\mathbf{z})$</span> as</p>
+<p class="mathjax mathjax--block">\[
+\nabla_{\phi}\mathbb{E}_{q_{\phi}(\mathbf{z}\vert\mathbf{x}_i)}[f(\mathbf{z})]=\nabla_{\phi}\mathbb{E}_{p(\boldsymbol{\epsilon})}[f(g_{\phi}(\boldsymbol{\epsilon},\mathbf{x}_i))]=\mathbb{E}_{p(\boldsymbol{\epsilon})}[\nabla_{\phi}f(g_{\phi}(\boldsymbol{\epsilon},\mathbf{x}_i))]\]</p>
+<p>Using Monte Carlo to estimate this expectation we obtain an estimator (the SGVB estimator) which has lower variance than the score function estimator<sup id="fnref1:4"><a href="#fn:4" class="footnote-ref">4</a></sup>, allowing us to learn more complicated models. The reparametrization trick was then extended to discrete variables (<a href="https://arxiv.org/abs/1611.00712">Maddison et al, 2016</a>, <a href="https://arxiv.org/abs/1611.01144">Jang et al., 2016</a>), which allowed training VAE with discrete latent variables. None of these works, though, closed the performance gap of VAEs with continuous latent variables. This has been recently solved by <a href="https://arxiv.org/abs/1711.00937">van den Oord et al., 2017</a>, with their famous VQ-VAE. </p>
+<p>SGVB allows us to estimate the ELBO <em>for a single datapoint</em>, but we need to estimate it for all <span class="mathjax mathjax--inline">$N$</span>. To do this, we use minibatches of size <span class="mathjax mathjax--inline">$M$</span>: the gradients are computed with automatic differentiation, and the parameter values are updated with some gradient ascent method, such as SGD, RMSProp or Adam. The combination of the SGVB estimator with the minibatch stochastic gradient on <span class="mathjax mathjax--inline">$\phi,\theta$</span> is the famous Auto-Encoding Variational Bayes (AEVB), which gives title to the Kingma and Welling paper.</p>
+<h2 id="amortized-variational-inference..." class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#amortized-variational-inference..." title="Permanent link: Amortized Variational Inference, AKA Variational Autoencoders, finally!" data-icon="#">Amortized Variational Inference, AKA Variational Autoencoders, finally!</a></h2>
+<p>At this point, you may feel cheated: I haven't mentioned VAEs even once (except in the click-baity introduction). This was done on purpose, to show that the AEVB algorithm is much more general than just Variational Autoencoders, which are simply an instantiation of it. This gives you the possibility to use AEVB to learn more general models than just the original VAE. For example, now you know:</p>
+<ul>
+<li>that <span class="mathjax mathjax--inline">$q_{\phi}(\mathbf{z})$</span> doesn't have to be in the Gaussian family</li>
+<li>that you could in principle learn a <em>different</em> <span class="mathjax mathjax--inline">$q_{\phi}(\mathbf{z})$</span> for each datapoint (that's why we condition on <span class="mathjax mathjax--inline">$\mathbf{x}_i$</span>)</li>
+<li>why the reparametrization trick is so great (it reduces the variance of the estimate of the gradient of the ELBO w.r.t. <span class="mathjax mathjax--inline">$\phi$</span>)</li>
+<li>why just creating a bigger &amp; badder encoder-decoder NN won't , by itself, reduce the amortization gap</li>
+</ul>
+<p>Contrast that with some introductions which simply start from Eq.(<span class="mathjax mathjax--inline">$\ref{e}$</span>), and then dive straight into the architecture of encoder &amp; decoder.</p>
+<p>But it's now time to make the JAX/Tensorflow/PyTorch/&lt;insert your favorite framework&gt; fans happy! Until now, we haven't specified the form of <span class="mathjax mathjax--inline">$p_{\theta}(\mathbf{z})$</span>, <span class="mathjax mathjax--inline">$p_{\theta}(\mathbf{x}_i\vert\mathbf{z})$</span>, and <span class="mathjax mathjax--inline">$q_{\phi}(\mathbf{z}\vert\mathbf{x}_i)$</span>. Also, we saw that we're learning a different variational (approximate) posterior <span class="mathjax mathjax--inline">$q_{\phi}(\mathbf{z}\vert\mathbf{x}_i$</span>) for each datapoint. We could do that by using nonparametric density estimation, but of course, we don't expect that to scale very well to large datasets. It would be probably smarter to <strong>learn</strong> a mapping from <span class="mathjax mathjax--inline">$f_{\phi}:\mathcal{X}\to\mathcal{Q}$</span>, for each value of  <span class="mathjax mathjax--inline">$\theta$</span>. Now, which tool do we know which allows to efficiently learn complicated, nonlinear mappings between high-dimensional spaces? Neural networks, of course! Now, if at each <span class="mathjax mathjax--inline">$\phi$</span> optimization step we had to retrain the neural network over the whole data set, of course we wouldn't have saved computation: the effort would still be proportional to the size of the dataset. But in practice we interleave the optimization on <span class="mathjax mathjax--inline">$\theta$</span> and on <span class="mathjax mathjax--inline">$\phi$</span> over each minibatch. This way, by introducing neural networks we <em>amortized</em> the cost of variational inference (<span class="mathjax mathjax--inline">$q_{\phi}(\mathbf{z}\vert\mathbf{x}_1),\dots,q_{\phi}(\mathbf{z}\vert\mathbf{x}_N)$</span>), and we introduced flexible function approximators for <span class="mathjax mathjax--inline">$p_{\theta}(\mathbf{z})$</span> and <span class="mathjax mathjax--inline">$p_{\theta}(\mathbf{x}_i\vert\mathbf{z})$</span> .</p>
+<p>How does this work in practice? In the Kingma &amp; Welling paper, the following choices were made for the case of real data:</p>
+<ul>
+<li><span class="mathjax mathjax--inline">$p_{\theta}(\mathbf{z})=\mathcal{N}(0,I)$</span> (thus the prior has no parameters)</li>
+<li><span class="mathjax mathjax--inline">$p_{\theta}(\mathbf{x}\vert\mathbf{z})=\mathcal{N}(\mathbf{x};\mu_{\theta}(\mathbf{z}),\boldsymbol{\sigma}^2_{\theta}(\mathbf{z})\odot I))$</span> where <span class="mathjax mathjax--inline">$\mu_{\theta}(\mathbf{z})$</span>, <span class="mathjax mathjax--inline">$\sigma_{\theta}^2(\mathbf{z})$</span> are two single hidden layer MLPs of 500 units each in the original paper). The neural network  made up of these two MLPs in parallel is called the <em>decoder</em><sup id="fnref1:5"><a href="#fn:5" class="footnote-ref">5</a></sup>.</li>
+<li><span class="mathjax mathjax--inline">$q_{\phi}(\mathbf{z}\vert\mathbf{x})=\mathcal{N}(\mathbf{z};\mu_{\phi}(\mathbf{x}),\boldsymbol{\sigma}^2_{\phi}(\mathbf{x})\odot I)$</span>, so basically the same neural network as used for the decoder. Since this maps the input space to the latent space (or the space of codes), we call this neural network the <em>encoder</em>.</li>
+</ul>
+<h4 id="learning-the-vae" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#learning-the-vae" title="Permanent link: Learning the VAE" data-icon="#">Learning the VAE</a></h4>
+<p>The weights of both neural networks are learnt at the same time using AEVB: note that with this simple choice of <span class="mathjax mathjax--inline">$p_{\theta}(\mathbf{z})$</span> and <span class="mathjax mathjax--inline">$q_{\phi}(\mathbf{z}\vert\mathbf{x})$</span>, the term <span class="mathjax mathjax--inline">$D_{KL}(q_{\phi}(\mathbf{z}\vert\mathbf{x}_i)\vert\vert p_{\theta}(\mathbf{z}))$</span> (the regularization term) has an analytical expression, thus the Monte Carlo estimate is only needed for the reconstruction term and its gradient.</p>
+<h4 id="generating-samples" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#generating-samples" title="Permanent link: Generating samples" data-icon="#">Generating samples</a></h4>
+<p>At inference time, we sample a latent code <span class="mathjax mathjax--inline">$\mathbf{z}\sim\mathcal{N}(0,I)$</span> and then we propagate it through the decoder, thus the encoder is not used anymore. </p>
+<h3 id="experimental-results" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#experimental-results" title="Permanent link: Experimental results" data-icon="#">Experimental results</a></h3>
+<p>The quality of the samples generated by the original VAE on both MNIST have the classical, blurry "VAE" feeling:</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/variational-autoencoders-1/images/40YNAg0.png">
+        </figure>
+<figcaption>Adapted from <a href="https://arxiv.org/pdf/1312.6114.pdf">Kingma &amp; Welling, 2014</a>.</figcaption>
+<p>More recent results training a deep hierarchical Variational Autoencoder (<a href="https://arxiv.org/abs/1902.02102">Maaløe et al., 2019</a>) on CelebA are much better:</p>
+<figure role="group">
+        <img src="https://iaml.it/blog/variational-autoencoders-1/images/wk54TIH.png">
+        </figure>
+<p>We're still a far cry from GANs, but at least the performance of autoregressive models are now matched. In the next episode of this series we'll actually train a VAE, have a look at some classic failure modes, and describe a few workarounds/more advanced architectures. This is all for now, folks! Stay tuned!</p>
+<h2 id="about-the-author" class="headeranchor"><a class="headeranchor-link headeranchor-link--left headeranchor-visible--hover" aria-hidden="true" href="#about-the-author" title="Permanent link: About the author" data-icon="#">About the author</a></h2>
+<p>Senior Staff Data Scientist at BHGE (Baker &amp; Hughes, a GE Company). Andrea is a Data Scientist with substantial experience in Statistics, Deep Learning, modeling and simulation. He works on the development and evangelization of Deep Learning/AI Industrial Analytics. He previously worked on the Aerodynamic Design of Centrifugal Compressors in BHGE (then GE Oil &amp; Gas), and before as a CFD researcher at CIRA (Centro Italiano di Ricerche Aerospaziali). He has a Ph.D. in Aerospace Engineering.</p>
+<hr />
+<p>If you liked our article, remember that subscribing to the <a href="../member.html">Italian Association for Machine Learning</a> is free! You can follow us daily on <a href="https://www.facebook.com/machinelearningitalia/">Facebook</a>, <a href="https://www.linkedin.com/company/iaml/">LinkedIn</a>, and <a href="https://twitter.com/iaml_it">Twitter</a>.</p>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn:1">
+<p>of course, none of these are the real reasons why people use VAE. VAE are cool because they are one of the very few cases in Deep Learning where theory actually informs architecture design (the only other which comes to my mind are <a href="https://arxiv.org/pdf/1902.04615.pdf">gauge equivariant neural networks</a>).&#160;<a href="#fnref1:1" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:2">
+<p>if this is the first time you meet the term "intractable" and you're anything like me, you'll want to know what it actually means (roughly, that  the expression takes exponential time to compute) and why <em>exactly</em> this integral should be intractable. Read  section 2.1 of <a href="https://arxiv.org/pdf/1601.00670.pdf">this great paper</a> for the proof that even the marginal likelihood of a simple LVM such as a Gaussian mixture is intractable.&#160;<a href="#fnref1:2" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:3">
+<p>If at this point you feel a crushing weight over your soul, that's fine: it's just the normal reaction to seeing the derivation of the VAE objective function for the first time. If it's any consolation, just think that in their original paper, Kingma &amp; Welling casually introduce the ELBO in the first equation after <span class="mathjax mathjax--inline">$\ref{a}$</span>, and summarize all the VI part of the VAE model in a very short paragraph. Such are the heights to which great minds soar.&#160;<a href="#fnref1:3" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:4">
+<p>as proved in the appendix of <a href="https://arxiv.org/abs/1401.4082">Rezende et al., 2014</a>&#160;<a href="#fnref1:4" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+<li id="fn:5">
+<p>don't be fooled by the apparent simplicity of <span class="mathjax mathjax--inline">$p_{\theta}(\mathbf{z})$</span> and <span class="mathjax mathjax--inline">$p_{\theta}(\mathbf{x}\vert\mathbf{z})$</span>. Even though they're "simple" multivariate gaussian (with a diagonal covariance matrix, even!), <span class="mathjax mathjax--inline">$p_{\theta}(\mathbf{x}) = \int p_{\theta}(\mathbf{x}\vert\mathbf{z})p_{\theta}(\mathbf{z})d\mathbf{z}$</span> is a mixture of <em>an infinite number of multivariate Gaussians</em>, each of them with its own mean and variance vectors. Thus it's a much more complicated and flexible distribution, with an essentially arbitrary number of modes, that can model such complicated data distributions as that of celebrity faces.&#160;<a href="#fnref1:5" rev="footnote" class="footnote-backref">&#8617;</a></p>
+</li>
+</ol>
+</div></p>
+            
+    
+        <p class="prev-next">
+                            <a class="button" href="differenziazione-automatica-parte-1.html"><i class="fa fa-chevron-left"></i> Previous Post</a>
+            
+                            <a class="button" href="novita-tensorflow-2.html">Next Post <i class="fa fa-chevron-right"></i></a>
+                    </p>
+    
+    </div>
+</div>
+			</div>
+			<div id="sidebar" class="g-block size-1-3 pure-u-1-3">
+				<div class="sidebar-content">
+    <h4>Search the blog</h4>
+    <input type="text" placeholder="Search..." value="" data-searchsidebar-input="/search/query" />
+<script>
+jQuery(document).ready(function($){
+    var input = $('[data-searchsidebar-input]');
+
+    input.on('keypress', function(event) {
+        if (event.which == 13 && input.val().length > 3) {
+            event.preventDefault();
+            window.location.href = input.data('searchsidebar-input') + ':' + input.val();
+        }
+    });
+});
+</script>
+</div>
+<!--
+<div class="sidebar-content">
+	<h4>Some Text Widget</h4>
+	<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna.</p>
+</div>
+!-->
+<div class="sidebar-content">
+    <h4>Categories</h4>
+    
+
+<ul class="archives">
+        <li>
+        <a href="categoryTutorials.html">Tutorials </a> (16)
+    </li>
+        <li>
+        <a href="categoryDiscussions.html">Discussions </a> (12)
+    </li>
+        <li>
+        <a href="categoryAnnouncements.html">Announcements </a> (4)
+    </li>
+        <li>
+        <a href="categoryTutorials (English).html">Tutorials (English) </a> (4)
+    </li>
+        <li>
+        <a href="categoryArticles' summaries.html">Articles' summaries </a> (3)
+    </li>
+        <li>
+        <a href="categoryDiscussions (English).html">Discussions (English) </a> (2)
+    </li>
+        <li>
+        <a href="categoryFocus-on.html">Focus-on </a> (1)
+    </li>
+        <li>
+        <a href="categoryReviews.html">Reviews </a> (1)
+    </li>
+        <li>
+        <a href="categoryDiscussion.html">Discussion </a> (1)
+    </li>
+    </ul>
+</div>
+<div class="sidebar-content">
+    <h4>Archives</h4>
+	<ul class="archives">
+    <li>
+    	<a href="archives_monthapr_2020.html">
+        <span class="archive_date">April 2020</span>
+                <span>(1)</span>
+                </a>
+    </li>
+</ul>
+</div>
+<div class="sidebar-content">
+    <h4>Popular Tags</h4>
+    
+
+<ul class="archives">
+        <li>
+        <a href="tagdeep learning.html">deep learning </a> (11)
+    </li>
+        <li>
+        <a href="tagpytorch.html">pytorch </a> (9)
+    </li>
+        <li>
+        <a href="tagreti neurali.html">reti neurali </a> (5)
+    </li>
+        <li>
+        <a href="taggoogle.html">google </a> (4)
+    </li>
+        <li>
+        <a href="tagjit.html">jit </a> (4)
+    </li>
+        <li>
+        <a href="tagtensorflow.html">tensorflow </a> (4)
+    </li>
+        <li>
+        <a href="tagottimizzazione.html">ottimizzazione </a> (4)
+    </li>
+        <li>
+        <a href="tagrete neurale.html">rete neurale </a> (3)
+    </li>
+        <li>
+        <a href="tagtime series.html">time series </a> (3)
+    </li>
+        <li>
+        <a href="tagkeras.html">keras </a> (3)
+    </li>
+        <li>
+        <a href="tagreti convolutive.html">reti convolutive </a> (3)
+    </li>
+        <li>
+        <a href="tagpipeline.html">pipeline </a> (2)
+    </li>
+        <li>
+        <a href="tagsklearn.html">sklearn </a> (2)
+    </li>
+        <li>
+        <a href="tagautodiff.html">autodiff </a> (2)
+    </li>
+        <li>
+        <a href="tagautomatic differentation.html">automatic differentation </a> (2)
+    </li>
+        <li>
+        <a href="tagreverse-mode.html">reverse-mode </a> (2)
+    </li>
+        <li>
+        <a href="tagderivate.html">derivate </a> (2)
+    </li>
+        <li>
+        <a href="tagdifferenziazione.html">differenziazione </a> (2)
+    </li>
+        <li>
+        <a href="tagmodel selection.html">model selection </a> (2)
+    </li>
+        <li>
+        <a href="tagcross validation.html">cross validation </a> (2)
+    </li>
+        <li>
+        <a href="tagc++.html">c++ </a> (2)
+    </li>
+        <li>
+        <a href="tagnumpy.html">numpy </a> (2)
+    </li>
+        <li>
+        <a href="tagvmap.html">vmap </a> (2)
+    </li>
+        <li>
+        <a href="tagcaffe.html">caffe </a> (2)
+    </li>
+        <li>
+        <a href="tagcompiler.html">compiler </a> (2)
+    </li>
+        <li>
+        <a href="tagjax.html">jax </a> (2)
+    </li>
+        <li>
+        <a href="tagcodemotion.html">codemotion </a> (1)
+    </li>
+        <li>
+        <a href="tagbias.html">bias </a> (1)
+    </li>
+        <li>
+        <a href="tagdiscrimination.html">discrimination </a> (1)
+    </li>
+        <li>
+        <a href="tagfairness.html">fairness </a> (1)
+    </li>
+        <li>
+        <a href="tagiaml.html">iaml </a> (1)
+    </li>
+        <li>
+        <a href="tagdatabase.html">database </a> (1)
+    </li>
+        <li>
+        <a href="tagiperparametri.html">iperparametri </a> (1)
+    </li>
+        <li>
+        <a href="tagautograph.html">autograph </a> (1)
+    </li>
+        <li>
+        <a href="taghead.html">head </a> (1)
+    </li>
+        <li>
+        <a href="tagmulti-task.html">multi-task </a> (1)
+    </li>
+        <li>
+        <a href="taglearning.html">learning </a> (1)
+    </li>
+        <li>
+        <a href="tagnovità.html">novità </a> (1)
+    </li>
+        <li>
+        <a href="tagdev summit.html">dev summit </a> (1)
+    </li>
+        <li>
+        <a href="tagcustom estimator.html">custom estimator </a> (1)
+    </li>
+        <li>
+        <a href="taghyperopt.html">hyperopt </a> (1)
+    </li>
+        <li>
+        <a href="taggoodfellow.html">goodfellow </a> (1)
+    </li>
+        <li>
+        <a href="tagnlp.html">nlp </a> (1)
+    </li>
+        <li>
+        <a href="tagdati mancanti.html">dati mancanti </a> (1)
+    </li>
+        <li>
+        <a href="tagtransformer.html">transformer </a> (1)
+    </li>
+        <li>
+        <a href="tagattenzione.html">attenzione </a> (1)
+    </li>
+        <li>
+        <a href="tagrobocop.html">robocop </a> (1)
+    </li>
+        <li>
+        <a href="tagyolo.html">yolo </a> (1)
+    </li>
+        <li>
+        <a href="tagobject detection.html">object detection </a> (1)
+    </li>
+        <li>
+        <a href="tagbayes.html">bayes </a> (1)
+    </li>
+        <li>
+        <a href="tagautoencoders.html">autoencoders </a> (1)
+    </li>
+        <li>
+        <a href="tagvariational.html">variational </a> (1)
+    </li>
+        <li>
+        <a href="tageager.html">eager </a> (1)
+    </li>
+        <li>
+        <a href="tagimputazione.html">imputazione </a> (1)
+    </li>
+        <li>
+        <a href="tagCIFAR.html">CIFAR </a> (1)
+    </li>
+        <li>
+        <a href="tagword embedding.html">word embedding </a> (1)
+    </li>
+        <li>
+        <a href="tagMNIST.html">MNIST </a> (1)
+    </li>
+        <li>
+        <a href="tagimmagini.html">immagini </a> (1)
+    </li>
+        <li>
+        <a href="tagclassificazione.html">classificazione </a> (1)
+    </li>
+        <li>
+        <a href="tagkpi.html">kpi </a> (1)
+    </li>
+        <li>
+        <a href="tagreprogramming.html">reprogramming </a> (1)
+    </li>
+        <li>
+        <a href="tagadversarial.html">adversarial </a> (1)
+    </li>
+        <li>
+        <a href="tagbrowser.html">browser </a> (1)
+    </li>
+        <li>
+        <a href="tagjavascript.html">javascript </a> (1)
+    </li>
+        <li>
+        <a href="tagreti ricorsive.html">reti ricorsive </a> (1)
+    </li>
+        <li>
+        <a href="tagreti ricorrenti.html">reti ricorrenti </a> (1)
+    </li>
+        <li>
+        <a href="tagftth.html">ftth </a> (1)
+    </li>
+        <li>
+        <a href="tagadversarial example.html">adversarial example </a> (1)
+    </li>
+        <li>
+        <a href="tagmanagement.html">management </a> (1)
+    </li>
+        <li>
+        <a href="tagrobotica.html">robotica </a> (1)
+    </li>
+        <li>
+        <a href="tagocr.html">ocr </a> (1)
+    </li>
+        <li>
+        <a href="tagfocus.html">focus </a> (1)
+    </li>
+        <li>
+        <a href="tagiphone.html">iphone </a> (1)
+    </li>
+        <li>
+        <a href="tagpython.html">python </a> (1)
+    </li>
+        <li>
+        <a href="tagface id.html">face id </a> (1)
+    </li>
+        <li>
+        <a href="tagmomento.html">momento </a> (1)
+    </li>
+        <li>
+        <a href="tagadam.html">adam </a> (1)
+    </li>
+        <li>
+        <a href="tagneuroscienza.html">neuroscienza </a> (1)
+    </li>
+        <li>
+        <a href="tagonde cerebrali.html">onde cerebrali </a> (1)
+    </li>
+        <li>
+        <a href="tagtorchvision.html">torchvision </a> (1)
+    </li>
+        <li>
+        <a href="taglatin.html">latin </a> (1)
+    </li>
+        <li>
+        <a href="tagpretrained.html">pretrained </a> (1)
+    </li>
+        <li>
+        <a href="tagrete convolutiva.html">rete convolutiva </a> (1)
+    </li>
+        <li>
+        <a href="tagautograd.html">autograd </a> (1)
+    </li>
+        <li>
+        <a href="tagswish.html">swish </a> (1)
+    </li>
+        <li>
+        <a href="tagattivazione.html">attivazione </a> (1)
+    </li>
+        <li>
+        <a href="tagcheckpoint.html">checkpoint </a> (1)
+    </li>
+        <li>
+        <a href="tagtensori.html">tensori </a> (1)
+    </li>
+        <li>
+        <a href="tagvariabili.html">variabili </a> (1)
+    </li>
+        <li>
+        <a href="taglineare.html">lineare </a> (1)
+    </li>
+        <li>
+        <a href="tagregressione.html">regressione </a> (1)
+    </li>
+        <li>
+        <a href="tagconvolutional networks.html">convolutional networks </a> (1)
+    </li>
+        <li>
+        <a href="tagVatican.html">Vatican </a> (1)
+    </li>
+        <li>
+        <a href="tagproject.html">project </a> (1)
+    </li>
+        <li>
+        <a href="tagkernel.html">kernel </a> (1)
+    </li>
+        <li>
+        <a href="tagICLR.html">ICLR </a> (1)
+    </li>
+        <li>
+        <a href="tagipotesi.html">ipotesi </a> (1)
+    </li>
+        <li>
+        <a href="tagsparsità.html">sparsità </a> (1)
+    </li>
+        <li>
+        <a href="tagfunzionale.html">funzionale </a> (1)
+    </li>
+        <li>
+        <a href="tagfunctional.html">functional </a> (1)
+    </li>
+        <li>
+        <a href="tagadversarial attack.html">adversarial attack </a> (1)
+    </li>
+        <li>
+        <a href="tagkmeans.html">kmeans </a> (1)
+    </li>
+        <li>
+        <a href="taganalysis.html">analysis </a> (1)
+    </li>
+        <li>
+        <a href="tagclustering.html">clustering </a> (1)
+    </li>
+        <li>
+        <a href="tagGoogle.html">Google </a> (1)
+    </li>
+        <li>
+        <a href="tagregression.html">regression </a> (1)
+    </li>
+        <li>
+        <a href="tagJAX.html">JAX </a> (1)
+    </li>
+        <li>
+        <a href="taggaussian process.html">gaussian process </a> (1)
+    </li>
+        <li>
+        <a href="tagensemble.html">ensemble </a> (1)
+    </li>
+        <li>
+        <a href="tagboosting.html">boosting </a> (1)
+    </li>
+        <li>
+        <a href="taggradient.html">gradient </a> (1)
+    </li>
+        <li>
+        <a href="tagsemi-supervised learning.html">semi-supervised learning </a> (1)
+    </li>
+        <li>
+        <a href="tagdocument classification.html">document classification </a> (1)
+    </li>
+        <li>
+        <a href="taggraphs.html">graphs </a> (1)
+    </li>
+        <li>
+        <a href="tagvariables.html">variables </a> (1)
+    </li>
+        <li>
+        <a href="taglinear.html">linear </a> (1)
+    </li>
+        <li>
+        <a href="tagk-NN.html">k-NN </a> (1)
+    </li>
+    </ul>
+</div>
+<div class="sidebar-content syndicate">
+    <h4>Syndicate</h4>
+    <a class="button" href="../blog.atom"><i class="fa fa-rss-square"></i> Atom 1.0</a>
+    <a class="button" href="../blog.rss"><i class="fa fa-rss-square"></i> RSS</a>
+</div>
+			</div>
+		</div>
+	
+                        <div class="modular-row footer ">
+    <div class="footer-items">
+        <div class="footer-module large">
+		<h4>About</h4>
+                            <p>Italian Association for Machine Learning (C.F. 97949550582)</p>
+            			<p>Write us: info@iaml.it</p>
+        </div>
+        <div class="footer-module"><h4>Address</h4>
+            <p>
+                                    <span><strong>Operational office</strong></span>
+                                    <span>IAML c/o Pi Campus, via Indonesia 23, 00144 Rome</span>
+                                    <span><strong>Legal office</strong></span>
+                                    <span>Via Cassia 964, 00189, Rome</span>
+                            </p>
+        </div>
+        <div class="footer-module"><h4>Quick Links</h4>
+         <ul class="quickmenu">
+                            <li><i class="fa fa-chevron-right"></i><a href="../home">Home</a></li>
+                            <li><i class="fa fa-chevron-right"></i><a href="https://iaml.it/documents">Documents (Italian)</a></li>
+                    </ul>
+    </div>
+   
+</div>
+<hr>
+<div class="footer-modules">
+    <div class="footer-copyright">
+        Copyright 2018 IAML.IT. All Rights Reserved.
+    </div>
+    <div class="footer-menu">
+    <ul class="othermenu">
+           <li><a href="https://learn.getgrav.org/">Powered by Grav</a></li>
+           <li><a href="https://github.com/getgrav/grav-theme-deliver">Theme (adapted) from Deliver</a></li>
+        </ul>
+    </div>
+</div>
+</div>                    </section>
+        
+    </div>
+    <div class="sb-slidebar sb-left sb-width-thin">
+        <div id="panel">
+        
+<ul class="navigation">
+                                                        <li class="">
+                    <a href="../index.html">
+                                                Home
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../activities">
+                                                Activities
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../supporters.html">
+                                                Supporters
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../member.html">
+                                                Become a member
+                    </a>
+                </li>
+                                                                <li class="active">
+                    <a href="../blog">
+                                                Blog
+                    </a>
+                </li>
+                                                                <li class="">
+                    <a href="../governance.html">
+                                                Governance
+                    </a>
+                </li>
+                                                                                                                                </ul>                   </div>
+    </div>
+        <script src="../user/plugins/simplesearch/js/simplesearch.js" type="text/javascript" ></script>
+
+    <script>
+    $(function () {
+        $(document).ready(function() {
+          $.slidebars({
+            hideControlClasses: true,
+            scrollLock: true
+          });
+        });
+    });
+    </script>
+    </body>
+</html>
+
+
